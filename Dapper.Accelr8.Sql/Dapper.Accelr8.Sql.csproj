@@ -1,0 +1,334 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5816CBBB-0201-490E-BB0A-8D8B69845905}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Dapper.Accelr8.Sql</RootNamespace>
+    <AssemblyName>Dapper.Accelr8.Sql</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper">
+      <HintPath>..\packages\Dapper.1.42\lib\net40\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DapperExecuter.cs" />
+    <Compile Include="Domain\AdminSetting.cs" />
+    <Compile Include="Domain\Agency.cs" />
+    <Compile Include="Domain\AgencyEndpoint.cs" />
+    <Compile Include="Domain\AgencySpec.cs" />
+    <Compile Include="Domain\Application.cs" />
+    <Compile Include="Domain\AuditTrail.cs" />
+    <Compile Include="Domain\BiographicGroup.cs" />
+    <Compile Include="Domain\Biometric.cs" />
+    <Compile Include="Domain\Client.cs" />
+    <Compile Include="Domain\CmtTransactionEnrollmentMnemonicValue.cs" />
+    <Compile Include="Domain\DefaultValue.cs" />
+    <Compile Include="Domain\Document.cs" />
+    <Compile Include="Domain\Endpoint.cs" />
+    <Compile Include="Domain\EnrollmentMnemonicValue.cs" />
+    <Compile Include="Domain\Group.cs" />
+    <Compile Include="Domain\Information.cs" />
+    <Compile Include="Domain\License.cs" />
+    <Compile Include="Domain\MatchRequest.cs" />
+    <Compile Include="Domain\Person.cs" />
+    <Compile Include="Domain\Printer.cs" />
+    <Compile Include="Domain\PrinterGroup.cs" />
+    <Compile Include="Domain\Response.cs" />
+    <Compile Include="Domain\RoutedResponse.cs" />
+    <Compile Include="Domain\RoutedResponseStatusHistory.cs" />
+    <Compile Include="Domain\Server.cs" />
+    <Compile Include="Domain\Setting.cs" />
+    <Compile Include="Domain\Source.cs" />
+    <Compile Include="Domain\Submission.cs" />
+    <Compile Include="Domain\SubmissionStatusHistory.cs" />
+    <Compile Include="Domain\SubmissionView.cs" />
+    <Compile Include="Domain\Transaction.cs" />
+    <Compile Include="Domain\TransactionClientSource.cs" />
+    <Compile Include="Domain\TransactionField.cs" />
+    <Compile Include="Domain\TransactionFieldValue.cs" />
+    <Compile Include="Domain\TransactionFilePath.cs" />
+    <Compile Include="Domain\TransactionGroup.cs" />
+    <Compile Include="Domain\TransactionGroupSource.cs" />
+    <Compile Include="Domain\TransactionOperationDetail.cs" />
+    <Compile Include="Domain\TransactionOperationHistory.cs" />
+    <Compile Include="Domain\TransactionStatusHistory.cs" />
+    <Compile Include="Domain\User.cs" />
+    <Compile Include="Domain\UsersGroup.cs" />
+    <Compile Include="Domain\Workspace.cs" />
+    <Compile Include="Domain\WorkspaceGroup.cs" />
+    <Compile Include="EntityReader.cs" />
+    <Compile Include="EntityWriter.cs" />
+    <Compile Include="ExecuteTask.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Readers\AdminSettingReader.cs" />
+    <Compile Include="Readers\AgencyEndpointReader.cs" />
+    <Compile Include="Readers\AgencyReader.cs" />
+    <Compile Include="Readers\AgencySpecReader.cs" />
+    <Compile Include="Readers\ApplicationReader.cs" />
+    <Compile Include="Readers\AuditTrailReader.cs" />
+    <Compile Include="Readers\BiographicGroupReader.cs" />
+    <Compile Include="Readers\BiometricReader.cs" />
+    <Compile Include="Readers\ClientReader.cs" />
+    <Compile Include="Readers\CmtTransactionEnrollmentMnemonicValueReader.cs" />
+    <Compile Include="Readers\DefaultValueReader.cs" />
+    <Compile Include="Readers\DocumentReader.cs" />
+    <Compile Include="Readers\EndpointReader.cs" />
+    <Compile Include="Readers\EnrollmentMnemonicValueReader.cs" />
+    <Compile Include="Readers\GroupReader.cs" />
+    <Compile Include="Readers\InformationReader.cs" />
+    <Compile Include="Readers\LicenseReader.cs" />
+    <Compile Include="Readers\MatchRequestReader.cs" />
+    <Compile Include="Readers\PersonReader.cs" />
+    <Compile Include="Readers\PrinterGroupReader.cs" />
+    <Compile Include="Readers\PrinterReader.cs" />
+    <Compile Include="Readers\ResponseReader.cs" />
+    <Compile Include="Readers\RoutedResponseReader.cs" />
+    <Compile Include="Readers\RoutedResponseStatusHistoryReader.cs" />
+    <Compile Include="Readers\ServerReader.cs" />
+    <Compile Include="Readers\SettingReader.cs" />
+    <Compile Include="Readers\SourceReader.cs" />
+    <Compile Include="Readers\SubmissionReader.cs" />
+    <Compile Include="Readers\SubmissionStatusHistoryReader.cs" />
+    <Compile Include="Readers\SubmissionViewReader.cs" />
+    <Compile Include="Readers\TransactionClientSourceReader.cs" />
+    <Compile Include="Readers\TransactionFieldReader.cs" />
+    <Compile Include="Readers\TransactionFieldValueReader.cs" />
+    <Compile Include="Readers\TransactionFilePathReader.cs" />
+    <Compile Include="Readers\TransactionGroupReader.cs" />
+    <Compile Include="Readers\TransactionGroupSourceReader.cs" />
+    <Compile Include="Readers\TransactionOperationDetailReader.cs" />
+    <Compile Include="Readers\TransactionOperationHistoryReader.cs" />
+    <Compile Include="Readers\TransactionReader.cs" />
+    <Compile Include="Readers\TransactionStatusHistoryReader.cs" />
+    <Compile Include="Readers\UserReader.cs" />
+    <Compile Include="Readers\UsersGroupReader.cs" />
+    <Compile Include="Readers\WorkspaceGroupReader.cs" />
+    <Compile Include="Readers\WorkspaceReader.cs" />
+    <Compile Include="SqlBuilders\JoinBuilder.cs" />
+    <Compile Include="SqlBuilders\QueryBuilder.cs" />
+    <Compile Include="TableInfo\TableInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TableInfo.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\AdminSettingsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\AgenciesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\AgencyEndpointsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\AgencySpecsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\ApplicationsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\AuditTrailReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\BiographicGroupsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\BiometricsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\ClientsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\CMT_TransactionEnrollmentMnemonicValuesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\DefaultValuesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\DocumentsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\EndpointsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\EnrollmentMnemonicValuesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\GroupsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\InformationReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\LicensesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\MatchRequestsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\PeopleReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\PrinterGroupsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\PrintersReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\ResponsesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\RoutedResponsesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\RoutedResponseStatusHistoryReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\ServersReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\SettingsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\SourceReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\SubmissionsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\SubmissionStatusHistoryReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\Submissions_VWReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionClientSourceReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionFieldsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionFieldValuesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionFilePathsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionGroupSourceReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionGroupsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionOperationDetailsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionOperationHistoryReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\TransactionStatusHistoryReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\UsersGroupsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\UsersReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\WorkspaceGroupsReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\..\Readers\WorkspacesReader.cs">
+      <DependentUpon>GenerateFramework.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Domain.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Domain.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\EntityReader.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityReader.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dapper.Accelr8.Repo\Dapper.Accelr8.Repo.csproj">
+      <Project>{1120e03d-8004-43cc-af1b-75a5b424b595}</Project>
+      <Name>Dapper.Accelr8.Repo</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="TableInfo\TableInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TableInfo.cs</LastGenOutput>
+    </None>
+    <None Include="Templates\Domain.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Domain.cs</LastGenOutput>
+    </None>
+    <None Include="Templates\Schema.ttinclude" />
+    <None Include="Templates\EntityReader.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>EntityReader.cs</LastGenOutput>
+    </None>
+    <None Include="Templates\Includes\Accelr8or.ttinclude" />
+    <None Include="Templates\Includes\DbHelper.ttinclude" />
+    <None Include="Templates\Includes\Manager.ttinclude" />
+    <None Include="Templates\TableInfo.tt">
+      <LastGenOutput>TableInfo1.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Writers\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,116 @@
+﻿<#+    
+	class SchemaHelper
+	{
+		public static bool UseDirtyProperties = true;
+		public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
+		public static string DomainProject = "Dapper.Accelr8.Sql";
+		public static string DomainNamespace = @"Dapper.Accelr8.Domain";
+		public static string DomainDirectory = @"Domain";
+		public static string WritersProject = "Dapper.Accelr8.Sql";
+		public static string WritersNamespace = @"Dapper.Accelr8.Writers";
+		public static string WritersDirectory = @"Writers";
+		public static string ReadersProject = "Dapper.Accelr8.Sql";
+		public static string ReadersNamespace = @"Dapper.Accelr8.Readers";
+		public static string ReadersDirectory = @"Readers";
+		public static string TableInfoProject = "Dapper.Accelr8.Sql";
+		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfo";
+		public static string TableInfoDirectory = @"TableInfo";
+
+		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=EnrollmentBioStore;Integrated Security=SSPI;";
+		static string _database = @"EnrollmentBioStore";
+
+		// Change Names Here =>
+		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
+		{ 
+			{ "Submissions_VW", "SubmissionView"}
+		};
+
+		static Dictionary<string, string> columnNames = new Dictionary<string, string>();
+
+		static Dictionary<string, string> columnTypes = new Dictionary<string, string>();
+
+		static SchemaHelper()
+		{
+			var project = Accelr8or.GetLibraryProject(DomainProject);
+			var path = Accelr8or.GetProjectPath(project);
+			DomainDirectory = Path.Combine(path, DomainDirectory);
+
+			project = Accelr8or.GetLibraryProject(WritersProject);
+			path = Accelr8or.GetProjectPath(project);
+			WritersDirectory = Path.Combine(path, WritersDirectory);
+
+			project = Accelr8or.GetLibraryProject(ReadersProject);
+			path = Accelr8or.GetProjectPath(project);
+			ReadersDirectory = Path.Combine(path, ReadersDirectory);
+
+			project = Accelr8or.GetLibraryProject(TableInfoProject);
+			path = Accelr8or.GetProjectPath(project);
+			TableInfoDirectory = Path.Combine(path, TableInfoDirectory);
+		}
+
+		public static IDictionary<string, DbTable> GetTables()
+		{
+			var helper = new SqlServerDbHelper();
+
+			// Read schema
+			var tables = helper.GetDbTables(_connectionString, _database);
+
+			foreach (var t in tables)
+			{
+				if (t.Value.Ignore)
+					continue;
+
+				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key);
+				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key);
+				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key);
+
+				if (tableNames.ContainsKey(t.Value.TableName))
+				{
+					Debug.WriteLine("renaming table {0} to {1}", t.Key, tableNames[t.Value.TableName]);
+					t.Value.ClassName = tableNames[t.Value.TableName];
+				}
+				else
+					t.Value.ClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(t.Value.TableName));
+
+				foreach (var column in t.Value.Columns)
+				{
+					if (columnNames.ContainsKey(t.Value.TableName + "." + column.ColumnName))
+						column.FieldName = columnNames[t.Value.TableName + "." + column.ColumnName];
+					else
+						column.FieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(column.ColumnName));
+
+					if (columnTypes.ContainsKey(t.Value.TableName + "." + column.ColumnName))
+						column.CastType = columnTypes[t.Value.TableName + "." + column.ColumnName];
+				}
+
+				foreach(var c in t.Value.Children)
+				{
+					if (tableNames.ContainsKey(c.Table))
+						c.ChildClassName = tableNames[c.Table];
+					else
+						c.ChildClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Table));
+
+					if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
+						c.ChildFieldName = columnNames[t.Value.TableName + "." + c.Column];
+					else
+						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column));
+				}
+
+				foreach(var c in t.Value.Parents)
+				{
+					if (tableNames.ContainsKey(c.Parent))
+						c.ParentClassName = tableNames[c.Parent];
+					else
+						c.ParentClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Parent));
+
+					if (columnNames.ContainsKey(t.Value.TableName + "." + c.ParentColumn))
+						c.ParentFieldName = columnNames[t.Value.TableName + "." + c.ParentColumn];
+					else
+						c.ParentFieldName = c.ParentColumn;
+				}
+			}
+
+			return tables;
+		}
+	}
+#>

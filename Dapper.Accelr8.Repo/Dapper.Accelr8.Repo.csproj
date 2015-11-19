@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1120E03D-8004-43CC-AF1B-75A5B424B595}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Dapper.Accelr8.Repo</RootNamespace>
+    <AssemblyName>Dapper.Accelr8.Repo</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Contracts\Readers\IEntityReader.cs" />
+    <Compile Include="Contracts\Writers\IEntityWriter.cs" />
+    <Compile Include="Diagnostics.cs" />
+    <Compile Include="Domain\BaseEntity.cs" />
+    <Compile Include="ExecutionContext.cs" />
+    <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="IdKey.cs" />
+    <Compile Include="IEntity.cs" />
+    <Compile Include="IRepository.cs" />
+    <Compile Include="IServiceLocatorMarker.cs" />
+    <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="JoinInfo.cs" />
+    <Compile Include="Parameters\Aggregate.cs" />
+    <Compile Include="Parameters\GroupBy.cs" />
+    <Compile Include="Parameters\JoinQueryElement.cs" />
+    <Compile Include="Parameters\Operator.cs" />
+    <Compile Include="Parameters\OrderBy.cs" />
+    <Compile Include="Parameters\QueryElement.cs" />
+    <Compile Include="Parameters\TableFieldKey.cs" />
+    <Compile Include="PInvoke\Msvcrt.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository.cs" />
+    <Compile Include="RepositoryProvider.cs" />
+    <Compile Include="ScriptContext.cs" />
+    <Compile Include="TableInfo.cs" />
+    <Compile Include="UnitOfWork.cs" />
+    <Compile Include="UnitOfWorkStore.cs" />
+    <Compile Include="WorkAction.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

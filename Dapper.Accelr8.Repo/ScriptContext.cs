@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dapper.Accelr8.Repo
+{
+    public class ScriptContext
+    {
+        public ScriptContext()
+        {
+            _keys = new Stack<int>();
+        }
+
+        object _syncRoot = new Object();
+
+        Stack<int> _keys { get; set; }
+
+        public void Add(int hashcode)
+        {
+            lock (_syncRoot)
+                _keys.Push(hashcode);
+        }
+
+        public bool ContainsKey(int hashcode)
+        {
+            lock (_syncRoot)
+                return _keys.Contains(hashcode);
+        }
+    }
+}
