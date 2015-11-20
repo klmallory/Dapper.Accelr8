@@ -22,6 +22,10 @@ namespace Dapper.Accelr8.Sql
     {
         #region Lookups
 
+        protected static object _syncRoot = new object();
+        protected static Dictionary<string, object> _readers = new Dictionary<string, object>();
+        protected static bool _cacheReaders = true;
+
         public static Dictionary<AggregateType, string> AggregateCommands
             = new Dictionary<AggregateType, string>()
              {
@@ -74,7 +78,7 @@ namespace Dapper.Accelr8.Sql
         protected List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>> _children
             = new List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>>();
 
-        protected IServiceLocatorMarker _locator;
+        static protected IServiceLocatorMarker _locator;
 
         string _connectionStringName;
         DapperExecuter _executer;
@@ -87,7 +91,7 @@ namespace Dapper.Accelr8.Sql
         bool _noLock;
 
         public EntityReader
-            (TableInfo tableInfo
+            (Dapper.Accelr8.Repo.TableInfo tableInfo
             , string connectionStringName
             , DapperExecuter executer
             , QueryBuilder queryBuilder
@@ -98,15 +102,32 @@ namespace Dapper.Accelr8.Sql
             _executer = executer;
             _queryBuilder = queryBuilder;
             _joinBuilder = joinBuilder;
-            _locator = serviceLocator;
+
+            if (_locator != null)
+                _locator = serviceLocator;
 
             UniqueId = tableInfo.UniqueId;
-            IdField = tableInfo.IdField;
+            IdColumn = tableInfo.IdColumn;
             TableName = tableInfo.TableName;
             TableAlias = tableInfo.TableAlias;
-            FieldNames = (string[])tableInfo.FieldNames.Clone();
+            ColumnNames = (string[])tableInfo.ColumnNames.Clone();
             Joins = (JoinInfo[])tableInfo.Joins.Clone();
             TableInfo = tableInfo;
+        }
+
+        protected IEntityReader GetReader(Type idType, Type entityType)
+        {
+            if(_cacheReaders)
+            {
+                var key = idType + "." + entityType;
+                lock (_syncRoot)
+                    if (!_readers.ContainsKey(key))
+                        _readers.Add(key, _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)));
+
+                return _readers[key] as IEntityReader;
+            }
+
+            return _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)) as IEntityReader;
         }
 
         protected ReturnType GetRowData<ReturnType>(IDictionary<string, object> dataRow, string property)
@@ -173,7 +194,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual string BuildFields()
         {
-            var fieldNames = "[" + TableAlias + "].[" + string.Join("], [" + TableAlias + "].[", FieldNames) + "]";
+            var fieldNames = "[" + TableAlias + "].[" + string.Join("], [" + TableAlias + "].[", ColumnNames) + "]";
 
             var agg = BuildAggregates(_aggregates);
 
@@ -447,36 +468,36 @@ namespace Dapper.Accelr8.Sql
             return _joins[5].Load(entity, join6) as EntityType;
         }
         public virtual bool UniqueId { get; protected set; }
-        public virtual string IdField { get; protected set; }
+        public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
-        public virtual string[] FieldNames { get; protected set; }
+        public virtual string[] ColumnNames { get; protected set; }
         public virtual JoinInfo[] Joins { get; protected set; }
         public virtual TableInfo TableInfo { get; protected set; }
 
         public IEntityReader<IdType, EntityType> WithColumn(string column)
         {
-            var with = new List<string>(FieldNames);
+            var with = new List<string>(ColumnNames);
             with.Add(column);
-            FieldNames = with.ToArray();
+            ColumnNames = with.ToArray();
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WithoutColumn(string column)
         {
-            var without = new List<string>(FieldNames);
+            var without = new List<string>(ColumnNames);
             without.Remove(column);
-            FieldNames = without.ToArray();
+            ColumnNames = without.ToArray();
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WithoutColumns(string[] columns)
         {
-            var without = new List<string>(FieldNames);
+            var without = new List<string>(ColumnNames);
             without.RemoveAll(a => columns.Contains(a));
-            FieldNames = without.ToArray();
+            ColumnNames = without.ToArray();
 
             return this;
         }
@@ -641,24 +662,15 @@ namespace Dapper.Accelr8.Sql
             return this;
         }
 
+        /// <summary>
+        /// Sets the Reader to execute all joins from the table info.
+        /// </summary>
+        /// <returns>this entity reader instance</returns>
         public virtual IEntityReader WithAllJoins()
         {
             foreach (var j in Joins)
             {
-                if (j.Reader == null)
-                    j.Reader = () => _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(j.IdType, j.EntityType)) as IEntityReader;
-
-                WithJoin(
-                    new Join()
-                    {
-                        Load = (o, r) => j.Reader().LoadEntityObject(r),
-                        SplitOnColumnName = "SplitMe",
-                        JoinTable = j.TableName,
-                        JoinAlias = j.Alias,
-                        JoinFiedNames = j.Reader().FieldNames,
-                        JoinOnQueries = j.JoinQuery,
-                        Outer = j.Outer
-                    });
+                WithManyToOneJoin(j);
             }
 
             return this;
@@ -787,37 +799,22 @@ namespace Dapper.Accelr8.Sql
             return d;
         }
 
-        public virtual string GetSqlForQueries()
+        protected virtual string GetPagingQuery()
         {
             var query = new StringBuilder();
-            var fields = string.Empty;
+            query.Append("with pagingCte AS (");
 
-            //if (_skip > 0)
-            //{
-            //    query.Append("with pagingCte AS (");
-
-            //    fields += BuildSkipRowsClause() + ", ";
-            //}
-
-            fields += BuildFields();
-
-            if (_joins.Count > 0)
-            {
-                foreach (var j in _joins)
-                {
-                    var joinFields = ", 0 as " + j.SplitOnColumnName + ", [" + j.JoinAlias + "].[" + string.Join("], [" + j.JoinAlias + "].[", j.JoinFiedNames) + "]";
-
-                    fields += joinFields;
-                }
-            }
+            string fields = null;
+            
+            fields = BuildSkipRowsClause() + ", ";
+            fields += "[" + TableAlias + "].[" + IdColumn + "]";
 
             var distinct = _distinct ? "distinct " : "";
-            var top = _top > 0 && _skip == 0 ? "top (@top) " : "";
             var nolock = _noLock ? " with (nolock)" : string.Empty;
 
             query.Append(string.Format(genericSelectQuery
                , distinct
-               , top
+               , ""
                , fields
                , TableName
                , TableAlias
@@ -860,12 +857,84 @@ namespace Dapper.Accelr8.Sql
                 query.Append(Environment.NewLine);
             }
 
-            if (_skip > 0 || _top > 0)
+            query.Append(")");
+            query.Append(Environment.NewLine);
+
+            return query.ToString();
+        }
+
+        public virtual string GetSqlForQueries()
+        {
+            var query = new StringBuilder();
+            var fields = string.Empty;
+
+            if (_skip > 0)
             {
-                query.Append(@"OFFSET (@skip * @top) ROWS");
+                query.Append(GetPagingQuery());
+            }
+
+            fields += BuildFields();
+
+            if (_joins.Count > 0)
+            {
+                foreach (var j in _joins)
+                {
+                    var joinFields = ", 0 as " + j.SplitOnColumnName + ", [" + j.JoinAlias + "].[" + string.Join("], [" + j.JoinAlias + "].[", j.JoinFieldNames) + "]";
+
+                    fields += joinFields;
+                }
+            }
+
+            fields.Replace("_spc_", " ");
+
+            var distinct = _distinct ? "distinct " : "";
+            var top = _top > 0 && _skip == 0 ? "top (@top) " : "";
+            var nolock = _noLock ? " with (nolock)" : string.Empty;
+
+            query.Append(string.Format(genericSelectQuery
+               , distinct
+               , top
+               , fields
+               , TableName
+               , TableAlias
+               , nolock));
+
+            query.Append(Environment.NewLine);
+
+            if (_joins.Count > 0)
+            {
+                if (_skip > 0)
+                    query.Append("join pagingCTE on pagingCTE.[" + IdColumn + "] = " + "[" + TableAlias + "].[" + IdColumn + "] and pagingCTE.[_rowsByNumber] > @skip");
+
+                query.Append(BuildJoins(_joins));
+
                 query.Append(Environment.NewLine);
-                query.Append(@"FETCH NEXT @top ROWS ONLY");
-                //query.Append(@") select * from pagingCte where _rowsByNumber > @skip and _rowsByNumber <= @top order by _rowsByNumber");
+            }
+
+            if (_queries.Count > 0)
+            {
+                query.Append(BuildQueryElements(_queries, 0));
+
+                query.Append(Environment.NewLine);
+            }
+
+            if (_groups.Count > 0)
+            {
+                query.Append(BuildGroupByClauses(_groups));
+
+                query.Append(Environment.NewLine);
+            }
+
+            if (_havings.Count > 0)
+            {
+                query.Append(BuildHavingClauses(_havings));
+
+                query.Append(Environment.NewLine);
+            }
+
+            if (_orderBys.Count > 0)
+            {
+                query.Append(BuildOrderByClauses(_orderBys));
 
                 query.Append(Environment.NewLine);
             }
@@ -956,7 +1025,7 @@ namespace Dapper.Accelr8.Sql
         {
             _queries.Add(new QueryElement()
             {
-                FieldName = IdField,
+                FieldName = IdColumn,
                 TableAlias = TableAlias,
                 Operator = Operator.Equals,
                 Value = id
@@ -969,7 +1038,7 @@ namespace Dapper.Accelr8.Sql
         {
             _queries.Add(new QueryElement()
             {
-                FieldName = IdField,
+                FieldName = IdColumn,
                 TableAlias = TableAlias,
                 Operator = Operator.Equals,
                 Value = id
@@ -1026,6 +1095,23 @@ namespace Dapper.Accelr8.Sql
             return this;
         }
 
+        public virtual IEntityReader WithManyToOneJoin
+            (JoinInfo join)
+        {
+            var j = new Join()
+            {
+                Load = join.Load,
+                SplitOnColumnName = "SplitMe",
+                JoinAlias = join.Alias,
+                JoinFieldNames = join.Reader().ColumnNames,
+                JoinTable = join.TableName,
+                Outer = join.Outer,
+                JoinOnQueries = join.JoinQuery
+            };
+
+            return this;
+        }
+
         public virtual IEntityReader<IdType, EntityType> WithManyToOneJoin<IType, EType>
             (IEntityReader<IType, EType> joinReader
             , string joinField
@@ -1048,7 +1134,7 @@ namespace Dapper.Accelr8.Sql
                 Load = loadVisitor,
                 SplitOnColumnName = "SplitMe",
                 JoinAlias = TableAlias + "_" + joinReader.TableAlias + alias,
-                JoinFiedNames = joinReader.FieldNames,
+                JoinFieldNames = joinReader.ColumnNames,
                 JoinTable = joinReader.TableName,
                 Outer = outer,
                 JoinOnQueries = new JoinQueryElement[] 
@@ -1073,7 +1159,7 @@ namespace Dapper.Accelr8.Sql
         {
             var join = new Join()
             {
-                JoinFiedNames = joinFieldNames,
+                JoinFieldNames = joinFieldNames,
                 SplitOnColumnName = "SplitOnColumn",
                 JoinTable = joinTable,
                 JoinAlias = joinAlias,

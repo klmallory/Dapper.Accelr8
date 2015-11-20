@@ -298,7 +298,7 @@ public static class Accelr8or
 
 	static List<string> nonNullableTypes = new List<string>() { "string", "object", "byte[]" };
 
-	public static string GetCastForType(bool isNullable, string castType, string type)
+	public static string GetCastForType(bool isNullable, string castType)
 	{
 		if (string.IsNullOrEmpty(castType))
 			return "";

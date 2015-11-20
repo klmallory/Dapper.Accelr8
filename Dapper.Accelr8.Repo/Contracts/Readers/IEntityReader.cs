@@ -11,9 +11,9 @@ namespace Dapper.Accelr8.Repo.Contracts.Readers
     public interface IEntityReader : IDisposable
     {
         bool UniqueId { get; }
-        string IdField { get; }
+        string IdColumn { get; }
         string TableName { get; }
-        string[] FieldNames { get; }
+        string[] ColumnNames { get; }
         string TableAlias { get; }
         JoinInfo[] Joins { get; }
         TableInfo TableInfo { get; }

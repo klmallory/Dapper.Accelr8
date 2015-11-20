@@ -56,7 +56,7 @@
 			idField = table.Columns.First().ColumnName;
 		}
 
-		entityType = Accelr8or.Inflector.MakeSingular(name);
+		entityType = name;
 
 		manager.StartNewFile(Path.Combine(SchemaHelper.ReadersDirectory, name + "Reader.cs")); #>
 
@@ -91,14 +91,38 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 
 		//Child Count <#= table.Children.Count() #>
 		//Parent Count <#= table.Parents.Count() #>
+		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne).GroupBy(c => c.ChildClassName).Select(s => s.First()))
+			{ 
+				//
+				//Add Methods to Resolve Other Children Readers
+				//
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName; 
+				var readerName = "_" + Accelr8or.Inflector.MakeInitialLowerCase(ceType) + "Reader"; 
+#>static IEntityReader<<#= cidType #> , <#= ceType #>> <#= readerName #>;
+		static IEntityReader<<#= cidType #> , <#= ceType #>> Get<#= ceType #>Reader()
+		{
+		<# if (SchemaHelper.CacheLocatorResults) {
+#>	if (<#= readerName #> == null)
+				<#= readerName #> = _locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>>();
+
+			return <#= readerName #>;
+		<# } else {  
+#>	return _locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>>();
+		<# } #>}
+
+		<# } #>
 
 	<# foreach (var child in table.Children)
 	{ 
+		//
+		//Add Methods to Set Children collections on the parents and set circular references.
+		//
 		if (child.Ignore)
 			continue;
 
 		var cidType = child.CSharpType;
-		var ceType = Accelr8or.Inflector.MakeSingular(child.Table);
+		var ceType = Accelr8or.Inflector.MakeSingular(child.ChildClassName);
 	#>	/// <summary>
 		/// Sets the children of type <#= ceType #> on the parent on <#= Accelr8or.Inflector.MakePlural(ceType) #>.
 		/// From foriegn key <#= child.Name #>
@@ -117,7 +141,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 
 			foreach (var r in results)
 			{
-				r.<#= Accelr8or.Inflector.MakePlural(ceType) #> = typedChildren.Where(b => b.<#= child.Column #> == r.Id).ToList();
+				r.<#= Accelr8or.Inflector.MakePlural(ceType) #> = typedChildren.Where(b => b.<#= child.ChildFieldName #> == r.Id).ToList();
 				r.<#= Accelr8or.Inflector.MakePlural(ceType) #>.ToList().ForEach(b => b.<#= entityType #> = r);
 			}
 		}
@@ -137,30 +161,32 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 	{
 		var pkCol = table.Columns.First(c => c.IsPrimaryKey || c.IsIdentity);
 	#>
-		domain.Id = GetRowData<<#= pkCol.CSharpType #>>(dataRow, IdField);
+		domain.Id = GetRowData<<#= pkCol.CSharpType #>>(dataRow, IdColumn);
 	<#}#>
 	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore && !c.IsIdentity))
 	{#>	
-			domain.<#= col.ColumnName #> = GetRowData<<#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #>>(dataRow, <#= entityType #>ColumnNames.<#= col.ColumnName #>.ToString()); <# } #>
+			domain.<#= col.FieldName #> = <#= Accelr8or.GetCastForType(col.IsNullable, col.CastType) #>GetRowData<<#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #>>(dataRow, <#= entityType #>ColumnNames.<#= col.ColumnName #>.ToString()); <# } #>
             
 			
 			return domain;
         }
 
+		/// <summary>
+		/// Add All the children to the query for the specified <#= idType #> Id.
+		/// </summary>
+		/// <param name="results">IEntityReader<<#= idType #>, <#= entityType #>></param>
+		/// <param name="id"><#= idType #></param>
         public override IEntityReader<<#= idType #>, <#= entityType #>> WithAllChildrenForId(<#= idType #> id)
         {
 			base.WithAllChildrenForId(id);
 
-			<# foreach (var child in table.Children)
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 			{ 
-				if (child.Ignore)
-					continue;
-
 				var cidType = child.CSharpType;
-				var ceType = child.Table;
+				var ceType = child.ChildClassName;
 			#>
 
-			WithChildForParentId(_locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>(), id, IdField, SetChildren<# Accelr8or.Inflector.MakePlural(ceType); #>);
+			WithChildForParentId(Get<#= ceType #>Reader(), id, IdColumn, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
 			<# } #>
 
             return this;
@@ -174,14 +200,14 @@ namespace <#= SchemaHelper.ReadersNamespace #>
             if (entity == null)
                 return;
 
-			<# foreach (var child in table.Children)
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 			{ 
-				if (child.Ignore)
-					continue;
-
 				var cidType = child.CSharpType;
-				var ceType = child.Table;
-#>WithChildForParentId(_locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>(), id, IdField, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+				var ceType = child.ChildClassName;
+#>WithChildForParentId(Get<#= ceType #>Reader(), entity.Id
+				, <#= ceType #>ColumnNames.<#= child.Column #>.ToString()
+				, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+
 			<# } #>
 QueryResultForChildrenOnly(new List<<#= entityType #>>() { entity });
 
@@ -191,8 +217,8 @@ QueryResultForChildrenOnly(new List<<#= entityType #>>() { entity });
 					continue;
 
 				var cidType = child.CSharpType;
-				var ceType = child.Table;
-#>_locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>().SetAllChildrenForExisting(entity.<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+				var ceType = child.ChildClassName;
+#>Get<#= ceType #>Reader().SetAllChildrenForExisting(entity.<#= Accelr8or.Inflector.MakePlural(ceType) #>);
 			<# } }#>	
 		}
 
@@ -204,25 +230,26 @@ QueryResultForChildrenOnly(new List<<#= entityType #>>() { entity });
             if (entities == null || entities.Count < 1)
                 return;
 
-			<# foreach (var child in table.Children)
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 			{ 
-				if (child.Ignore)
-					continue;
-
 				var cidType = child.CSharpType;
-				var ceType = child.Table;
-#>WithChildForParentId(_locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>(), id, IdField, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+				var ceType = child.ChildClassName;
+
+#>WithChildForParentIds(Get<#= ceType #>Reader()
+				, entities.Where(e => e != null)
+				.Select(s => s.Id)
+				.ToArray(), <#= ceType #>ColumnNames.<#= child.Column #>.ToString()
+				, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+
 			<# } #>		
 			QueryResultForChildrenOnly(entities);
 
-			<# foreach (var child in table.Children)
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 			{ 
-				if (child.Ignore)
-					continue;
-
 				var cidType = child.CSharpType;
-				var ceType = child.Table;	
-#>_locator.Resolve<IEntityReader<<#= cidType #>, <#= ceType #>>().SetAllChildrenForExisting(entities.SelectMany(e => e.<#= Accelr8or.Inflector.MakePlural(ceType) #>));
+				var ceType = child.ChildClassName;	
+				
+#>Get<#= ceType #>Reader().SetAllChildrenForExisting(entities.SelectMany(e => e.<#= Accelr8or.Inflector.MakePlural(ceType) #>).ToList());
 			<# } } #>		
 		}
     }

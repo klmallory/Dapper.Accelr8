@@ -1,0 +1,65 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.DataSetExtensions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="System.Runtime.InteropServices" #>
+<#@ output extension=".cs" #>
+<#@ include file="Includes\\Accelr8or.ttinclude" #>
+<#@ include file="Includes\\DbHelper.ttinclude" #>
+<#@ include file="Includes\\Manager.ttinclude" #>
+<#@ include file="Schema.ttinclude" #>
+
+<#
+	var className = @"";
+	var idType = @"";
+	var entityType = @"";
+	var idField = @"";
+
+	var tables = SchemaHelper.GetTables();
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	// Generate EntityWriters
+	foreach (var t in tables.Where(tb => !tb.Value.Ignore && !tb.Value.ReadOnly))
+	{
+		var table = t.Value;
+
+		Debug.WriteLine("Starting EntityWriter for Table {0} ", t.Key);
+
+		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
+
+		className = name + "Reader";
+		if (table.Columns.Any(c => c.IsPrimaryKey))
+		{
+			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
+			idField = table.Columns.First(c => c.IsPrimaryKey).ColumnName;
+		}
+		else
+		{
+			idType = table.Columns.First().CSharpType;
+			idField = table.Columns.First().ColumnName;
+		}
+
+		entityType = name;
+
+		manager.StartNewFile(Path.Combine(SchemaHelper.WritersDirectory, name + "Writer.cs")); #>
+
+
+		<# manager.EndBlock();
+	}
+
+	manager.Process(true);
+#>

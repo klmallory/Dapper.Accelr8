@@ -57,7 +57,7 @@ namespace Dapper.Accelr8.Sql
 
             var valOp = string.Format(o, p);
 
-            return string.Format(template, openBlock, e.TableAlias, e.FieldName, valOp, closeBlock);
+            return string.Format(template, openBlock, e.TableAlias, e.FieldName.Replace("_spc_", ""), valOp, closeBlock);
         }
     }
 }

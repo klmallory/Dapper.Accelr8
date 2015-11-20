@@ -20,6 +20,7 @@
 		public List<DbChild> Children { get; set; }
 		public List<DbParent> Parents { get; set; }
 
+		public string TableAlias { get; set; }
 		public bool Ignore { get; set; }
 		public bool ReadOnly { get; set; }
 		public string ClassName { get; set; }
@@ -54,12 +55,15 @@
 		public string Column { get; set; }
 		public string ParentColumn { get; set; }
 		public string CSharpType { get; set; }
+		public string TableAlias { get; set; }
 
 		public bool Ignore { get; set; }
 		public bool OneToOne { get; set; }
 
+		public bool ChildColumnIsPrimaryKey { get; set; }
 		public string ChildClassName { get; set; }
 		public string ChildFieldName { get; set; }
+		public bool IsNullable { get; set; }
 	}
 
     public class DbParent
@@ -70,11 +74,14 @@
 		public string Column { get; set; }
 		public string ParentColumn { get; set; }
 		public string CSharpType { get; set; }
+		public string ParentAlias { get; set; }
 
 		public bool Ignore { get; set; }
 
+		public bool ParentColumnIsPrimaryKey { get; set; }
 		public string ParentClassName { get; set; }
 		public string ParentFieldName { get; set; }
+		public bool IsNullable { get; set; }
 	}
 
 	//SQL Helper
@@ -105,12 +112,14 @@
 
             DataTable dt = GetDataTable(connectionString, sql);
             return dt.Rows.Cast<DataRow>().Select(row => new DbTable
+
             {
                 TableName = row.Field<string>("tablename"),
                 SchemaName = row.Field<string>("schemname"),
 				TableType = row.Field<string>("type"),
                 Rows = row.Field<int>("rows"),
-                HasPrimaryKey = row.Field<bool>("HasPrimaryKey")
+                HasPrimaryKey = row.Field<bool>("HasPrimaryKey"),
+				ReadOnly = row.Field<string>("type") == "V"
             }).ToDictionary(c => c.TableName);
         }
         
@@ -176,10 +185,22 @@
         {
             string sql = 
 				string.Format(@"
+                WITH indexCTE AS
+                (
+                    SELECT 
+                    ic.column_id,
+                    ic.index_column_id,
+                    ic.object_id
+                    FROM {0}.sys.indexes idx
+                    join {0}.sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
+                    WHERE  idx.object_id =OBJECT_ID(@tableName) AND idx.is_primary_key=1
+                )
 				select OBJECT_NAME(fk.object_id) Name, 
 					OBJECT_NAME(fk.parent_object_id) [Table], 
-					Object_Name(fk.referenced_object_id) Parent, 
-					col.Name [Column], 
+					Object_Name(fk.referenced_object_id) Parent,
+					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
+					col.Name [Column],
+					col.is_nullable IsNullable, 
 					pCol.Name ParentColumn,
 					pSysType.name ColumnType
 				from {0}.sys.foreign_keys fk
@@ -187,6 +208,7 @@
 				join {0}.sys.columns col on col.column_id = fkc.constraint_column_id and col.object_id = fk.parent_object_id
 				join {0}.sys.columns pCol on pCol.column_id = fkc.constraint_column_id and pCol.object_id = fk.referenced_object_id
 				join {0}.sys.systypes pSysType on pSysType.type = pCol.system_type_id
+				left outer join indexCTE ON pCol.column_id=indexCTE.column_id AND pCol.object_id=indexCTE.object_id
 				where fk.referenced_object_id = OBJECT_ID(@tableName)", database);
 
             SqlParameter param = new SqlParameter("@tableName", SqlDbType.NVarChar, 100) { Value = string.Format("{0}.{1}.{2}", database, schema, tableName) };
@@ -197,9 +219,11 @@
 				Name = row.Field<string>("Name"),
 				Table = row.Field<string>("Table"),
 				Parent = row.Field<string>("Parent"),
+				IsNullable = row.Field<bool>("IsNullable"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
-				CSharpType = MapCsharpType(row.Field<string>("ColumnType"))
+				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
+				ChildColumnIsPrimaryKey = row.Field<bool>("IsPrimaryKey")
             }).ToList();
         }
         
@@ -207,10 +231,22 @@
         {
             string sql = 
 				string.Format(@"
+                WITH indexCTE AS
+                (
+                    SELECT 
+                    ic.column_id,
+                    ic.index_column_id,
+                    ic.object_id
+                    FROM {0}.sys.indexes idx
+                    join {0}.sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
+                    WHERE  idx.object_id =OBJECT_ID(@tableName) AND idx.is_primary_key=1
+                )
 				select OBJECT_NAME(fk.object_id) Name, 
 					OBJECT_NAME(fk.parent_object_id) [Table], 
 					Object_Name(fk.referenced_object_id) Parent, 
 					col.Name [Column], 
+					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
+					pCol.is_nullable IsNullable, 
 					pCol.Name ParentColumn,
 					pSysType.name ColumnType
 				from sys.foreign_keys fk
@@ -218,6 +254,7 @@
 				join sys.columns col on col.column_id = fkc.constraint_column_id and col.object_id = fk.parent_object_id
 				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id and pCol.object_id = fk.referenced_object_id
 				join {0}.sys.systypes pSysType on pSysType.type = pCol.system_type_id
+				left outer join indexCTE ON col.column_id=indexCTE.column_id AND col.object_id=indexCTE.object_id
 				where fk.parent_object_id = OBJECT_ID(@tableName)", database);
 
             SqlParameter param = new SqlParameter("@tableName", SqlDbType.NVarChar, 100) { Value = string.Format("{0}.{1}.{2}", database, schema, tableName) };
@@ -228,9 +265,11 @@
 				Name = row.Field<string>("Name"),
 				Table = row.Field<string>("Table"),
 				Parent = row.Field<string>("Parent"),
+				IsNullable = row.Field<bool>("IsNullable"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
-				CSharpType = MapCsharpType(row.Field<string>("ColumnType"))
+				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
+				ParentColumnIsPrimaryKey = row.Field<bool>("IsPrimaryKey")
             }).ToList();
         }
 

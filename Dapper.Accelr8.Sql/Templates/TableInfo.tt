@@ -1,1 +1,146 @@
-﻿
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.DataSetExtensions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="System.Runtime.InteropServices" #>
+<#@ output extension=".cs" #>
+<#@ include file="Includes\\Accelr8or.ttinclude" #>
+<#@ include file="Includes\\DbHelper.ttinclude" #>
+<#@ include file="Includes\\Manager.ttinclude" #>
+<#@ include file="Schema.ttinclude" #>
+
+<#
+	var className = @"";
+	var idType = @"";
+	var entityType = @"";
+	var idField = @"";
+
+	var tables = SchemaHelper.GetTables();
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	// Generate EntityReaders
+	foreach (var t in tables)
+	{
+		var table = t.Value;
+
+		if (table.Ignore)
+			continue;
+
+		Debug.WriteLine("Starting Entity domain for Table {0} ", t.Key);
+
+		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
+
+		className = name + "TableInfo";
+
+		if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
+		{
+			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
+			idField = table.Columns.First(c => c.IsPrimaryKey).ColumnName;
+		}
+		else
+		{
+			idType = table.Columns.First().CSharpType;
+			idField = table.Columns.First().ColumnName;
+		}
+		
+		entityType = name;
+
+		manager.StartNewFile(Path.Combine(SchemaHelper.TableInfoDirectory, className + ".cs")); #>
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using <#= SchemaHelper.DomainNamespace #>;
+using <#= SchemaHelper.TableInfoNamespace #>;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts.Readers;
+
+namespace <#= SchemaHelper.TableInfoNamespace #>
+{
+	public enum <#= entityType #>ColumnNames
+	{<# foreach (var col in table.Columns)
+	{#>	
+
+		<#= col.ColumnName #>, <# } #>	
+	}
+
+	public class <#= className #> : Dapper.Accelr8.Repo.TableInfo
+	{
+		public <#= className #>(IServiceLocatorMarker locator) : base(locator)
+		{
+			UniqueId = <#= table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore).ToString().ToLower() #>;
+			IdColumn = <#= entityType #>ColumnNames.<#= (table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName #>.ToString();
+			TableName = "<#= table.TableName #>";
+			TableAlias = "<#= table.TableAlias #>";
+			ColumnNames = Enum.GetNames(typeof(<#= entityType #>ColumnNames));
+
+			Joins = new JoinInfo[] {
+			<# 
+			//*************************************
+			foreach (var parent in table.Parents.Where(p => !p.IsNullable && !p.Ignore))
+			{ 
+				var pidType = parent.CSharpType;
+				var peType = Accelr8or.Inflector.MakeSingular(parent.ParentClassName);
+			#>
+			//For Key <#= parent.Name #>
+			new JoinInfo() {
+			Reader = new Func<IEntityReader>(() => GetReader(typeof(<#= pidType #>), typeof(<#= peType #>))),
+			TableName = "<#= parent.Parent #>",
+			Alias = TableAlias + "_" + "<#= parent.ParentAlias #>",
+			Load = (entity, row) =>
+				{ 
+					var reader = GetReader(typeof(<#= pidType #>), typeof(<#= peType #>));
+					var st = (entity as <#= entityType #>);
+
+					if (st == null || row == null)
+						return st;
+
+					if (row.Id == default(<#= pidType #>))
+						return st;
+
+					st.<#= peType #> = reader.LoadEntityObject(row);
+
+					return st;
+				},
+			JoinQuery = new JoinQueryElement[]
+			{
+				new JoinQueryElement() 
+				{ 
+					JoinField = <#= peType #>ColumnNames.<#= parent.ParentColumn #>.ToString(),
+					Operator = Operator.Equals,
+					ParentField = <#= entityType #>ColumnNames.<#= parent.Column #>.ToString(),
+					ParentTableAlias = TableAlias
+				}
+			} },
+			<# } 
+			//*************************************
+			#>
+			};
+		}
+	}
+}
+		<# manager.EndBlock();
+	}
+	manager.Process(true);
+#>

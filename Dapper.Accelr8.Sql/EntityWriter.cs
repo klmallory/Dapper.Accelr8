@@ -39,10 +39,10 @@ namespace Dapper.Accelr8.Sql
             _joinBuilder = joinBuilder;
 
             UniqueId = tableInfo.UniqueId;
-            IdField = tableInfo.IdField;
+            IdField = tableInfo.IdColumn;
             TableName = tableInfo.TableName;
             TableAlias = tableInfo.TableAlias;
-            FieldNames = (string[])tableInfo.FieldNames.Clone();
+            FieldNames = (string[])tableInfo.ColumnNames.Clone();
         }
 
         protected bool _withCascades;
@@ -110,7 +110,7 @@ namespace Dapper.Accelr8.Sql
                 .Select(field =>
                     string.Format
                     (setTemplate
-                    , field
+                    , field.Replace("_spc_", " ")
                     , GetParamName(field, "u", task.Index, count++)));
 
             var s = string.Join(", ", fieldSets);
@@ -239,7 +239,7 @@ namespace Dapper.Accelr8.Sql
             {
                 query.Append(string.Format(insertTemplate
                    , TableName
-                   , "[" + String.Join("], [", names.ToArray()) + "]"
+                   , "[" + String.Join("], [", names.ToArray()).Replace("_spc_", " ") + "]"
                    , IdField
                    , BuildInsertParameters(task.Index)));
             }

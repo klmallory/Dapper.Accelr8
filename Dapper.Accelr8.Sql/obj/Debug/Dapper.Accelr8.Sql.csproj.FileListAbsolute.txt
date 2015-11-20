@@ -24,3 +24,9 @@ C:\Source\Dapper.Accer8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.csprojRe
 C:\Source\Dapper.Accer8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.dll
 C:\Source\Dapper.Accer8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.pdb
 C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.csprojResolveAssemblyReference.cache
+C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Sql.dll
+C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Sql.pdb
+C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Repo.dll
+C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Repo.pdb
+C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.dll
+C:\Source\Dapper.Accelr8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.pdb

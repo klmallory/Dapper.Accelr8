@@ -12,14 +12,8 @@ namespace Dapper.Accelr8.Repo
 
     public interface IEntity
     {
-        bool Merged { get; set; }
         bool IsDirty { get; set; }
-        bool IdMatches(object id);
-        object GeneralId { get; }
         int GetTypeHashCode();
         bool IsNew();
-        void MergeChangesFrom<EntityType>(EntityType model) where EntityType : IEntity;
-        bool MergeCollection { get; }
-        void SetSelfReferences();
     }
 }

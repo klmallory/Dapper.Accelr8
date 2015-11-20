@@ -11,6 +11,9 @@
 // https://raw.github.com/damieng/DamienGKit
 // http://damieng.com/blog/2009/11/06/multiple-outputs-from-t4-made-easy-revisited
 
+//Modified by Kristen Mallory for the Dapper.Accelr8 project.
+//https://github.com/thehexgod/Dapper.Accelr8
+
 // Manager class records the various blocks so it can split them up
 class Manager {
     private class Block {

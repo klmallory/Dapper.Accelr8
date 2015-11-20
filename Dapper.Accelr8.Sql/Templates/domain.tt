@@ -74,9 +74,9 @@ using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 
-namespace <#= SchemaHelper.ReadersNamespace #>
+namespace <#= SchemaHelper.DomainNamespace #>
 {
-	public class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>
+	public class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>, IEntity, IHaveId<<#= idType #>>
 	{<# if (SchemaHelper.UseDirtyProperties)
 		{ #>
 	
@@ -85,13 +85,13 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 			IsDirty = false;
 		}
 		<# } #>
-	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore && !c.IsIdentity))
+	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore ))
 	{
 		if (SchemaHelper.UseDirtyProperties)
 		{
 		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.FieldName);#>	
-		protected <#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #> <#= backing #>;
-		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #> <#= col.FieldName #> 
+		protected <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= backing #>;
+		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= col.FieldName #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -128,8 +128,8 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 			if (SchemaHelper.UseDirtyProperties)
 			{
 			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName));#>	
-		protected <#= child.ChildClassName #> <#= backing #>;
-		public <#= child.ChildClassName #> <#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> 
+		protected IList<<#= child.ChildClassName #>> <#= backing #>;
+		public IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -140,7 +140,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 		} 
 			<#} else
 				{ #>
-		public <#= child.ChildClassName #> <#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> { get; set; }
+		public IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> { get; set; }
 			<# } } #>
 		}
 }

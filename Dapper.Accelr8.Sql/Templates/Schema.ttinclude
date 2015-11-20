@@ -1,6 +1,7 @@
 ﻿<#+    
 	class SchemaHelper
 	{
+		public static bool CacheLocatorResults = true;
 		public static bool UseDirtyProperties = true;
 		public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
 		public static string DomainProject = "Dapper.Accelr8.Sql";
@@ -13,7 +14,7 @@
 		public static string ReadersNamespace = @"Dapper.Accelr8.Readers";
 		public static string ReadersDirectory = @"Readers";
 		public static string TableInfoProject = "Dapper.Accelr8.Sql";
-		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfo";
+		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
 		public static string TableInfoDirectory = @"TableInfo";
 
 		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=EnrollmentBioStore;Integrated Security=SSPI;";
@@ -23,6 +24,11 @@
 		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
 		{ 
 			{ "Submissions_VW", "SubmissionView"}
+		};
+
+		static Dictionary<string, string> tableAliases = new Dictionary<string, string>()
+		{
+			{ "CmtTransactionEnrollmentMnemonicValueTableInfo", "temv" }
 		};
 
 		static Dictionary<string, string> columnNames = new Dictionary<string, string>();
@@ -72,12 +78,24 @@
 				else
 					t.Value.ClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(t.Value.TableName));
 
+				if (tableAliases.ContainsKey(t.Value.TableName))
+				{
+					Debug.WriteLine("renaming table {0} to {1}", t.Key, tableAliases[t.Value.TableName]);
+					t.Value.TableAlias = tableAliases[t.Value.TableName];
+				}
+				else
+					t.Value.TableAlias = Accelr8or.Inflector.MakeSingular(t.Value.TableName).ToLower();
+
 				foreach (var column in t.Value.Columns)
 				{
-					if (columnNames.ContainsKey(t.Value.TableName + "." + column.ColumnName))
+					column.ColumnName = column.ColumnName.Replace(" ", "_spc_");
+
+					if (column.IsPrimaryKey)
+						column.FieldName = "Id";
+					else if (columnNames.ContainsKey(t.Value.TableName + "." + column.ColumnName))
 						column.FieldName = columnNames[t.Value.TableName + "." + column.ColumnName];
 					else
-						column.FieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(column.ColumnName));
+						column.FieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(column.ColumnName).Replace("_spc_", ""));
 
 					if (columnTypes.ContainsKey(t.Value.TableName + "." + column.ColumnName))
 						column.CastType = columnTypes[t.Value.TableName + "." + column.ColumnName];
@@ -85,15 +103,25 @@
 
 				foreach(var c in t.Value.Children)
 				{
+					c.Column = c.Replace(" ", "_spc_");
+
 					if (tableNames.ContainsKey(c.Table))
 						c.ChildClassName = tableNames[c.Table];
 					else
 						c.ChildClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Table));
 
-					if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
+					if (c.ChildColumnIsPrimaryKey)
+						c.ChildFieldName = "Id";
+					else if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
 						c.ChildFieldName = columnNames[t.Value.TableName + "." + c.Column];
 					else
-						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column));
+						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column.Replace("_spc_", ""));
+
+					if (tableAliases.ContainsKey(c.Table))
+						c.TableAlias = tableAliases[c.Table];
+					else
+						c.TableAlias = Accelr8or.Inflector.MakeSingular(c.Table).ToLower();
+
 				}
 
 				foreach(var c in t.Value.Parents)
@@ -103,10 +131,17 @@
 					else
 						c.ParentClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Parent));
 
+					if (c.ParentColumnIsPrimaryKey)
+						c.ParentFieldName = "Id";
 					if (columnNames.ContainsKey(t.Value.TableName + "." + c.ParentColumn))
 						c.ParentFieldName = columnNames[t.Value.TableName + "." + c.ParentColumn];
 					else
 						c.ParentFieldName = c.ParentColumn;
+
+					if (tableAliases.ContainsKey(c.Parent))
+						c.ParentAlias = tableAliases[c.Parent];
+					else
+						c.ParentAlias = Accelr8or.Inflector.MakeSingular(c.Parent).ToLower();
 				}
 			}
 

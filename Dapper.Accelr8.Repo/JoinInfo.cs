@@ -11,9 +11,7 @@ namespace Dapper.Accelr8.Repo
     public class JoinInfo
     {
         public Func<IEntityReader> Reader { get; set; }
-        public Action<object, dynamic> SetOnParent { get; set; }
-        public Type IdType { get; set; }
-        public Type EntityType { get; set; }
+        public Func<object, dynamic, object> Load { get; set; }
         public string TableName { get; set; }
         public string Alias { get; set; }
         public bool Outer { get; set; }

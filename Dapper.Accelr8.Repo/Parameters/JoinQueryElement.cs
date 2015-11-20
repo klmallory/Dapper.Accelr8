@@ -11,7 +11,7 @@ namespace Dapper.Accelr8.Repo.Parameters
         public bool Outer;
         public string JoinTable;
         public string JoinAlias;
-        public string[] JoinFiedNames;
+        public string[] JoinFieldNames;
         public string SplitOnColumnName;
         public JoinQueryElement[] JoinOnQueries;
         public Func<object, dynamic, object> Load;
