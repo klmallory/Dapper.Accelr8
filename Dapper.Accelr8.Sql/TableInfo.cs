@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 using Dapper.Accelr8.Repo.Contracts.Writers;
 
-namespace Dapper.Accelr8.Repo
+namespace Dapper.Accelr8.Sql
 {
     public class TableInfo
     {

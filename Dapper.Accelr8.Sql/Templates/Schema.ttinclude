@@ -95,7 +95,7 @@
 					else if (columnNames.ContainsKey(t.Value.TableName + "." + column.ColumnName))
 						column.FieldName = columnNames[t.Value.TableName + "." + column.ColumnName];
 					else
-						column.FieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(column.ColumnName).Replace("_spc_", ""));
+						column.FieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(column.ColumnName));
 
 					if (columnTypes.ContainsKey(t.Value.TableName + "." + column.ColumnName))
 						column.CastType = columnTypes[t.Value.TableName + "." + column.ColumnName];
@@ -103,7 +103,7 @@
 
 				foreach(var c in t.Value.Children)
 				{
-					c.Column = c.Replace(" ", "_spc_");
+					c.Column = c.Column.Replace(" ", "_spc_");
 
 					if (tableNames.ContainsKey(c.Table))
 						c.ChildClassName = tableNames[c.Table];
@@ -115,7 +115,7 @@
 					else if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
 						c.ChildFieldName = columnNames[t.Value.TableName + "." + c.Column];
 					else
-						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column.Replace("_spc_", ""));
+						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column));
 
 					if (tableAliases.ContainsKey(c.Table))
 						c.TableAlias = tableAliases[c.Table];
@@ -126,6 +126,8 @@
 
 				foreach(var c in t.Value.Parents)
 				{
+					c.Column = c.Column.Replace(" ", "_spc_");
+
 					if (tableNames.ContainsKey(c.Parent))
 						c.ParentClassName = tableNames[c.Parent];
 					else

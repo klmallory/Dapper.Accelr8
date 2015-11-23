@@ -41,7 +41,7 @@
 
 		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
 
-		className = name + "Reader";
+		className = name + "Writer";
 		if (table.Columns.Any(c => c.IsPrimaryKey))
 		{
 			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
@@ -57,7 +57,92 @@
 
 		manager.StartNewFile(Path.Combine(SchemaHelper.WritersDirectory, name + "Writer.cs")); #>
 
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using <#= SchemaHelper.DomainNamespace #>;
+using <#= SchemaHelper.TableInfoNamespace #>;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts.Readers;
 
+namespace <#= SchemaHelper.WritersNamespace #>
+{
+    public class <#= className #> : EntityReader<<#= idType #>, <#= entityType #>>
+    {
+        public MockDomainAWriter
+			(TableInfo tableInfo
+            , string connectionStringName
+            , DapperExecuter executer
+            , QueryBuilder queryBuilder
+            , JoinBuilder joinBuilder) 
+            : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder)
+		{
+
+		}
+
+		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne).GroupBy(c => c.ChildClassName).Select(s => s.First()))
+			{ 
+				//
+				//Add Methods to Resolve Other Children Writers
+				//
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName;
+				var writerName = "_" + Accelr8or.Inflector.MakeInitialLowerCase(ceType) + "Writer"; 
+#>static IEntityWriter<<#= cidType #> , <#= ceType #>> <#= writerName #>;
+		static IEntityWriter<<#= cidType #> , <#= ceType #>> Get<#= ceType #>Writer()
+		{
+		<# if (SchemaHelper.CacheLocatorResults) {
+#>	if (<#= writerName #> == null)
+				<#= writerName #> = _locator.Resolve<IEntityWriter<<#= cidType #> , <#= ceType #>>>();
+
+			return <#= writerName #>;
+		<# } else {  
+#>	return _locator.Resolve<IEntityWriter<<#= cidType #> , <#= ceType #>>>();
+		<# } #>}
+
+		<# } #>
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="results">Parameters for sql writes</param>
+		/// <param name="row"></param>
+        protected override IDictionary<string, object> GetParams(Repository.ActionType actionType, <#= entityType #> entity, int taskIndex, int count)
+        {
+            var parms = new Dictionary<string, object>();
+
+		<# foreach (var col in table.Columns.Where(c => !c.Ignore))
+		{#>
+			parms.Add(GetParamName(<#= entityType #>ColumnNames.<#= col.ColumnName #>, actionType, taskIndex, count), entity.<#= col.FieldName #>);
+		<#}#>
+			
+			return parms;
+        }
+
+
+		protected override void CascadeRelations(MockDomainA entity, Repository.ScriptContext context)
+        {
+            if (entity == null)
+                return;
+
+            if ((_cascades.Contains("mockb") || _cascades.Contains("all")) && entity.ChildrenB != null)
+                foreach (var b in entity.ChildrenB)
+                    Cascade(_bWriter, b, context);
+
+            if (_bWriter.Count > 0)
+                WithChild(_bWriter, entity);
+        }
+
+
+	}
+}
 		<# manager.EndBlock();
 	}
 

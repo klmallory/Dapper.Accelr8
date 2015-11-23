@@ -51,7 +51,6 @@
     <Compile Include="IRepository.cs" />
     <Compile Include="IServiceLocatorMarker.cs" />
     <Compile Include="IUnitOfWork.cs" />
-    <Compile Include="JoinInfo.cs" />
     <Compile Include="Parameters\Aggregate.cs" />
     <Compile Include="Parameters\GroupBy.cs" />
     <Compile Include="Parameters\JoinQueryElement.cs" />
@@ -64,7 +63,6 @@
     <Compile Include="Repository.cs" />
     <Compile Include="RepositoryProvider.cs" />
     <Compile Include="ScriptContext.cs" />
-    <Compile Include="TableInfo.cs" />
     <Compile Include="UnitOfWork.cs" />
     <Compile Include="UnitOfWorkStore.cs" />
     <Compile Include="WorkAction.cs" />

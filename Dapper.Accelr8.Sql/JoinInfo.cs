@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 using Dapper.Accelr8.Repo.Parameters;
 
-namespace Dapper.Accelr8.Repo
+namespace Dapper.Accelr8.Sql
 {
     public class JoinInfo
     {

@@ -24,9 +24,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
         IEntityWriter DeleteId(object id);
         IEntityWriter Delete(object entity);
         IEntityWriter Delete(IList<object> ids);
-
-        IEntityWriter Where(QueryElement query);
-        IEntityWriter WithJoin(Join join);
+        IEntityWriter Delete(IList<QueryElement> queries);
 
         IEntityWriter WithChild(IEntityWriter writer, object parent);
 
@@ -42,11 +40,6 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
         where EntityType : class, IEntity, IHaveId<IdType>
         where IdType : struct, IComparable<IdType>, IEquatable<IdType>
     {
-        bool UniqueId { get; }
-        string IdField { get; }
-        string TableName { get; }
-        string[] FieldNames { get; }
-        string TableAlias { get; }
         IEntityWriter<IdType, EntityType> Insert(EntityType entity);
         IEntityWriter<IdType, EntityType> Insert(IList<EntityType> entities);
         IEntityWriter<IdType, EntityType> Update(EntityType entity);
@@ -58,9 +51,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
         IEntityWriter<IdType, EntityType> Delete(IList<IdType> ids);
         IEntityWriter<IdType, EntityType> Delete(EntityType entity);
         IEntityWriter<IdType, EntityType> Delete(IList<EntityType> entities);
-        IEntityWriter<IdType, EntityType> Delete(IList<QueryElement> queries);
-        IEntityWriter<IdType, EntityType> Where(QueryElement query);
-        IEntityWriter<IdType, EntityType> WithJoin(Join join);
+        IEntityWriter<IdType, EntityType> DeleteByQuery(IList<QueryElement> queries);
         IEntityWriter<IdType, EntityType> Run(string script, IDictionary<string, object> parms);
         IEntityWriter<IdType, EntityType> WithChild(IEntityWriter writer, EntityType parent);
     }

@@ -91,7 +91,7 @@ namespace Dapper.Accelr8.Sql
         bool _noLock;
 
         public EntityReader
-            (Dapper.Accelr8.Repo.TableInfo tableInfo
+            (TableInfo tableInfo
             , string connectionStringName
             , DapperExecuter executer
             , QueryBuilder queryBuilder

@@ -474,7 +474,7 @@ namespace Dapper.Accelr8.Repo
             AddOrUpdate(entities.OfType<EntityType>().ToList(), cascades);
         }
 
-        IList<object> IRepository.SelectAll(int take, params OrderBy[] ordering)
+        IList<object> IRepository.SelectAllObj(int take, params OrderBy[] ordering)
         {
             return SelectAll(take, ordering).OfType<object>().ToList();
         }

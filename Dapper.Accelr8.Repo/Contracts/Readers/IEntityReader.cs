@@ -15,8 +15,6 @@ namespace Dapper.Accelr8.Repo.Contracts.Readers
         string TableName { get; }
         string[] ColumnNames { get; }
         string TableAlias { get; }
-        JoinInfo[] Joins { get; }
-        TableInfo TableInfo { get; }
         object LoadEntityObject(dynamic row);
         IList<object> LoadEntityObjects(IEnumerable<dynamic> rows);
         IList<object> LoadMultiple(object reader);

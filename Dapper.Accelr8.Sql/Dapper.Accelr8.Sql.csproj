@@ -49,9 +49,11 @@
     <Compile Include="EntityReader.cs" />
     <Compile Include="EntityWriter.cs" />
     <Compile Include="ExecuteTask.cs" />
+    <Compile Include="JoinInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
+    <Compile Include="TableInfo.cs" />
     <Compile Include="Templates\Domain.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

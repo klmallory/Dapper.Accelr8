@@ -394,7 +394,7 @@ namespace Dapper.Accelr8.Sql
             return this;
         }
 
-        public IEntityWriter<IdType, EntityType> Delete(IList<QueryElement> queries)
+        public IEntityWriter<IdType, EntityType> DeleteByQuery(IList<QueryElement> queries)
         {
             var task = new ExecuteTask<EntityType>(_tasks.Count)
             {
@@ -522,15 +522,15 @@ namespace Dapper.Accelr8.Sql
             return this;
         }
 
-        public IEntityWriter<IdType, EntityType> Where(QueryElement query)
-        {
-            if (_tasks.Count != 1)
-                throw new InvalidOperationException("There was no current operation which to append this query");
+        //public IEntityWriter<IdType, EntityType> Where(QueryElement query)
+        //{
+        //    if (_tasks.Count != 1)
+        //        throw new InvalidOperationException("There was no current operation which to append this query");
 
-            _tasks[0].Queries.Add(query);
+        //    _tasks[0].Queries.Add(query);
 
-            return this;
-        }
+        //    return this;
+        //}
 
         public IEntityWriter<IdType, EntityType> Run(string script, IDictionary<string, object> parms)
         {
@@ -546,15 +546,15 @@ namespace Dapper.Accelr8.Sql
             return this;
         }
 
-        public IEntityWriter<IdType, EntityType> WithJoin(Join join)
-        {
-            if (_tasks.Count != 1)
-                throw new InvalidOperationException("There was no current operation which to append this query");
+        //public IEntityWriter<IdType, EntityType> WithJoin(Join join)
+        //{
+        //    if (_tasks.Count != 1)
+        //        throw new InvalidOperationException("There was no current operation which to append this query");
 
-            _tasks[0].Joins.Add(join);
+        //    _tasks[0].Joins.Add(join);
 
-            return this;
-        }
+        //    return this;
+        //}
 
         public virtual dynamic BuildParameters(IList<ExecuteTask<EntityType>> tasks)
         {
@@ -711,15 +711,20 @@ namespace Dapper.Accelr8.Sql
             return this.Delete(ids.Cast<IdType>().ToList());
         }
 
-        IEntityWriter IEntityWriter.Where(QueryElement query)
+        IEntityWriter IEntityWriter.Delete(IList<QueryElement> queries)
         {
-            return this.Where(query);
+            return this.DeleteByQuery(queries);
         }
 
-        IEntityWriter IEntityWriter.WithJoin(Join join)
-        {
-            return this.WithJoin(join);
-        }
+        //IEntityWriter IEntityWriter.Where(QueryElement query)
+        //{
+        //    return this.Where(query);
+        //}
+
+        //IEntityWriter IEntityWriter.WithJoin(Join join)
+        //{
+        //    return this.WithJoin(join);
+        //}
 
         IEntityWriter IEntityWriter.WithChild(IEntityWriter writer, object parent)
         {
