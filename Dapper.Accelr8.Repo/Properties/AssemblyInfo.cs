@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dapper.Accelr8.Repo")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Dapper Acceler8or Repository")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard Company")]
-[assembly: AssemblyProduct("Dapper.Accelr8.Repo")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2015")]
+[assembly: AssemblyCompany("Kristen Mallory")]
+[assembly: AssemblyProduct("Dapper Accelr8or")]
+[assembly: AssemblyCopyright("Copyright © Kristen Mallory")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
