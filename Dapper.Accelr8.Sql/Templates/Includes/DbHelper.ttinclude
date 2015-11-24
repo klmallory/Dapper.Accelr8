@@ -81,6 +81,7 @@
 		public bool ParentColumnIsPrimaryKey { get; set; }
 		public string ParentClassName { get; set; }
 		public string ParentFieldName { get; set; }
+		public string ChildFieldName { get; set; }
 		public bool IsNullable { get; set; }
 	}
 
@@ -191,25 +192,25 @@
                     ic.column_id,
                     ic.index_column_id,
                     ic.object_id
-                    FROM {0}.sys.indexes idx
-                    join {0}.sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
-                    WHERE  idx.object_id =OBJECT_ID(@tableName) AND idx.is_primary_key=1
+                    FROM sys.indexes idx
+                    join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
+                    WHERE idx.is_primary_key=1
                 )
 				select OBJECT_NAME(fk.object_id) Name, 
-					OBJECT_NAME(fk.parent_object_id) [Table], 
-					Object_Name(fk.referenced_object_id) Parent,
-					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
-					col.Name [Column],
-					col.is_nullable IsNullable, 
+					OBJECT_NAME(fk.referenced_object_id) Parent, 
 					pCol.Name ParentColumn,
+					Object_Name(fk.parent_object_id) [Table],
+					col.Name [Column],
+					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
+					col.is_nullable IsNullable, 
 					pSysType.name ColumnType
-				from {0}.sys.foreign_keys fk
-				join {0}.sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
-				join {0}.sys.columns col on col.column_id = fkc.constraint_column_id and col.object_id = fk.parent_object_id
-				join {0}.sys.columns pCol on pCol.column_id = fkc.constraint_column_id and pCol.object_id = fk.referenced_object_id
-				join {0}.sys.systypes pSysType on pSysType.type = pCol.system_type_id
-				left outer join indexCTE ON pCol.column_id=indexCTE.column_id AND pCol.object_id=indexCTE.object_id
-				where fk.referenced_object_id = OBJECT_ID(@tableName)", database);
+				from sys.foreign_keys fk
+				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
+				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
+				join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
+				join sys.systypes pSysType on pSysType.type = pCol.system_type_id
+				left outer join indexCTE ON col.column_id=indexCTE.column_id AND col.object_id=indexCTE.object_id
+				where fk.referenced_object_id = OBJECT_ID(@tableName);", database);
 
             SqlParameter param = new SqlParameter("@tableName", SqlDbType.NVarChar, 100) { Value = string.Format("{0}.{1}.{2}", database, schema, tableName) };
             DataTable dt = GetDataTable(connectionString, sql, param);
@@ -236,25 +237,26 @@
                     SELECT 
                     ic.column_id,
                     ic.index_column_id,
-                    ic.object_id
-                    FROM {0}.sys.indexes idx
-                    join {0}.sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
-                    WHERE  idx.object_id =OBJECT_ID(@tableName) AND idx.is_primary_key=1
+					ic.object_id,
+                    OBJECT_NAME(ic.object_id) name
+                    FROM sys.indexes idx
+                    join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
+                    WHERE idx.is_primary_key=1
                 )
 				select OBJECT_NAME(fk.object_id) Name, 
-					OBJECT_NAME(fk.parent_object_id) [Table], 
-					Object_Name(fk.referenced_object_id) Parent, 
-					col.Name [Column], 
+					OBJECT_NAME(fk.referenced_object_id) Parent, 
+					pCol.Name ParentColumn, 
+					Object_Name(fk.parent_object_id) [Table], 
+					col.Name [Column],
 					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
 					pCol.is_nullable IsNullable, 
-					pCol.Name ParentColumn,
 					pSysType.name ColumnType
-				from sys.foreign_keys fk
-				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
-				join sys.columns col on col.column_id = fkc.constraint_column_id and col.object_id = fk.parent_object_id
-				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id and pCol.object_id = fk.referenced_object_id
+				from {0}.sys.foreign_keys fk
+				join {0}.sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
+				join {0}.sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
+				join {0}.sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
 				join {0}.sys.systypes pSysType on pSysType.type = pCol.system_type_id
-				left outer join indexCTE ON col.column_id=indexCTE.column_id AND col.object_id=indexCTE.object_id
+				left outer join indexCTE ON pCol.column_id=indexCTE.column_id AND pCol.object_id=indexCTE.object_id
 				where fk.parent_object_id = OBJECT_ID(@tableName)", database);
 
             SqlParameter param = new SqlParameter("@tableName", SqlDbType.NVarChar, 100) { Value = string.Format("{0}.{1}.{2}", database, schema, tableName) };

@@ -104,6 +104,7 @@
 				foreach(var c in t.Value.Children)
 				{
 					c.Column = c.Column.Replace(" ", "_spc_");
+					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
 
 					if (tableNames.ContainsKey(c.Table))
 						c.ChildClassName = tableNames[c.Table];
@@ -126,6 +127,7 @@
 
 				foreach(var c in t.Value.Parents)
 				{
+					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
 					c.Column = c.Column.Replace(" ", "_spc_");
 
 					if (tableNames.ContainsKey(c.Parent))
@@ -138,7 +140,12 @@
 					if (columnNames.ContainsKey(t.Value.TableName + "." + c.ParentColumn))
 						c.ParentFieldName = columnNames[t.Value.TableName + "." + c.ParentColumn];
 					else
-						c.ParentFieldName = c.ParentColumn;
+						c.ParentFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.ParentColumn));
+
+					if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
+						c.ChildFieldName = columnNames[t.Value.TableName + "." + c.Column];
+					else
+						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column));
 
 					if (tableAliases.ContainsKey(c.Parent))
 						c.ParentAlias = tableAliases[c.Parent];

@@ -680,7 +680,7 @@ namespace Dapper.Accelr8.Sql
             return count;
         }
 
-        #region IEntityWriter Memebers
+        #region IEntityWriter Members
 
         IEntityWriter IEntityWriter.Insert(object entity)
         {
