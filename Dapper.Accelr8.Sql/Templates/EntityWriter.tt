@@ -70,43 +70,31 @@ using Dapper;
 using Dapper.Accelr8.Sql;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
-using Dapper.Accelr8.Repo.Contracts.Readers;
+using Dapper.Accelr8.Repo.Contracts.Writers;
 
 namespace <#= SchemaHelper.WritersNamespace #>
 {
-    public class <#= className #> : EntityReader<<#= idType #>, <#= entityType #>>
+    public class <#= className #> : EntityWriter<<#= idType #>, <#= entityType #>>
     {
-        public MockDomainAWriter
+        public <#= className #>
 			(TableInfo tableInfo
             , string connectionStringName
             , DapperExecuter executer
             , QueryBuilder queryBuilder
-            , JoinBuilder joinBuilder) 
-            : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder)
+            , JoinBuilder joinBuilder
+			, IServiceLocatorMarker locator) 
+            : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, locator)
 		{
 
 		}
 
 		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne).GroupBy(c => c.ChildClassName).Select(s => s.First()))
 			{ 
-				//
-				//Add Methods to Resolve Other Children Writers
-				//
 				var cidType = child.CSharpType;
 				var ceType = child.ChildClassName;
-				var writerName = "_" + Accelr8or.Inflector.MakeInitialLowerCase(ceType) + "Writer"; 
-#>static IEntityWriter<<#= cidType #> , <#= ceType #>> <#= writerName #>;
-		static IEntityWriter<<#= cidType #> , <#= ceType #>> Get<#= ceType #>Writer()
-		{
-		<# if (SchemaHelper.CacheLocatorResults) {
-#>	if (<#= writerName #> == null)
-				<#= writerName #> = _locator.Resolve<IEntityWriter<<#= cidType #> , <#= ceType #>>>();
-
-			return <#= writerName #>;
-		<# } else {  
-#>	return _locator.Resolve<IEntityWriter<<#= cidType #> , <#= ceType #>>>();
-		<# } #>}
-
+#>
+static IEntityWriter<<#= cidType #> , <#= ceType #>> Get<#= ceType #>Writer()
+		{ return _locator.Resolve<IEntityWriter<<#= cidType #> , <#= ceType #>>>(); }
 		<# } #>
 
 		/// <summary>
@@ -114,30 +102,39 @@ namespace <#= SchemaHelper.WritersNamespace #>
 		/// </summary>
 		/// <param name="results">Parameters for sql writes</param>
 		/// <param name="row"></param>
-        protected override IDictionary<string, object> GetParams(Repository.ActionType actionType, <#= entityType #> entity, int taskIndex, int count)
+        protected override IDictionary<string, object> GetParams(ActionType actionType, <#= entityType #> entity, int taskIndex, int count)
         {
             var parms = new Dictionary<string, object>();
 
 		<# foreach (var col in table.Columns.Where(c => !c.Ignore))
 		{#>
-			parms.Add(GetParamName(<#= entityType #>ColumnNames.<#= col.ColumnName #>, actionType, taskIndex, count), entity.<#= col.FieldName #>);
+	parms.Add(GetParamName(<#= entityType #>ColumnNames.<#= col.ColumnName #>.ToString(), actionType, taskIndex, count), <# if (col.CastType != null) { #> (<#= col.CastType #>) <# } #>entity.<#= col.FieldName #>);
 		<#}#>
 			
 			return parms;
         }
 
 
-		protected override void CascadeRelations(MockDomainA entity, Repository.ScriptContext context)
+		protected override void CascadeRelations(<#= entityType #> entity, ScriptContext context)
         {
             if (entity == null)
                 return;
 
-            if ((_cascades.Contains("mockb") || _cascades.Contains("all")) && entity.ChildrenB != null)
-                foreach (var b in entity.ChildrenB)
-                    Cascade(_bWriter, b, context);
+		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName);
+			#>
+	//From Foreign Key <#= child.Name #>
+			var <#= writerName #> = Get<#= child.ChildClassName #>Writer();
+			if (_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(child.Table).ToLower() #>.ToString()))
+				foreach (var item in entity.<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #>)
+					Cascade(<#= writerName #>, item, context);
 
-            if (_bWriter.Count > 0)
-                WithChild(_bWriter, entity);
+			if (<#= writerName #>.Count > 0)
+				WithChild(<#= writerName #>, entity);
+
+		<# } #>
+
         }
 
 

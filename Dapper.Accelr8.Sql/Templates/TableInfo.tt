@@ -81,11 +81,19 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 	public enum <#= entityType #>ColumnNames
 	{<# foreach (var col in table.Columns)
 	{#>	
-
 		<#= col.ColumnName #>, <# } #>	
 	}
 
-	public class <#= className #> : Dapper.Accelr8.Repo.TableInfo
+	public enum <#= entityType #>CascadeNames
+	{<# foreach (var c in table.Children.Where(c => !c.Ignore))
+	{#>	
+		<#= Accelr8or.Inflector.MakeSingular(c.Table).ToLower() #>, <# } #>	
+	<# foreach (var p in table.Parents.Where(p => !p.Ignore))
+	{#>	
+		<#= Accelr8or.Inflector.MakeSingular(p.Parent).ToLower() #>, <# } #>	
+	}
+
+	public class <#= className #> : Dapper.Accelr8.Sql.TableInfo
 	{
 		public <#= className #>(IServiceLocatorMarker locator) : base(locator)
 		{

@@ -17,6 +17,8 @@ namespace Dapper.Accelr8.Sql
     {
         protected static string _sqlIdType = "int";
         protected static int _typeHash = typeof(EntityType).GetHashCode();
+        static protected IServiceLocatorMarker _locator;
+
         static EntityWriter()
         {
             if (typeof(IdType) == typeof(Int32))
@@ -31,12 +33,16 @@ namespace Dapper.Accelr8.Sql
                 _sqlIdType = "nvarchar(512)";
         }
 
-        public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder)
+
+        public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder, IServiceLocatorMarker serviceLocator)
         {
             _connectionStringName = connectionStringName;
             _executer = executer;
             _queryBuilder = queryBuilder;
             _joinBuilder = joinBuilder;
+
+            if (_locator == null)
+                _locator = serviceLocator;
 
             UniqueId = tableInfo.UniqueId;
             IdField = tableInfo.IdColumn;

@@ -46,6 +46,52 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DapperExecuter.cs" />
+    <Compile Include="Domain\AdminSetting.cs" />
+    <Compile Include="Domain\Agency.cs" />
+    <Compile Include="Domain\AgencyEndpoint.cs" />
+    <Compile Include="Domain\AgencySpec.cs" />
+    <Compile Include="Domain\Application.cs" />
+    <Compile Include="Domain\AuditTrail.cs" />
+    <Compile Include="Domain\BiographicGroup.cs" />
+    <Compile Include="Domain\Biometric.cs" />
+    <Compile Include="Domain\Client.cs" />
+    <Compile Include="Domain\CmtTransactionEnrollmentMnemonicValue.cs" />
+    <Compile Include="Domain\DefaultValue.cs" />
+    <Compile Include="Domain\Document.cs" />
+    <Compile Include="Domain\Endpoint.cs" />
+    <Compile Include="Domain\EnrollmentMnemonicValue.cs" />
+    <Compile Include="Domain\Group.cs" />
+    <Compile Include="Domain\Information.cs" />
+    <Compile Include="Domain\License.cs" />
+    <Compile Include="Domain\MatchRequest.cs" />
+    <Compile Include="Domain\Person.cs" />
+    <Compile Include="Domain\Printer.cs" />
+    <Compile Include="Domain\PrinterGroup.cs" />
+    <Compile Include="Domain\Response.cs" />
+    <Compile Include="Domain\RoutedResponse.cs" />
+    <Compile Include="Domain\RoutedResponseStatusHistory.cs" />
+    <Compile Include="Domain\Server.cs" />
+    <Compile Include="Domain\Setting.cs" />
+    <Compile Include="Domain\Source.cs" />
+    <Compile Include="Domain\Submission.cs" />
+    <Compile Include="Domain\SubmissionStatusHistory.cs" />
+    <Compile Include="Domain\SubmissionView.cs" />
+    <Compile Include="Domain\Transaction.cs" />
+    <Compile Include="Domain\TransactionClientSource.cs" />
+    <Compile Include="Domain\TransactionField.cs" />
+    <Compile Include="Domain\TransactionFieldValue.cs" />
+    <Compile Include="Domain\TransactionFilePath.cs" />
+    <Compile Include="Domain\TransactionGroup.cs" />
+    <Compile Include="Domain\TransactionGroupSource.cs" />
+    <Compile Include="Domain\TransactionOperationDetail.cs" />
+    <Compile Include="Domain\TransactionOperationHistory.cs" />
+    <Compile Include="Domain\TransactionStatusHistory.cs" />
+    <Compile Include="Domain\TransmissionLog.cs" />
+    <Compile Include="Domain\User.cs" />
+    <Compile Include="Domain\UsersGroup.cs" />
+    <Compile Include="Domain\Workspace.cs" />
+    <Compile Include="Domain\WorkspaceGroup.cs" />
+    <Compile Include="Domain\WorkspaceName.cs" />
     <Compile Include="EntityReader.cs" />
     <Compile Include="EntityWriter.cs" />
     <Compile Include="ExecuteTask.cs" />
@@ -54,6 +100,52 @@
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
     <Compile Include="TableInfo.cs" />
+    <Compile Include="TableInfo\AdminSettingTableInfo.cs" />
+    <Compile Include="TableInfo\AgencyEndpointTableInfo.cs" />
+    <Compile Include="TableInfo\AgencySpecTableInfo.cs" />
+    <Compile Include="TableInfo\AgencyTableInfo.cs" />
+    <Compile Include="TableInfo\ApplicationTableInfo.cs" />
+    <Compile Include="TableInfo\AuditTrailTableInfo.cs" />
+    <Compile Include="TableInfo\BiographicGroupTableInfo.cs" />
+    <Compile Include="TableInfo\BiometricTableInfo.cs" />
+    <Compile Include="TableInfo\ClientTableInfo.cs" />
+    <Compile Include="TableInfo\CmtTransactionEnrollmentMnemonicValueTableInfo.cs" />
+    <Compile Include="TableInfo\DefaultValueTableInfo.cs" />
+    <Compile Include="TableInfo\DocumentTableInfo.cs" />
+    <Compile Include="TableInfo\EndpointTableInfo.cs" />
+    <Compile Include="TableInfo\EnrollmentMnemonicValueTableInfo.cs" />
+    <Compile Include="TableInfo\GroupTableInfo.cs" />
+    <Compile Include="TableInfo\InformationTableInfo.cs" />
+    <Compile Include="TableInfo\LicenseTableInfo.cs" />
+    <Compile Include="TableInfo\MatchRequestTableInfo.cs" />
+    <Compile Include="TableInfo\PersonTableInfo.cs" />
+    <Compile Include="TableInfo\PrinterGroupTableInfo.cs" />
+    <Compile Include="TableInfo\PrinterTableInfo.cs" />
+    <Compile Include="TableInfo\ResponseTableInfo.cs" />
+    <Compile Include="TableInfo\RoutedResponseStatusHistoryTableInfo.cs" />
+    <Compile Include="TableInfo\RoutedResponseTableInfo.cs" />
+    <Compile Include="TableInfo\ServerTableInfo.cs" />
+    <Compile Include="TableInfo\SettingTableInfo.cs" />
+    <Compile Include="TableInfo\SourceTableInfo.cs" />
+    <Compile Include="TableInfo\SubmissionStatusHistoryTableInfo.cs" />
+    <Compile Include="TableInfo\SubmissionTableInfo.cs" />
+    <Compile Include="TableInfo\SubmissionViewTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionClientSourceTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionFieldTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionFieldValueTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionFilePathTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionGroupSourceTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionGroupTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionOperationDetailTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionOperationHistoryTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionStatusHistoryTableInfo.cs" />
+    <Compile Include="TableInfo\TransactionTableInfo.cs" />
+    <Compile Include="TableInfo\TransmissionLogTableInfo.cs" />
+    <Compile Include="TableInfo\UsersGroupTableInfo.cs" />
+    <Compile Include="TableInfo\UserTableInfo.cs" />
+    <Compile Include="TableInfo\WorkspaceGroupTableInfo.cs" />
+    <Compile Include="TableInfo\WorkspaceNameTableInfo.cs" />
+    <Compile Include="TableInfo\WorkspaceTableInfo.cs" />
     <Compile Include="Templates\Domain.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -74,6 +166,52 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TableInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Writers\AdminSettingWriter.cs" />
+    <Compile Include="Writers\AgencyEndpointWriter.cs" />
+    <Compile Include="Writers\AgencySpecWriter.cs" />
+    <Compile Include="Writers\AgencyWriter.cs" />
+    <Compile Include="Writers\ApplicationWriter.cs" />
+    <Compile Include="Writers\AuditTrailWriter.cs" />
+    <Compile Include="Writers\BiographicGroupWriter.cs" />
+    <Compile Include="Writers\BiometricWriter.cs" />
+    <Compile Include="Writers\ClientWriter.cs" />
+    <Compile Include="Writers\CmtTransactionEnrollmentMnemonicValueWriter.cs" />
+    <Compile Include="Writers\DefaultValueWriter.cs" />
+    <Compile Include="Writers\DocumentWriter.cs" />
+    <Compile Include="Writers\EndpointWriter.cs" />
+    <Compile Include="Writers\EnrollmentMnemonicValueWriter.cs" />
+    <Compile Include="Writers\GroupWriter.cs" />
+    <Compile Include="Writers\InformationWriter.cs" />
+    <Compile Include="Writers\LicenseWriter.cs" />
+    <Compile Include="Writers\MatchRequestWriter.cs" />
+    <Compile Include="Writers\PersonWriter.cs" />
+    <Compile Include="Writers\PrinterGroupWriter.cs" />
+    <Compile Include="Writers\PrinterWriter.cs" />
+    <Compile Include="Writers\ResponseWriter.cs" />
+    <Compile Include="Writers\RoutedResponseStatusHistoryWriter.cs" />
+    <Compile Include="Writers\RoutedResponseWriter.cs" />
+    <Compile Include="Writers\ServerWriter.cs" />
+    <Compile Include="Writers\SettingWriter.cs" />
+    <Compile Include="Writers\SourceWriter.cs" />
+    <Compile Include="Writers\SubmissionStatusHistoryWriter.cs" />
+    <Compile Include="Writers\SubmissionViewWriter.cs" />
+    <Compile Include="Writers\SubmissionWriter.cs" />
+    <Compile Include="Writers\TransactionClientSourceWriter.cs" />
+    <Compile Include="Writers\TransactionFieldValueWriter.cs" />
+    <Compile Include="Writers\TransactionFieldWriter.cs" />
+    <Compile Include="Writers\TransactionFilePathWriter.cs" />
+    <Compile Include="Writers\TransactionGroupSourceWriter.cs" />
+    <Compile Include="Writers\TransactionGroupWriter.cs" />
+    <Compile Include="Writers\TransactionOperationDetailWriter.cs" />
+    <Compile Include="Writers\TransactionOperationHistoryWriter.cs" />
+    <Compile Include="Writers\TransactionStatusHistoryWriter.cs" />
+    <Compile Include="Writers\TransactionWriter.cs" />
+    <Compile Include="Writers\TransmissionLogWriter.cs" />
+    <Compile Include="Writers\UsersGroupWriter.cs" />
+    <Compile Include="Writers\UserWriter.cs" />
+    <Compile Include="Writers\WorkspaceGroupWriter.cs" />
+    <Compile Include="Writers\WorkspaceNameWriter.cs" />
+    <Compile Include="Writers\WorkspaceWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapper.Accelr8.Repo\Dapper.Accelr8.Repo.csproj">
@@ -108,10 +246,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Domain\" />
     <Folder Include="Readers\" />
-    <Folder Include="TableInfo\" />
-    <Folder Include="Writers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

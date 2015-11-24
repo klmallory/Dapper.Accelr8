@@ -28,7 +28,7 @@
 
 		static Dictionary<string, string> tableAliases = new Dictionary<string, string>()
 		{
-			{ "CmtTransactionEnrollmentMnemonicValueTableInfo", "temv" }
+			{ "CmtTransactionEnrollmentMnemonicValue", "temv" }
 		};
 
 		static Dictionary<string, string> columnNames = new Dictionary<string, string>();
