@@ -63,7 +63,7 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using <#= SchemaHelper.DomainNamespace #>;
 using <#= SchemaHelper.TableInfoNamespace #>;
 using Dapper;
@@ -82,7 +82,7 @@ namespace <#= SchemaHelper.WritersNamespace #>
             , DapperExecuter executer
             , QueryBuilder queryBuilder
             , JoinBuilder joinBuilder
-			, IServiceLocatorMarker locator) 
+			, IAccelr8Locator locator) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, locator)
 		{
 

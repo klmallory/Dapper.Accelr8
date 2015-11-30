@@ -65,18 +65,17 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using <#= SchemaHelper.DomainNamespace #>;
 using <#= SchemaHelper.TableInfoNamespace #>;
 using Dapper;
-using Dapper.Accelr8.Sql;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 
 namespace <#= SchemaHelper.DomainNamespace #>
 {
-	public class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>, IEntity, IHaveId<<#= idType #>>
+	public class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>
 	{<# if (SchemaHelper.UseDirtyProperties)
 		{ #>
 	

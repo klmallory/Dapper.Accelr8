@@ -4,7 +4,7 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using Dapper;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
@@ -78,7 +78,7 @@ namespace Dapper.Accelr8.Sql
         protected List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>> _children
             = new List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>>();
 
-        static protected IServiceLocatorMarker _locator;
+        static protected IAccelr8Locator _locator;
 
         string _connectionStringName;
         DapperExecuter _executer;
@@ -96,7 +96,7 @@ namespace Dapper.Accelr8.Sql
             , DapperExecuter executer
             , QueryBuilder queryBuilder
             , JoinBuilder joinBuilder
-            , IServiceLocatorMarker serviceLocator)
+            , IAccelr8Locator serviceLocator)
         {
             _connectionStringName = connectionStringName;
             _executer = executer;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using Dapper;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Writers;
@@ -17,7 +17,7 @@ namespace Dapper.Accelr8.Sql
     {
         protected static string _sqlIdType = "int";
         protected static int _typeHash = typeof(EntityType).GetHashCode();
-        static protected IServiceLocatorMarker _locator;
+        static protected IAccelr8Locator _locator;
 
         static EntityWriter()
         {
@@ -34,7 +34,7 @@ namespace Dapper.Accelr8.Sql
         }
 
 
-        public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder, IServiceLocatorMarker serviceLocator)
+        public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder, IAccelr8Locator serviceLocator)
         {
             _connectionStringName = connectionStringName;
             _executer = executer;
@@ -45,10 +45,10 @@ namespace Dapper.Accelr8.Sql
                 _locator = serviceLocator;
 
             UniqueId = tableInfo.UniqueId;
-            IdField = tableInfo.IdColumn;
+            IdColumn = tableInfo.IdColumn;
             TableName = tableInfo.TableName;
             TableAlias = tableInfo.TableAlias;
-            FieldNames = (string[])tableInfo.ColumnNames.Clone();
+            ColumnNames = (string[])tableInfo.ColumnNames.Clone();
         }
 
         protected bool _withCascades;
@@ -111,8 +111,8 @@ namespace Dapper.Accelr8.Sql
         protected virtual object BuildSetParamaters(ExecuteTask<EntityType> task)
         {
             int count = 0;
-            var fieldSets = FieldNames
-                .Except(new string[] { IdField })
+            var fieldSets = ColumnNames
+                .Except(new string[] { IdColumn })
                 .Select(field =>
                     string.Format
                     (setTemplate
@@ -128,10 +128,10 @@ namespace Dapper.Accelr8.Sql
         {
             int count = 0;
 
-            if (FieldNames.Length == 0)
+            if (ColumnNames.Length == 0)
                 return string.Empty;
 
-            var fieldNames = string.Concat(FieldNames.Where(f => f != IdField).Select(s => GetParamName(s, "i", taskIndex, count++) + ", "));
+            var fieldNames = string.Concat(ColumnNames.Where(f => f != IdColumn).Select(s => GetParamName(s, "i", taskIndex, count++) + ", "));
 
             return fieldNames.TrimEnd(',', ' ');
         }
@@ -178,10 +178,10 @@ namespace Dapper.Accelr8.Sql
         protected abstract void UpdateIdsFromReferences(IList<string> cascades, EntityType entity);
 
         public virtual bool UniqueId { get; protected set; }
-        public virtual string IdField { get; protected set; }
+        public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
-        public virtual string[] FieldNames { get; protected set; }
+        public virtual string[] ColumnNames { get; protected set; }
 
         public virtual int Count { get { return _tasks.Count; } }
 
@@ -237,7 +237,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual string GetSqlForInsert(ExecuteTask<EntityType> task)
         {
-            var names = FieldNames.Where(s => s != IdField);
+            var names = ColumnNames.Where(s => s != IdColumn);
 
             var query = new StringBuilder();
 
@@ -246,14 +246,14 @@ namespace Dapper.Accelr8.Sql
                 query.Append(string.Format(insertTemplate
                    , TableName
                    , "[" + String.Join("], [", names.ToArray()).Replace("_spc_", " ") + "]"
-                   , IdField
+                   , IdColumn
                    , BuildInsertParameters(task.Index)));
             }
             else
             {
                 query.Append(string.Format(insertNoFieldsTemplate
                    , TableName
-                   , IdField));
+                   , IdColumn));
             }
 
             query.Append(Environment.NewLine);
@@ -353,27 +353,27 @@ namespace Dapper.Accelr8.Sql
 
         public IEntityWriter<IdType, EntityType> WithColumn(string column)
         {
-            var with = new List<string>(FieldNames);
+            var with = new List<string>(ColumnNames);
             with.Add(column);
-            FieldNames = with.ToArray();
+            ColumnNames = with.ToArray();
 
             return this;
         }
 
         public IEntityWriter<IdType, EntityType> WithoutColumn(string column)
         {
-            var without = new List<string>(FieldNames);
+            var without = new List<string>(ColumnNames);
             without.Remove(column);
-            FieldNames = without.ToArray();
+            ColumnNames = without.ToArray();
 
             return this;
         }
 
         public IEntityWriter<IdType, EntityType> WithoutColumn(string[] columns)
         {
-            var without = new List<string>(FieldNames);
+            var without = new List<string>(ColumnNames);
             without.RemoveAll(a => columns.Contains(a));
-            FieldNames = without.ToArray();
+            ColumnNames = without.ToArray();
 
             return this;
         }
@@ -389,7 +389,7 @@ namespace Dapper.Accelr8.Sql
             task.Queries.Add(
               new QueryElement()
               {
-                  FieldName = IdField,
+                  FieldName = IdColumn,
                   Operator = Operator.Equals,
                   Value = entity.Id,
                   TableAlias = TableAlias
@@ -424,7 +424,7 @@ namespace Dapper.Accelr8.Sql
 
             task.Queries.Add(new QueryElement()
             {
-                FieldName = IdField,
+                FieldName = IdColumn,
                 Operator = Operator.Equals,
                 TableAlias = TableAlias,
                 Value = entity.Id
@@ -444,7 +444,7 @@ namespace Dapper.Accelr8.Sql
 
             task.Queries.Add(new QueryElement()
             {
-                FieldName = IdField,
+                FieldName = IdColumn,
                 Operator = Operator.In,
                 TableAlias = TableAlias + (_tasks.Count),
                 ValueArray = entities.Select(e => e.Id).Cast<object>().ToArray()
@@ -464,7 +464,7 @@ namespace Dapper.Accelr8.Sql
 
             task.Queries.Add(new QueryElement()
             {
-                FieldName = IdField,
+                FieldName = IdColumn,
                 Operator = Operator.In,
                 TableAlias = TableAlias,
                 Value = id
@@ -484,7 +484,7 @@ namespace Dapper.Accelr8.Sql
 
             task.Queries.Add(new QueryElement()
             {
-                FieldName = IdField,
+                FieldName = IdColumn,
                 Operator = Operator.In,
                 TableAlias = TableAlias + (_tasks.Count),
                 ValueArray = ids.Cast<object>().ToArray()
@@ -508,7 +508,7 @@ namespace Dapper.Accelr8.Sql
                 task.Queries.Add(
                   new QueryElement()
                   {
-                      FieldName = IdField,
+                      FieldName = IdColumn,
                       Operator = Operator.Equals,
                       Value = entity.Id,
                       TableAlias = TableAlias.ToString()

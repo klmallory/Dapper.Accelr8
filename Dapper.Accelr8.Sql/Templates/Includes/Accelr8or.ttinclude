@@ -331,6 +331,9 @@ public static class Accelr8or
 
 	public static string GetProjectPath(Project project)
 	{
+		if (project == null)
+			return "";
+
 		var pathProjectFile = project.FullName;
 		return pathProjectFile.Replace(project.Name + ".csproj", "");
 	}

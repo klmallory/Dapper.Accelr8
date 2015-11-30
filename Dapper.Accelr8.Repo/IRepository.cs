@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Readers;

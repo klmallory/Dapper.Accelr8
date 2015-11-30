@@ -67,7 +67,7 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using <#= SchemaHelper.DomainNamespace #>;
 using <#= SchemaHelper.TableInfoNamespace #>;
 using Dapper;
@@ -95,7 +95,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 
 	public class <#= className #> : Dapper.Accelr8.Sql.TableInfo
 	{
-		public <#= className #>(IServiceLocatorMarker locator) : base(locator)
+		public <#= className #>(IAccelr8Locator locator) : base(locator)
 		{
 			UniqueId = <#= table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore).ToString().ToLower() #>;
 			IdColumn = <#= entityType #>ColumnNames.<#= (table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName #>.ToString();

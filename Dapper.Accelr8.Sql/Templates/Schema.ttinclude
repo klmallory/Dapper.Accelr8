@@ -15,7 +15,7 @@
 		public static string ReadersDirectory = @"Readers";
 		public static string TableInfoProject = "Dapper.Accelr8.Sql";
 		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
-		public static string TableInfoDirectory = @"TableInfo";
+		public static string TableInfoDirectory = @"TableInfos";
 
 		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=EnrollmentBioStore;Integrated Security=SSPI;";
 		static string _database = @"EnrollmentBioStore";

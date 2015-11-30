@@ -8,7 +8,7 @@ using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using Dapper;
 using Dapper.Accelr8.Repo.Parameters;
 using SqlMapper = Dapper.SqlMapper;
@@ -218,7 +218,7 @@ namespace Dapper.Accelr8.Sql
                         (query
                         , map: load
                         , param: parameters
-                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName)))
+                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName).ToArray()))
                         .ToList();
                 }
                 catch (DbException dbEx)
@@ -256,7 +256,7 @@ namespace Dapper.Accelr8.Sql
                         (query
                         , map: load
                         , param: parameters
-                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName)))
+                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName).ToArray()))
                         .ToList();
                 }
                 catch (DbException dbEx)
@@ -295,7 +295,7 @@ namespace Dapper.Accelr8.Sql
                         (query
                         , map: load
                         , param: parameters
-                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName)))
+                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName).ToArray()))
                         .ToList();
                 }
                 catch (SqlException sqlEx)
@@ -335,7 +335,7 @@ namespace Dapper.Accelr8.Sql
                         (query
                         , map: load
                         , param: parameters
-                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName)))
+                        , splitOn: string.Join(",", joins.Select(j => j.SplitOnColumnName).ToArray()))
                         .ToList();
                 }
                 catch (SqlException sqlEx)

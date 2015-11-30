@@ -11,6 +11,7 @@
     <AssemblyName>Dapper.Accelr8.Sql</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Dapper.Accelr8.Repo\ver.cs">
+      <Link>ver.cs</Link>
+    </Compile>
     <Compile Include="DapperExecuter.cs" />
     <Compile Include="EntityReader.cs" />
     <Compile Include="EntityWriter.cs" />
@@ -54,11 +58,6 @@
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
     <Compile Include="TableInfo.cs" />
-    <Compile Include="Templates\Domain.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Domain.tt</DependentUpon>
-    </Compile>
     <Compile Include="Templates\EntityReader.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -110,7 +109,7 @@
   <ItemGroup>
     <Folder Include="Domain\" />
     <Folder Include="Readers\" />
-    <Folder Include="TableInfo\" />
+    <Folder Include="TableInfos\" />
     <Folder Include="Writers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

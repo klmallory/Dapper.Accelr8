@@ -10,9 +10,9 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
     public interface IEntityWriter : IDisposable
     {
         bool UniqueId { get; }
-        string IdField { get; }
+        string IdColumn { get; }
         string TableName { get; }
-        string[] FieldNames { get; }
+        string[] ColumnNames { get; }
         string TableAlias { get; }
         int Count { get; }
         IEntityWriter Insert(object entity);

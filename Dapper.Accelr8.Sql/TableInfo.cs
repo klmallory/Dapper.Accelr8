@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 using Dapper.Accelr8.Repo.Contracts.Writers;
@@ -15,14 +15,14 @@ namespace Dapper.Accelr8.Sql
         protected static object _syncRoot = new object();
         protected static Dictionary<string, object> _readers = new Dictionary<string, object>();
         protected static bool _cacheReaders = true;
-        static protected IServiceLocatorMarker _locator;
+        static protected IAccelr8Locator _locator;
 
         public TableInfo() : this(null)
         {
 
         }
 
-        public TableInfo(IServiceLocatorMarker locator)
+        public TableInfo(IAccelr8Locator locator)
         {
             ColumnNames = new string[0];
             Joins = new JoinInfo[0];

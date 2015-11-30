@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 using Dapper.Accelr8.Repo.Contracts.Writers;
@@ -18,13 +17,13 @@ namespace Dapper.Accelr8.Repo
     {
         static int _typeHash = typeof(EntityType).GetHashCode();
 
-        public Repository(IServiceLocatorMarker serviceLocator, IUnitOfWorkStore unitStore)
+        public Repository(IAccelr8Locator serviceLocator, IUnitOfWorkStore unitStore)
         {
             _serviceLocator = serviceLocator;
             _unitStore = unitStore;
         }
 
-        IServiceLocatorMarker _serviceLocator;
+        IAccelr8Locator _serviceLocator;
         IUnitOfWorkStore _unitStore;
 
         protected virtual IEntityWriter<IdType, EntityType> GetWriter()
