@@ -83,6 +83,8 @@ namespace Dapper.Accelr8.Repo
         {
             using (var reader = GetReader())
             {
+                reader.WithAllJoins();
+
                 reader.WithTop(take);
 
                 foreach (var o in ordering)
@@ -97,6 +99,8 @@ namespace Dapper.Accelr8.Repo
             using (var reader = GetReader())
             {
                 reader.WhereId(id);
+
+                reader.WithAllJoins();
 
                 return reader.QueryResult().FirstOrDefault();
             }
@@ -118,6 +122,8 @@ namespace Dapper.Accelr8.Repo
             {
                 reader.Where(query);
 
+                reader.WithAllJoins();
+
                 var res = reader.QueryResult();
 
                 if (withChildren)
@@ -135,6 +141,8 @@ namespace Dapper.Accelr8.Repo
                 foreach (var q in query)
                     reader.Where(q);
 
+                reader.WithAllJoins();
+
                 var res = reader.QueryResult();
 
                 if (withChildren)
@@ -149,6 +157,8 @@ namespace Dapper.Accelr8.Repo
             using (var reader = GetReader())
             {
                 reader.Where(query);
+
+                reader.WithAllJoins();
 
                 if (take > 0)
                     reader.WithTop(take);
@@ -172,6 +182,8 @@ namespace Dapper.Accelr8.Repo
                 foreach (var q in query)
                     reader.Where(q);
 
+                reader.WithAllJoins();
+
                 if (take > 0)
                     reader.WithTop(take);
 
@@ -193,6 +205,8 @@ namespace Dapper.Accelr8.Repo
                 foreach (var q in query)
                     reader.Where(q);
 
+                reader.WithAllJoins();
+
                 foreach (var o in ordering)
                     reader.OrderBy(o);
 
@@ -206,6 +220,8 @@ namespace Dapper.Accelr8.Repo
             {
                 foreach (var q in query)
                     reader.Where(q);
+
+                reader.WithAllJoins();
 
                 foreach (var o in ordering)
                     reader.OrderBy(o);
@@ -221,6 +237,8 @@ namespace Dapper.Accelr8.Repo
                 foreach (var q in query)
                     reader.Where(q);
 
+                reader.WithAllJoins();
+
                 foreach (var g in grouping)
                     reader.GroupBy(g);
 
@@ -235,6 +253,8 @@ namespace Dapper.Accelr8.Repo
                 foreach (var q in query)
                     reader.Where(q);
 
+                reader.WithAllJoins();
+
                 foreach (var a in aggregates)
                     reader.WithAggregate(a);
 
@@ -248,6 +268,8 @@ namespace Dapper.Accelr8.Repo
             {
                 foreach (var q in query)
                     reader.Where(q);
+
+                reader.WithAllJoins();
 
                 foreach (var h in havings)
                     reader.Having(h);
@@ -269,6 +291,8 @@ namespace Dapper.Accelr8.Repo
             {
                 foreach (var q in query)
                     reader.Where(q);
+
+                reader.WithAllJoins();
 
                 foreach (var a in aggregates)
                     reader.WithAggregate(a);
@@ -364,7 +388,7 @@ namespace Dapper.Accelr8.Repo
             }
         }
 
-        public void Delete(IdType id, params string[] cascades)
+        public void Delete(IdType id)
         {
             var writer = GetWriter();
 
@@ -381,9 +405,15 @@ namespace Dapper.Accelr8.Repo
 
         public void Delete(EntityType entity, params string[] cascades)
         {
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+
             var writer = GetWriter();
 
-            writer.Delete(new List<IdType>() { entity.Id });
+            foreach (var c in cascades)
+                writer.WithCascade(c);
+
+            writer.Delete(entity);
 
             if (_unitStore.ActiveUnitOfWork != null)
                 _unitStore.ActiveUnitOfWork.Remove(entity.Id, _typeHash, writer);
@@ -417,12 +447,9 @@ namespace Dapper.Accelr8.Repo
             }
         }
 
-        public void Delete(IList<QueryElement> queries, params string[] cascades)
+        public void Delete(IList<QueryElement> queries)
         {
             var writer = GetWriter();
-
-            foreach (var c in cascades)
-                writer.WithCascade(c);
 
             var qq = queries.ToArray();
 

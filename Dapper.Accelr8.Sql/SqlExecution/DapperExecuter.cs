@@ -8,7 +8,6 @@ using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-
 using Dapper;
 using Dapper.Accelr8.Repo.Parameters;
 using SqlMapper = Dapper.SqlMapper;

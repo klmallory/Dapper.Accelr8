@@ -103,7 +103,7 @@ namespace Dapper.Accelr8.Sql
             _queryBuilder = queryBuilder;
             _joinBuilder = joinBuilder;
 
-            if (_locator != null)
+            if (_locator == null)
                 _locator = serviceLocator;
 
             UniqueId = tableInfo.UniqueId;
@@ -1098,6 +1098,11 @@ namespace Dapper.Accelr8.Sql
         public virtual IEntityReader WithManyToOneJoin
             (JoinInfo join)
         {
+            for (var i = 0; i < join.JoinQuery.Length; i++)
+            {
+                join.JoinQuery[i].ParentTableAlias = TableAlias;
+            }
+
             var j = new Join()
             {
                 Load = join.Load,
@@ -1108,6 +1113,8 @@ namespace Dapper.Accelr8.Sql
                 Outer = join.Outer,
                 JoinOnQueries = join.JoinQuery
             };
+
+            _joins.Add(j);
 
             return this;
         }

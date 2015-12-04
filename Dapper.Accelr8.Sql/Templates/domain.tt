@@ -76,14 +76,22 @@ using Dapper.Accelr8.Repo.Contracts.Readers;
 namespace <#= SchemaHelper.DomainNamespace #>
 {
 	public class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>
-	{<# if (SchemaHelper.UseDirtyProperties)
+	{
+			public <#= className #>()
+		{<# if (SchemaHelper.UseDirtyProperties)
 		{ #>
-	
-		public <#= className #>()
-		{
-			IsDirty = false;
-		}
-		<# } #>
+			
+			IsDirty = false; 
+			<# }
+				foreach (var child in table.Children.Where(c => !c.Ignore))
+		{ if (SchemaHelper.UseDirtyProperties) { 
+			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName));#>
+<#= backing #> = new List<<#= child.ChildClassName #>>();
+		<# } else { #>
+
+	<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> = new List<<#= child.ChildClassName #>>();
+		<# } } #>}
+
 	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore ))
 	{
 		if (SchemaHelper.UseDirtyProperties)
@@ -104,7 +112,8 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #> <#= col.FieldName #> { get; set; }
 		<# } } 
 		foreach (var parent in table.Parents.Where(p => !p.Ignore))
-	{
+	{ #> 
+	//From Foreign Key <#= parent.Name #><#
 		if (SchemaHelper.UseDirtyProperties)
 		{
 		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassName);#>	
@@ -123,7 +132,8 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		public <#= parent.ParentClassName #> <#= parent.ParentClassName #> { get; set; }
 		<# } } 
 		foreach (var child in table.Children.Where(c => !c.Ignore))
-		{
+		{#> 
+	//From Foreign Key <#= child.Name #><#
 			if (SchemaHelper.UseDirtyProperties)
 			{
 			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName));#>	

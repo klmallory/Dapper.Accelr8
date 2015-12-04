@@ -80,7 +80,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
     public class <#= className #> : EntityReader<<#= idType #>, <#= entityType #>>
     {
         public <#= className #>(
-            TableInfo tableInfo
+            <#= entityType #>TableInfo tableInfo
             , string connectionStringName
             , DapperExecuter executer
             , QueryBuilder queryBuilder

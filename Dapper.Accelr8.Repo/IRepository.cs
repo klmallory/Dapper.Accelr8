@@ -66,6 +66,6 @@ namespace Dapper.Accelr8.Repo
         IList<EntityType> Select(IEntityReader<IdType, EntityType> customQuery);
         void Delete(EntityType entity, params string[] cascades);
         void Delete(IList<EntityType> entities, params string[] cascades);
-        void Delete(IList<QueryElement> query, params string[] cascades);
+        void Delete(IList<QueryElement> query);
     }
 }

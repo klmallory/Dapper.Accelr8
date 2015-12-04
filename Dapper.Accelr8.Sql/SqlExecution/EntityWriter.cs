@@ -172,9 +172,30 @@ namespace Dapper.Accelr8.Sql
             return true;
         }
 
+        protected virtual bool CascadeDelete<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
+            where EType : class, IEntity, IHaveId<IType>
+            where IType : struct, IComparable<IType>, IEquatable<IType>
+        {
+            if (entity == null || !entity.IsDirty)
+                return false;
+
+            if (context.ContainsKey(entity.GetHashCode()))// && !object.Equals(entity.Id, default(IType)))
+                return false;
+            else
+                context.Add(entity.GetHashCode());
+
+            if (!entity.IsNew())
+                writer.Delete(entity);
+
+            foreach (var c in _cascades)
+                writer.WithCascade(c);
+
+            return true;
+        }
+
         protected abstract IDictionary<string, object> GetParams(ActionType actionType, EntityType entity, int taskIndex, int count);
         protected abstract void CascadeRelations(EntityType entity, ScriptContext context);
-        protected abstract void RemoveRelations(IList<string> cascades, EntityType entity);
+        protected abstract void RemoveRelations(EntityType entity, ScriptContext context);
         protected abstract void UpdateIdsFromReferences(IList<string> cascades, EntityType entity);
 
         public virtual bool UniqueId { get; protected set; }
@@ -184,6 +205,14 @@ namespace Dapper.Accelr8.Sql
         public virtual string[] ColumnNames { get; protected set; }
 
         public virtual int Count { get { return _tasks.Count; } }
+
+        public virtual bool HasDeletes()
+        {
+            if (_tasks == null)
+                return false;
+
+            return _tasks.Any(t => t.TaskType == ActionType.Remove);
+        }
 
         public virtual IEntityWriter<IdType, EntityType> WithChild(IEntityWriter writer, EntityType parent)
         {
@@ -446,7 +475,7 @@ namespace Dapper.Accelr8.Sql
             {
                 FieldName = IdColumn,
                 Operator = Operator.In,
-                TableAlias = TableAlias + (_tasks.Count),
+                TableAlias = TableAlias,
                 ValueArray = entities.Select(e => e.Id).Cast<object>().ToArray()
             });
 
@@ -486,7 +515,7 @@ namespace Dapper.Accelr8.Sql
             {
                 FieldName = IdColumn,
                 Operator = Operator.In,
-                TableAlias = TableAlias + (_tasks.Count),
+                TableAlias = TableAlias,
                 ValueArray = ids.Cast<object>().ToArray()
             });
 
@@ -624,22 +653,34 @@ namespace Dapper.Accelr8.Sql
 
         public virtual int Execute(ScriptContext context)
         {
-            if (!_tasks.Any(t => t.Entity == null || t.Entity.IsDirty))
-                return 0;
-
             foreach (var d in _tasks)
             {
-                if (d.Entity == null)
+                if (d.TaskType != ActionType.Remove && d.Entity != null && !d.Entity.IsDirty)
+                {
+                    context.Add(d.Entity.GetHashCode());
                     continue;
+                }
 
                 UpdateIdsFromReferences(_cascades, d.Entity);
 
-                context.Add(d.Entity.GetHashCode());
+                if (d.Entity != null)
+                    context.Add(d.Entity.GetHashCode());
+                else if (d.Entities != null)
+                    foreach (var e in d.Entities)
+                        context.Add(e.GetHashCode());
+                else
+                    context.Add(d.Queries.First().FieldName.GetHashCode());
 
                 if (_cascades.Count > 0)
                 {
-                    if (d.TaskType == ActionType.Remove && d.Entity != null)
-                        RemoveRelations(_cascades, d.Entity);
+                    if (d.TaskType == ActionType.Remove)
+                    {
+                        if (d.Entity != null)
+                            RemoveRelations(d.Entity, context);
+                        else if (d.Entities.Count > 0)
+                            foreach (var e in d.Entities)
+                                RemoveRelations(e, context);
+                    }
                     else if (d.Entity != null)
                         CascadeRelations(d.Entity, context);
                 }
@@ -653,8 +694,14 @@ namespace Dapper.Accelr8.Sql
                 UpdateIdsFromReferences(_cascades, p.Item2);
             }
 
+            foreach (var c in _children.Where(c => c.Item1.HasDeletes()))
+            {
+                count += c.Item1.Execute(context);
+                UpdateIdsFromReferences(_cascades, c.Item2);
+            }
+
             //if the entity was already inserted via cascade since the task was initiated, remove it.
-            _tasks.RemoveAll(d => d.Entity != null && d.TaskType == ActionType.Add && !d.Entity.IsDirty);
+            _tasks.RemoveAll(d => d.Entity != null && d.TaskType != ActionType.Remove && !d.Entity.IsDirty);
 
             if (_tasks.Count < 1)
                 return count;
@@ -669,7 +716,7 @@ namespace Dapper.Accelr8.Sql
                 if (d.Entity != null)
                     d.Entity.IsDirty = false;
 
-            foreach (var c in _children)
+            foreach (var c in _children.Where(c => !c.Item1.HasDeletes()))
             {
                 if (c.Item2 != null)
                     UpdateIdsFromReferences(_cascades, c.Item2);

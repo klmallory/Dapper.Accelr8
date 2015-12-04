@@ -15,6 +15,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
         string[] ColumnNames { get; }
         string TableAlias { get; }
         int Count { get; }
+        bool HasDeletes();
         IEntityWriter Insert(object entity);
         IEntityWriter Insert(IList<object> entities);
 

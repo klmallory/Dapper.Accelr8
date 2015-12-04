@@ -18,11 +18,13 @@ namespace Dapper.Accelr8.Sql
             Queries = new List<QueryElement>();
             Joins = new List<Join>();
             Params = new Dictionary<string, object>();
+            Entities = new List<EntityType>();
         }
 
         public int Index { get; set; }
         public ActionType TaskType { get; set; }
         public EntityType Entity { get; set; }
+        public List<EntityType> Entities { get; set; }
         public List<QueryElement> Queries { get; set; }
         public List<Join> Joins { get; set; }
         public string Script { get; set; }
