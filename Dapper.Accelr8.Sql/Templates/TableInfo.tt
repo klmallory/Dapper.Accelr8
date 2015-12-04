@@ -106,7 +106,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 			Joins = new JoinInfo[] {
 			<# 
 			//*************************************
-			foreach (var parent in table.Parents.Where(p => !p.IsNullable && !p.Ignore))
+			foreach (var parent in table.Parents.Where(p => !p.Ignore).OrderBy(p => p.IsNullable))
 			{ 
 				var pidType = parent.CSharpType;
 				var peType = Accelr8or.Inflector.MakeSingular(parent.ParentClassName);
@@ -116,6 +116,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 			Reader = new Func<IEntityReader>(() => GetReader(typeof(<#= pidType #>), typeof(<#= peType #>))),
 			TableName = "<#= parent.Parent #>",
 			Alias = TableAlias + "_" + "<#= parent.ParentAlias #>",
+			Outer = <#= parent.IsNullable.ToString().ToLower() #>,
 			Load = (entity, row) =>
 				{ 
 					var reader = GetReader(typeof(<#= pidType #>), typeof(<#= peType #>));

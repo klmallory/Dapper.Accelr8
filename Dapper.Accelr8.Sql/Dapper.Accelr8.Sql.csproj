@@ -59,6 +59,11 @@
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
     <Compile Include="SqlExecution\TableInfo.cs" />
+    <Compile Include="Templates\TableInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TableInfo.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapper.Accelr8.Repo\Dapper.Accelr8.Repo.csproj">
