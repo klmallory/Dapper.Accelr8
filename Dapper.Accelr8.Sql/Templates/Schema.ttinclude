@@ -106,6 +106,12 @@
 					c.Column = c.Column.Replace(" ", "_spc_");
 					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
 
+					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
+						c.Ignore = true;
+
+					if (!tables.ContainsKey(c.Parent) || tables[c.Parent].Ignore)
+						c.Ignore = true;
+
 					if (tableNames.ContainsKey(c.Table))
 						c.ChildClassName = tableNames[c.Table];
 					else
@@ -129,6 +135,12 @@
 				{
 					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
 					c.Column = c.Column.Replace(" ", "_spc_");
+
+					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
+						c.Ignore = true;
+
+					if (!tables.ContainsKey(c.Parent) || tables[c.Parent].Ignore)
+						c.Ignore = true;
 
 					if (tableNames.ContainsKey(c.Parent))
 						c.ParentClassName = tableNames[c.Parent];

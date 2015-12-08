@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Transactions;
-
+using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo.Contracts.Writers;
 
 namespace Dapper.Accelr8.Repo

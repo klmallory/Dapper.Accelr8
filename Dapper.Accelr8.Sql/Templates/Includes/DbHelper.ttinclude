@@ -11,6 +11,12 @@
 
     public class DbTable
     {
+		public DbTable()
+		{
+			Children = new List<DbChild>();
+			Columns = new List<DbColumn>();
+		}
+
         public string TableName { get; set; }
         public string SchemaName { get; set; }
 		public string TableType {get; set; }
@@ -249,7 +255,7 @@
 					Object_Name(fk.parent_object_id) [Table], 
 					col.Name [Column],
 					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
-					pCol.is_nullable IsNullable, 
+					col.is_nullable IsNullable, 
 					pSysType.name ColumnType
 				from {0}.sys.foreign_keys fk
 				join {0}.sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id

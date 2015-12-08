@@ -67,11 +67,8 @@ using System.Linq;
 using System.Text;
 
 using <#= SchemaHelper.DomainNamespace #>;
-using <#= SchemaHelper.TableInfoNamespace #>;
 using Dapper;
-using Dapper.Accelr8.Repo;
-using Dapper.Accelr8.Repo.Parameters;
-using Dapper.Accelr8.Repo.Contracts.Readers;
+using Dapper.Accelr8.Domain;
 
 namespace <#= SchemaHelper.DomainNamespace #>
 {

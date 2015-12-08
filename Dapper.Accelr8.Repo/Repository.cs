@@ -7,6 +7,7 @@ using Dapper.Accelr8.Repo.Contracts.Readers;
 using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Extensions;
+using Dapper.Accelr8.Domain;
 
 
 namespace Dapper.Accelr8.Repo

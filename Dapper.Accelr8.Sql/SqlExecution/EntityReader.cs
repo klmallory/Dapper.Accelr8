@@ -12,6 +12,7 @@ using Dapper.Accelr8.Repo.Contracts.Readers;
 using EnvDTE;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using Dapper.Accelr8.Domain;
 
 namespace Dapper.Accelr8.Sql
 {

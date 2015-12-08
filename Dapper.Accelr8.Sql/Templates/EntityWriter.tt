@@ -68,6 +68,7 @@ using <#= SchemaHelper.DomainNamespace #>;
 using <#= SchemaHelper.TableInfoNamespace #>;
 using Dapper;
 using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Contracts.Writers;

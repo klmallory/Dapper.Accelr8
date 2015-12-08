@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
 

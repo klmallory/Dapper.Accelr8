@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1120E03D-8004-43CC-AF1B-75A5B424B595}</ProjectGuid>
+    <ProjectGuid>{885C760D-588F-4C7B-94C9-C5442FE0754E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dapper.Accelr8.Repo</RootNamespace>
-    <AssemblyName>Dapper.Accelr8.Repo</AssemblyName>
+    <RootNamespace>Dapper.Accelr8.Domain</RootNamespace>
+    <AssemblyName>Dapper.Accelr8.Domain</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,7 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,37 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contracts\Readers\IEntityReader.cs" />
-    <Compile Include="Contracts\Writers\IEntityWriter.cs" />
-    <Compile Include="Diagnostics.cs" />
-    <Compile Include="Domain\BaseEntity.cs" />
-    <Compile Include="ExecutionContext.cs" />
-    <Compile Include="Extensions\EntityExtensions.cs" />
-    <Compile Include="IdKey.cs" />
-    <Compile Include="IRepository.cs" />
-    <Compile Include="IAccelr8Locator.cs" />
-    <Compile Include="IUnitOfWork.cs" />
-    <Compile Include="Parameters\Aggregate.cs" />
-    <Compile Include="Parameters\GroupBy.cs" />
-    <Compile Include="Parameters\JoinQueryElement.cs" />
-    <Compile Include="Parameters\Operator.cs" />
-    <Compile Include="Parameters\OrderBy.cs" />
-    <Compile Include="Parameters\QueryElement.cs" />
-    <Compile Include="Parameters\TableFieldKey.cs" />
-    <Compile Include="PInvoke\Msvcrt.cs" />
+    <Compile Include="..\Dapper.Accelr8.Repo\ver.cs">
+      <Link>ver.cs</Link>
+    </Compile>
+    <Compile Include="IEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository.cs" />
-    <Compile Include="ScriptContext.cs" />
-    <Compile Include="UnitOfWork.cs" />
-    <Compile Include="UnitOfWorkStore.cs" />
-    <Compile Include="ver.cs" />
-    <Compile Include="WorkAction.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Dapper.Accelr8.Domain\Dapper.Accelr8.Domain.csproj">
-      <Project>{885c760d-588f-4c7b-94c9-c5442fe0754e}</Project>
-      <Name>Dapper.Accelr8.Domain</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

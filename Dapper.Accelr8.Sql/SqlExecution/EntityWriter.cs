@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-
 using Dapper;
+using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
@@ -448,7 +448,8 @@ namespace Dapper.Accelr8.Sql
         {
             var task = new ExecuteTask<EntityType>(_tasks.Count)
             {
-                TaskType = ActionType.Remove
+                TaskType = ActionType.Remove,
+                Entity = entity
             };
 
             task.Queries.Add(new QueryElement()
@@ -468,7 +469,8 @@ namespace Dapper.Accelr8.Sql
         {
             var task = new ExecuteTask<EntityType>(_tasks.Count)
             {
-                TaskType = ActionType.Remove
+                TaskType = ActionType.Remove,
+                Entities = entities.ToList()
             };
 
             task.Queries.Add(new QueryElement()
@@ -617,7 +619,10 @@ namespace Dapper.Accelr8.Sql
                         expand.Add(e.GetUniqueParameter("q") + "_" + task.Index, e.Value);
                     else
                         foreach (var p in e.GetUniqueParameters("q"))
-                            expand.Add(p, e.ValueArray[count++]);
+                        {
+                            var c = count++;
+                            expand.Add(p + "_" + c, e.ValueArray[c]);
+                        }
                 }
             }
 
@@ -655,7 +660,7 @@ namespace Dapper.Accelr8.Sql
         {
             foreach (var d in _tasks)
             {
-                if (d.TaskType != ActionType.Remove && d.Entity != null && !d.Entity.IsDirty)
+                if (d.TaskType == ActionType.Update && d.Entity != null && !d.Entity.IsDirty)
                 {
                     context.Add(d.Entity.GetHashCode());
                     continue;
@@ -701,7 +706,8 @@ namespace Dapper.Accelr8.Sql
             }
 
             //if the entity was already inserted via cascade since the task was initiated, remove it.
-            _tasks.RemoveAll(d => d.Entity != null && d.TaskType != ActionType.Remove && !d.Entity.IsDirty);
+            _tasks.RemoveAll(d => d.Entity != null && d.TaskType == ActionType.Add && !d.Entity.IsDirty);
+            //_tasks.RemoveAll(d => d.Entity != null && d.TaskType != ActionType.Remove && !d.Entity.IsDirty);
 
             if (_tasks.Count < 1)
                 return count;
