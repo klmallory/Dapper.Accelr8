@@ -8,7 +8,7 @@ and Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outp
 
 	The inspiration for this wrapper for dapper is the idea of a templating system that is more friendly for nLayer and distributed environments than most dapper tools. I've given a lot of thought to the repository pattern over the years and decided less is more, leaner is cleaner. In addition I wanted something flexible that could be manipulated to generate the sql I want without generating the sql manually. I still think it's bad practice to try to embed sql functionality into a domain, and conversely to pass sql directly accross application layer boundries. So a simple flexible query syntax was contructed for this purpose. Eventually I would like to suport linq querying directly on the repository, but that will require more time than I have now to invest in it.
 
-# How to install
+## How to install
 For single project data access layer run this command in your data access project:
 Install-Package Dapper.Accelr8.Sql 
 
@@ -32,7 +32,7 @@ Run Install-Package Dapper.Accelr8.Domain.Src in your domain project.
 
 Make sure to include your domain project in your repository project, and both in your Sql project.
 
-# How to use
+## How to setup
 To prevent some odd behavior, close all other instances of Visual Studio.
 Open the schema.ttinclude
 
