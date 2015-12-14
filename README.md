@@ -10,7 +10,7 @@ The inspiration for this wrapper for dapper is the idea of a templating system t
 For single project data access layer run this command in your data access project:
 Install-Package Dapper.Accelr8.Sql 
 
-It will automatically include these projects:
+It will automatically include these references:
   Dapper
   Dapper.Accelr8.Repo 
   Dapper.Accelr8.Domain
