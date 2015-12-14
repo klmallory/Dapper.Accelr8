@@ -126,7 +126,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 					if (st == null || row == null)
 						return st;
 
-					if (row.Id == default(<#= pidType #>))
+					if (row.<#= parent.Column #> == null || row.<#= parent.Column #> == default(<#= pidType #>))
 						return st;
 
 					st.<#= peType #> = reader.LoadEntityObject(row);

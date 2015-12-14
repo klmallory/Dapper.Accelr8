@@ -1,7 +1,7 @@
 ﻿<#+    
 	class SchemaHelper
 	{
-		public static bool CacheLocatorResults = true;
+		public static bool CacheLocatorResults = false;
 		public static bool UseDirtyProperties = true;
 		public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
 		public static string DomainProject = "Dapper.Accelr8.Sql";
@@ -17,8 +17,8 @@
 		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
 		public static string TableInfoDirectory = @"TableInfos";
 
-		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=EnrollmentBioStore;Integrated Security=SSPI;";
-		static string _database = @"EnrollmentBioStore";
+		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=Northwnd;Integrated Security=SSPI;";
+		static string _database = @"Northwnd";
 
 		// Change Names Here =>
 		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
@@ -60,6 +60,8 @@
 
 			// Read schema
 			var tables = helper.GetDbTables(_connectionString, _database);
+
+			//Tweak Tables Here.
 
 			foreach (var t in tables)
 			{
@@ -165,6 +167,8 @@
 						c.ParentAlias = Accelr8or.Inflector.MakeSingular(c.Parent).ToLower();
 				}
 			}
+
+			//Tweak Columns / Relationships Here.
 
 			return tables;
 		}
