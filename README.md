@@ -112,3 +112,28 @@ static Dictionary<string, string> columnTypes = new Dictionary<string, string>()
 	{ "PostalCode", "int" }
 };
 ```
+
+In Order to ignore a table, column, or foreign key relationship, see these examples below:
+
+To Ignore Tables see this comment:
+
+```
+//Tweak Tables Here.
+```
+And add C# code to ignore the tables you want.
+
+``` 
+tables["Territories"].Ignore = true;
+```
+
+To ignore columns and foreign keys, find this line:
+
+```
+//Tweak Columns / Relationships Here.
+```
+Add C# code below to ignore the column child or parent relation relation.
+
+```
+tables["Region"].Children["FK_Territories_Region"].Ignore = true;
+tables["Customers"].Columns["Fax"].Ignore = true;
+```
