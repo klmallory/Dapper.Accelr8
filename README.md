@@ -1,8 +1,7 @@
 # Dapper.Accelr8
 A Dapper Based Data Access Framework with Templating, I've included templates with some peices from 
 SubSonic, and Peta Poco;
-also 
-https://www.nuget.org/packages/T4
+also https://www.nuget.org/packages/T4
 and Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outputs-from-t4-made-easy-revisited
 
 
@@ -47,7 +46,7 @@ keep CacheLocatorResults set to false.
 		public static string DomainNamespace = @"Dapper.Accelr8.Domain";
 		public static string DomainDirectory = @"Domain";
 
-    - these properties below are for generating the sql and belong somewhere in your sql project.
+    		- these properties below are for generating the sql and belong somewhere in your sql project.
 		public static string WritersProject = "Dapper.Accelr8.Sql";
 		public static string WritersNamespace = @"Dapper.Accelr8.Writers";
 		public static string WritersDirectory = @"Writers";
