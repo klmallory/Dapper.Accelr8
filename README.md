@@ -39,15 +39,12 @@ Edit these variable to set the location of your output files for the templates.
 Keep CacheLocatorResults set to false.
 		
 UseDirtyProperties adds dirty property tracking to your domain templates.
-
 ```	
 UseDirtyProperties = true;
 ```
 
 These are the properties for your domain prjoect.
 The BaseDomainEntity variable allows you to use your own base entity class as long as it can fulfill the same Dapper.Accelr8.Domain IEntity.
-
-
 ```
 
 public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
@@ -57,7 +54,6 @@ public static string DomainDirectory = @"Domain";
 ```
 
 These properties below are for generating the sql and belong somewhere in your sql project.
-
 ```
 public static string WritersProject = "Dapper.Accelr8.Sql";
 public static string WritersNamespace = @"Dapper.Accelr8.Writers";
@@ -73,14 +69,12 @@ public static string TableInfoDirectory = @"TableInfos";
 ```
 
 Set your connection string and database here.
-
 ```
 static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=AdventureWorks;Integrated Security=SSPI;";
 static string _database = @"AdventureWorks";
 ```		
 
 These dictionaries hold name transformations..
-
 ```
 static Dictionary<string, string> tableNames = new Dictionary<string, string>()
 { 
@@ -115,23 +109,21 @@ static Dictionary<string, string> columnTypes = new Dictionary<string, string>()
 In Order to ignore a table, column, or foreign key relationship, see these examples below:
 
 To Ignore Tables see this comment:
-
 ```
 //Tweak Tables Here.
 ```
-And add C# code to ignore the tables you want.
 
+And add C# code to ignore the tables you want.
 ``` 
 tables["Territories"].Ignore = true;
 ```
 
 To ignore columns and foreign keys, find this line:
-
 ```
 //Tweak Columns / Relationships Here.
 ```
-Add C# code below to ignore the column child or parent relation relation.
 
+Add C# code below to ignore the column child or parent relation relation.
 ```
 tables["Region"].Children["FK_Territories_Region"].Ignore = true;
 tables["Customers"].Columns["Fax"].Ignore = true;
