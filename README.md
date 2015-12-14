@@ -35,23 +35,30 @@ Make sure to include your domain project in your repository project, and both in
 To prevent some odd behavior, close all other instances of Visual Studio.
 Open the schema.ttinclude
 
-edit these variable to set the location of your output files for the templates.
+Edit these variable to set the location of your output files for the templates.
 
-keep CacheLocatorResults set to false.
+Keep CacheLocatorResults set to false.
 		
-	-this adds dirty property tracking to your domain templates
-UseDirtyProperties = true;
+UseDirtyProperties adds dirty property tracking to your domain templates.
 
-these are the properties for your domain prjoect.
+```	
+UseDirtyProperties = true;
+```
+
+These are the properties for your domain prjoect.
+The BaseDomainEntity variable allows you to use your own base entity class as long as it can fulfill the same Dapper.Accelr8.Domain IEntity.
+
 
 ```
--this variable allows you to use your own base entity class as long as it can fulfill the same Dapper.Accelr8.Domain IEntity
+
 public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
 public static string DomainProject = "Dapper.Accelr8.Sql";
 public static string DomainNamespace = @"Dapper.Accelr8.Domain";
 public static string DomainDirectory = @"Domain";
 ```
+
 These properties below are for generating the sql and belong somewhere in your sql project.
+
 ```
 public static string WritersProject = "Dapper.Accelr8.Sql";
 public static string WritersNamespace = @"Dapper.Accelr8.Writers";
@@ -66,9 +73,42 @@ public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
 public static string TableInfoDirectory = @"TableInfos";
 ```
 
-- set your connection string and database here
+Set your connection string and database here.
+
 ```
 static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=AdventureWorks;Integrated Security=SSPI;";
 static string _database = @"AdventureWorks";
 ```		
 
+These dictionaries hold name transformations..
+
+```
+static Dictionary<string, string> tableNames = new Dictionary<string, string>()
+{ 
+	{ "Order Details", "OrderDetails"}
+};
+```
+
+Table Aliases cuts down the size of the sql generated when using large amounts of joins, and makes it easier to read.
+```
+static Dictionary<string, string> tableAliases = new Dictionary<string, string>()
+{
+	{ "Order Details", "oDetails" }
+};
+```
+
+Column names makes your field names prettier also, it allows you to fine tune names which are hard to inflect to singular or plural.
+```
+static Dictionary<string, string> columnNames = new Dictionary<string, string>()
+{
+	{ "TitleOfCourtesy", "Courtesy" }
+};
+```
+
+this adds a cast in front of the reads and reverses it for writes. This is for casting to enums or numbers. I will eventually support Enum parsing for strings, but not yet.
+```
+static Dictionary<string, string> columnTypes = new Dictionary<string, string>()
+{
+	{ "PostalCode", "int" }
+};
+```
