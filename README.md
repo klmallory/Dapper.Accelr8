@@ -6,6 +6,7 @@ also https://www.nuget.org/packages/T4
 
 and Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outputs-from-t4-made-easy-revisited
 
+	The inspiration for this wrapper for dapper is the idea of a templating system that is more friendly for nLayer and distributed environments than most dapper tools. I've given a lot of thought to the repository pattern over the years and decided less is more, leaner is cleaner. In addition I wanted something flexible that could be manipulated to generate the sql I want without generating the sql manually. I still think it's bad practice to try to embed sql functionality into a domain, and conversely to pass sql directly accross application layer boundries. So a simple flexible query syntax was contructed for this purpose. Eventually I would like to suport linq querying directly on the repository, but that will require more time than I have now to invest in it.
 
 # How to install
 For single project data access layer run this command in your data access project:
