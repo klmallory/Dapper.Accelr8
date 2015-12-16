@@ -5,3 +5,12 @@ obj\
 bin/
 obj/
 packages/
+Dapper.Accelr8.Sql/Writers/
+Dapper.Accelr8.Sql/Domain/
+Dapper.Accelr8.Sql/Readers/
+Dapper.Accelr8.Sql/TableInfos/
+Dapper.Accelr8.Sql/obj/
+Dapper.Accelr8.Sql/Templates/Domain.cs
+Dapper.Accelr8.Sql/Templates/EntityReader.cs
+Dapper.Accelr8.Sql/Templates/EntityWriter.cs
+Dapper.Accelr8.Sql/Templates/TableInfo.cs

@@ -121,7 +121,7 @@
             return dt.Rows.Cast<DataRow>().Select(row => new DbTable
 
             {
-                TableName = row.Field<string>("tablename"),
+                TableName = row.Field<string>("tablename").Replace(" ", "_spc_"),
                 SchemaName = row.Field<string>("schemname"),
 				TableType = row.Field<string>("type"),
                 Rows = row.Field<int>("rows"),

@@ -16,8 +16,8 @@ using Dapper.Accelr8.Domain;
 
 namespace Dapper.Accelr8.Sql
 {
-    public abstract class EntityReader<IdType, EntityType> 
-        : IEntityReader<IdType, EntityType> 
+    public abstract class EntityReader<IdType, EntityType>
+        : IEntityReader<IdType, EntityType>
         where EntityType : class, IHaveId<IdType>
         where IdType : IComparable<IdType>
     {
@@ -118,7 +118,7 @@ namespace Dapper.Accelr8.Sql
 
         protected IEntityReader GetReader(Type idType, Type entityType)
         {
-            if(_cacheReaders)
+            if (_cacheReaders)
             {
                 var key = idType + "." + entityType;
                 lock (_syncRoot)
@@ -187,6 +187,20 @@ namespace Dapper.Accelr8.Sql
             //    throw new System.Data.InvalidExpressionException("you must use order bys to use 'skip' clause");
 
             var over = new Over() { OrderBy = _orderBys.ToArray() };
+
+            overCl = BuildOverClause(over) + " ";
+
+            return string.Format(genericRowNumberClause, overCl);
+        }
+
+        protected virtual string BuildSkipRowsClause(IList<OrderBy> ordering)
+        {
+            var overCl = string.Empty;
+
+            //if (_orderBys.Count < 1)
+            //    throw new System.Data.InvalidExpressionException("you must use order bys to use 'skip' clause");
+
+            var over = new Over() { OrderBy = ordering.ToArray() };
 
             overCl = BuildOverClause(over) + " ";
 
@@ -330,7 +344,7 @@ namespace Dapper.Accelr8.Sql
         }
 
         protected virtual EntityType LoadJoinRow<IType, EType>(object entity, dynamic row, Action<EntityType, EType> setter)
-             where EType : class, IHaveId<IType>
+            where EType : class, IHaveId<IType>
             where IType : IComparable<IType>
         {
             var reader = _locator.Resolve<IEntityReader<IType, EType>>();
@@ -772,9 +786,9 @@ namespace Dapper.Accelr8.Sql
                     foreach (var p in e.GetUniqueParameters("q"))
                         expand.Add(p + "_" + 0, e.ValueArray[count++]);
                 else if (e.Operator == Operator.StartsLike)
-                    expand.Add(e.GetUniqueParameter("q") + "_" + 0, "%" + e.Value);
-                else if (e.Operator == Operator.EndsLike)
                     expand.Add(e.GetUniqueParameter("q") + "_" + 0, e.Value + "%");
+                else if (e.Operator == Operator.EndsLike)
+                    expand.Add(e.GetUniqueParameter("q") + "_" + 0, "%" + e.Value);
                 else if (e.Operator == Operator.Like)
                     expand.Add(e.GetUniqueParameter("q") + "_" + 0, "%" + e.Value + "%");
                 else
@@ -806,8 +820,8 @@ namespace Dapper.Accelr8.Sql
             query.Append("with pagingCte AS (");
 
             string fields = null;
-            
-            fields = BuildSkipRowsClause() + ", ";
+
+            fields = BuildSkipRowsClause(_orderBys.Count > 0 ? _orderBys : new List<OrderBy>() { new OrderBy() { FieldName = IdColumn, TableAlias = TableAlias } }) + ", ";
             fields += "[" + TableAlias + "].[" + IdColumn + "]";
 
             var distinct = _distinct ? "distinct " : "";
@@ -851,13 +865,6 @@ namespace Dapper.Accelr8.Sql
                 query.Append(Environment.NewLine);
             }
 
-            if (_orderBys.Count > 0)
-            {
-                query.Append(BuildOrderByClauses(_orderBys));
-
-                query.Append(Environment.NewLine);
-            }
-
             query.Append(")");
             query.Append(Environment.NewLine);
 
@@ -889,7 +896,7 @@ namespace Dapper.Accelr8.Sql
             fields.Replace("_spc_", " ");
 
             var distinct = _distinct ? "distinct " : "";
-            var top = _top > 0 && _skip == 0 ? "top (@top) " : "";
+            var top = _top > 0 ? "top (@top) " : "";
             var nolock = _noLock ? " with (nolock)" : string.Empty;
 
             query.Append(string.Format(genericSelectQuery
@@ -905,7 +912,11 @@ namespace Dapper.Accelr8.Sql
             if (_joins.Count > 0)
             {
                 if (_skip > 0)
-                    query.Append("join pagingCTE on pagingCTE.[" + IdColumn + "] = " + "[" + TableAlias + "].[" + IdColumn + "] and pagingCTE.[_rowsByNumber] > @skip");
+                {
+                    query.Append(Environment.NewLine);
+                    query.Append(" join pagingCTE on pagingCTE.[" + IdColumn + "] = " + "[" + TableAlias + "].[" + IdColumn + "] and pagingCTE.[_rowsByNumber] > @skip ");
+                    query.Append(Environment.NewLine);
+                }
 
                 query.Append(BuildJoins(_joins));
 

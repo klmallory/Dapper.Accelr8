@@ -80,12 +80,12 @@ namespace Dapper.Accelr8.Repo
             }
         }
 
-        public IList<EntityType> SelectAll(int take, params OrderBy[] ordering)
+        public IList<EntityType> SelectAll(int skip, int take, params OrderBy[] ordering)
         {
             using (var reader = GetReader())
             {
                 reader.WithAllJoins();
-
+                reader.WithSkip(skip);
                 reader.WithTop(take);
 
                 foreach (var o in ordering)
@@ -226,6 +226,9 @@ namespace Dapper.Accelr8.Repo
 
                 foreach (var o in ordering)
                     reader.OrderBy(o);
+
+                reader.WithSkip(skip);
+                reader.WithTop(take);
 
                 return reader.QueryResult();
             }
@@ -501,9 +504,9 @@ namespace Dapper.Accelr8.Repo
             AddOrUpdate(entities.OfType<EntityType>().ToList(), cascades);
         }
 
-        IList<object> IRepository.SelectAllObj(int take, params OrderBy[] ordering)
+        IList<object> IRepository.SelectAllObj(int skip, int take, params OrderBy[] ordering)
         {
-            return SelectAll(take, ordering).OfType<object>().ToList();
+            return SelectAll(skip, take, ordering).OfType<object>().ToList();
         }
 
         object IRepository.SelectById(object id)

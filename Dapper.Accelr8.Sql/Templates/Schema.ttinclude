@@ -68,9 +68,9 @@
 				if (t.Value.Ignore)
 					continue;
 
-				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key);
-				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key);
-				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key);
+				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key.Replace("_spc_", " "));
+				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key.Replace("_spc_", " "));
+				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key.Replace("_spc_", " "));
 
 				if (tableNames.ContainsKey(t.Value.TableName))
 				{
@@ -107,6 +107,7 @@
 				{
 					c.Column = c.Column.Replace(" ", "_spc_");
 					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
+					c.Table = c.Table.Replace(" ", "_spc_");
 
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;
@@ -130,13 +131,13 @@
 						c.TableAlias = tableAliases[c.Table];
 					else
 						c.TableAlias = Accelr8or.Inflector.MakeSingular(c.Table).ToLower();
-
 				}
 
 				foreach(var c in t.Value.Parents)
 				{
 					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
 					c.Column = c.Column.Replace(" ", "_spc_");
+					c.Parent = c.Parent.Replace(" ", "_spc_");
 
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;

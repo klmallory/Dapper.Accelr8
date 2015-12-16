@@ -22,7 +22,7 @@ namespace Dapper.Accelr8.Repo
         void AddOrUpdate(object entity, params string[] cascades);
         void AddOrUpdate(IList<object> entities, params string[] cascades);
 
-        IList<object> SelectAllObj(int take, params OrderBy[] ordering);
+        IList<object> SelectAllObj(int skip, int take, params OrderBy[] ordering);
         object SelectById(object id);
         object SelectByIdWithChildren(object id);
         void SetAllChildrenForExisting(object entity);
@@ -49,7 +49,7 @@ namespace Dapper.Accelr8.Repo
         void AddOrUpdate(EntityType entity, params string[] cascades);
         void AddOrUpdate(IList<EntityType> entities, params string[] cascades);
 
-        IList<EntityType> SelectAll(int take, params OrderBy[] ordering);
+        IList<EntityType> SelectAll(int skip, int take, params OrderBy[] ordering);
         EntityType SelectById(IdType id);
         EntityType SelectByIdWithChildren(IdType id);
         void SetAllChildrenForExisting(EntityType entity);
