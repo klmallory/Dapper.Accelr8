@@ -1,5 +1,5 @@
 # Dapper.Accelr8
-A Dapper Based Data Access Framework with Templating, I've included templates with some peices from 
+A Dapper Based Data Access Framework with Templating, I've included templates with some pieces from 
 SubSonic, and Peta Poco;
 Also https://www.nuget.org/packages/T4,
 And Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outputs-from-t4-made-easy-revisited
