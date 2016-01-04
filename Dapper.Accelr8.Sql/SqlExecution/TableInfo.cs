@@ -52,7 +52,7 @@ namespace Dapper.Accelr8.Sql
             IdColumn = idColumn;
             TableName = tableName;
             TableAlias = tableAlias;
-            ColumnNames = columnNames;
+            ColumnNames = columnNames.ToList().OrderBy(c => c).ToArray();
         }
 
         public bool UniqueId { get; set; }

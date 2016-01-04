@@ -108,7 +108,7 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
 		<# } #>
 
 		/// <summary>
-		/// 
+		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
 		/// </summary>
 		/// <param name="results">Parameters for sql writes</param>
 		/// <param name="row"></param>
