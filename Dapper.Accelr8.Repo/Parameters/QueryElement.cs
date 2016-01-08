@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 
 namespace Dapper.Accelr8.Repo.Parameters
 {
@@ -30,7 +30,7 @@ namespace Dapper.Accelr8.Repo.Parameters
             else
                 return ValueArray.ToList()
                     .Select
-                    (a => "@" + alias + "_" + name + "_" + paramType + "_" + count++).ToList();
+                    (a => "@" + alias + "_" + name + "_" + paramType).ToList(); //+ "_" + count++
         }
 
         public string GetUniqueParameter(string paramType)
@@ -44,7 +44,7 @@ namespace Dapper.Accelr8.Repo.Parameters
                     var s = string.Empty;
                     for (var i = 0; i < ValueArray.Length; i++)
                     {
-                        s += "@" + TableAlias + "_" + FieldName + "_" + paramType + "_" + i + ",";
+                        s += "@" + TableAlias + "_" + FieldName + "_" + paramType + ","; //+ "_" + i
                     }
                     return s.TrimEnd(',');
                 }

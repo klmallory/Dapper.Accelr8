@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using Dapper;
 using Dapper.Accelr8.Domain;
@@ -33,7 +35,6 @@ namespace Dapper.Accelr8.Sql
                 _sqlIdType = "nvarchar(512)";
         }
 
-
         public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder, IAccelr8Locator serviceLocator)
         {
             _connectionStringName = connectionStringName;
@@ -48,7 +49,8 @@ namespace Dapper.Accelr8.Sql
             IdColumn = tableInfo.IdColumn;
             TableName = tableInfo.TableName;
             TableAlias = tableInfo.TableAlias;
-            ColumnNames = (string[])tableInfo.ColumnNames.Clone();
+            ColumnNames = tableInfo.ColumnNames.OrderBy(c => c.Value).ToList();
+            TableInfo = tableInfo;
         }
 
         protected bool _withCascades;
@@ -83,11 +85,6 @@ namespace Dapper.Accelr8.Sql
             return _queryBuilder.BuildQueryElements(elements, taskIndex);
         }
 
-        protected virtual string BuildQueryElement(QueryElement e, string tableAlias, int count)
-        {
-            return _queryBuilder.BuildQueryElement(e, 0, count);
-        }
-
         protected virtual string BuildJoins(IList<Join> joins)
         {
             return _joinBuilder.BuildJoins(joins);
@@ -112,12 +109,13 @@ namespace Dapper.Accelr8.Sql
         {
             int count = 0;
             var fieldSets = ColumnNames
-                .Except(new string[] { IdColumn })
+                .Except(ColumnNames.Where(c => c.Value == IdColumn))
+                .OrderBy(f => f.Value)
                 .Select(field =>
                     string.Format
                     (setTemplate
-                    , field.Replace("_spc_", " ")
-                    , GetParamName(field, "u", task.Index, count++)));
+                    , field.Value.Replace("_spc_", " ")
+                    , GetParamName(field.Value, "u", task.Index, ref count)));
 
             var s = string.Join(", ", fieldSets);
 
@@ -128,25 +126,29 @@ namespace Dapper.Accelr8.Sql
         {
             int count = 0;
 
-            if (ColumnNames.Length == 0)
+            if (ColumnNames.Count == 0)
                 return string.Empty;
 
-            var fieldNames = string.Concat(ColumnNames.Where(f => f != IdColumn).Select(s => GetParamName(s, "i", taskIndex, count++) + ", "));
+            var fieldNames = string.Concat
+                (ColumnNames
+                .Where(f => f.Value != IdColumn)
+                .OrderBy(f => f.Value)
+                .Select(s => GetParamName(s.Value, "i", taskIndex, ref count) + ", "));
 
             return fieldNames.TrimEnd(',', ' ');
         }
 
-        protected virtual string GetParamName(string fieldName, ActionType actionType, int taskIndex, int count)
+        protected virtual string GetParamName(string fieldName, ActionType actionType, int taskIndex, ref int count)
         {
             var s = actionType == ActionType.Add ? "i"
                 : actionType == ActionType.Update ? "u" : "d";
 
-            return GetParamName(fieldName, s, taskIndex, count);
+            return GetParamName(fieldName, s, taskIndex, ref count);
         }
 
-        protected virtual string GetParamName(string fieldName, string paramType, int taskIndex, int count)
+        protected virtual string GetParamName(string fieldName, string paramType, int taskIndex, ref int count)
         {
-            return "@" + TableAlias + fieldName + "_" + paramType + "_" + taskIndex;
+            return "@" + TableAlias + fieldName + "_" + paramType + "_" + taskIndex + "_" + count++;
         }
 
         protected virtual bool Cascade<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
@@ -193,7 +195,7 @@ namespace Dapper.Accelr8.Sql
             return true;
         }
 
-        protected abstract IDictionary<string, object> GetParams(ActionType actionType, EntityType entity, int taskIndex, int count);
+        protected abstract IDictionary<string, object> GetParams(ActionType actionType, EntityType entity, int taskIndex, ref int count);
         protected abstract void CascadeRelations(EntityType entity, ScriptContext context);
         protected abstract void RemoveRelations(EntityType entity, ScriptContext context);
         protected abstract void UpdateIdsFromReferences(IList<string> cascades, EntityType entity);
@@ -202,7 +204,8 @@ namespace Dapper.Accelr8.Sql
         public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
-        public virtual string[] ColumnNames { get; protected set; }
+        public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
+        protected virtual TableInfo TableInfo {get; set; }
 
         public virtual int Count { get { return _tasks.Count; } }
 
@@ -266,7 +269,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual string GetSqlForInsert(ExecuteTask<EntityType> task)
         {
-            var names = ColumnNames.Where(s => s != IdColumn);
+            var names = ColumnNames.Where(s => s.Value != IdColumn);
 
             var query = new StringBuilder();
 
@@ -382,27 +385,38 @@ namespace Dapper.Accelr8.Sql
 
         public IEntityWriter<IdType, EntityType> WithColumn(string column)
         {
-            var with = new List<string>(ColumnNames);
-            with.Add(column);
-            ColumnNames = with.ToArray();
+            var matchingColumn = this.TableInfo.ColumnNames.FirstOrDefault(c => string.Equals(c.Value, column, StringComparison.CurrentCultureIgnoreCase));
+
+            if (matchingColumn.Value == null)
+                throw new KeyNotFoundException(string.Format("column {0} not found.", column));
+
+            ColumnNames.Add(matchingColumn);
 
             return this;
         }
 
         public IEntityWriter<IdType, EntityType> WithoutColumn(string column)
         {
-            var without = new List<string>(ColumnNames);
-            without.Remove(column);
-            ColumnNames = without.ToArray();
+            var matchingColumn = ColumnNames
+                .FirstOrDefault(c => string.Equals(c.Value, column
+                    , StringComparison.CurrentCultureIgnoreCase));
+
+            if (matchingColumn.Value == null)
+                return this;
+
+            ColumnNames.Remove(matchingColumn);
 
             return this;
         }
 
-        public IEntityWriter<IdType, EntityType> WithoutColumn(string[] columns)
+        public IEntityWriter<IdType, EntityType> WithoutColumns(string[] columns)
         {
-            var without = new List<string>(ColumnNames);
-            without.RemoveAll(a => columns.Contains(a));
-            ColumnNames = without.ToArray();
+            var matchingColumns = ColumnNames
+                .Where(c => columns.Any(m => string.Equals(c.Value, m
+                    , StringComparison.CurrentCultureIgnoreCase))).ToList();
+
+            foreach (var c in matchingColumns)
+                ColumnNames.Remove(c);
 
             return this;
         }
@@ -597,15 +611,17 @@ namespace Dapper.Accelr8.Sql
         {
             var d = new ExpandoObject();
             var expand = (IDictionary<string, object>)d;
-            
+
             foreach (var task in tasks)
             {
+                var pCount = 0;
+
                 if (task.Entity != null)
-                    foreach (var p in GetParams(task.TaskType, task.Entity, task.Index, 0))
+                    foreach (var p in GetParams(task.TaskType, task.Entity, task.Index, ref pCount).OrderBy(f => f.Key))
                         expand.Add(p.Key, p.Value);
 
                 if (task.Params != null)
-                    foreach (var t in task.Params)
+                    foreach (var t in task.Params.OrderBy(p => p.Key))
                         expand.Add(t.Key, t.Value);
 
                 foreach (var e in task.Queries)
@@ -613,15 +629,15 @@ namespace Dapper.Accelr8.Sql
                     if (e.ParamNames != null && e.ParamNames.Length > 0)
                         continue;
 
-                    var count = 0;
+                    var qCount = 0;
 
                     if (e.Operator != Operator.In)
-                        expand.Add(e.GetUniqueParameter("q") + "_" + task.Index, e.Value);
+                        expand.Add(e.GetUniqueParameter("q") + "_" + task.Index + "_" + qCount++, e.Value);
                     else
                         foreach (var p in e.GetUniqueParameters("q"))
                         {
-                            var c = count++;
-                            expand.Add(p + "_" + c, e.ValueArray[c]);
+                            var i = qCount++;
+                            expand.Add(p + "_" + task.Index + "_" + i, e.ValueArray[i]);
                         }
                 }
             }

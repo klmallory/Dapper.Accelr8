@@ -165,12 +165,12 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 		domain.Id = GetRowData<<#= pkCol.CSharpType #>>(dataRow, IdColumn);
 	<#}#>
 	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore && !c.IsIdentity))
-	{#>	
-			domain.<#= col.FieldName #> = <#= Accelr8or.GetCastForType(col.IsNullable, col.CastType) #>GetRowData<<#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #>>(dataRow, <#= entityType #>ColumnNames.<#= col.ColumnName #>.ToString()); <# } #>
-            
+	{ var castFormat = Accelr8or.GetCastForType(col);#>
+		domain.<#= col.FieldName #> = <#= string.Format(castFormat, @"GetRowData<" + Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) + @">(dataRow, " + entityType + @"ColumnNames." + col.ColumnName + @".ToString())") #>; 
+      <# } #>
 			
 			return domain;
-        }
+		}
 
 		/// <summary>
 		/// Add All the children to the query for the specified <#= idType #> Id.

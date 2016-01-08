@@ -15,3 +15,6 @@ Dapper.Accelr8.Sql/Templates/EntityReader.cs
 Dapper.Accelr8.Sql/Templates/EntityWriter.cs
 Dapper.Accelr8.Sql/Templates/TableInfo.cs
 *.csproj.user
+*.ncrunchsolution
+*.ncrunchproject
+*.ncrunchsolution.user

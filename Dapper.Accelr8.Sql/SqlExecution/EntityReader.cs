@@ -111,7 +111,7 @@ namespace Dapper.Accelr8.Sql
             IdColumn = tableInfo.IdColumn;
             TableName = tableInfo.TableName;
             TableAlias = tableInfo.TableAlias;
-            ColumnNames = (string[])tableInfo.ColumnNames.Clone();
+            ColumnNames = tableInfo.ColumnNames.OrderBy(c => c.Value).ToList();
             Joins = (JoinInfo[])tableInfo.Joins.Clone();
             TableInfo = tableInfo;
         }
@@ -144,19 +144,21 @@ namespace Dapper.Accelr8.Sql
                 return (ReturnType)Convert.ChangeType(dataRow[property], typeof(ReturnType));
         }
 
+
         protected virtual string BuildChildren(IList<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>> children)
         {
             var sb = new StringBuilder();
 
+            var count = 1;
             foreach (var e in children)
-                sb.Append(BuildChild(e.Item1, e.Item2));
+                sb.Append(BuildChild(e.Item1, e.Item2, count++));
 
             return sb.ToString();
         }
 
-        protected virtual string BuildChild(string childFieldName, IEntityReader reader)
+        protected virtual string BuildChild(string childFieldName, IEntityReader reader, int count)
         {
-            return reader.GetSqlForQueries();
+            return reader.GetSqlForQueries(count);
         }
 
         protected virtual string BuildJoins(IList<Join> joins)
@@ -172,11 +174,6 @@ namespace Dapper.Accelr8.Sql
         protected virtual string BuildQueryElements(IList<QueryElement> elements, int taskIndex)
         {
             return _queryBuilder.BuildQueryElements(elements, taskIndex);
-        }
-
-        protected virtual string BuildQueryElement(QueryElement e, string tableAlias, int count)
-        {
-            return _queryBuilder.BuildQueryElement(e, 0, count);
         }
 
         protected virtual string BuildSkipRowsClause()
@@ -209,9 +206,16 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual string BuildFields()
         {
-            var fieldNames = "[" + TableAlias + "].[" + string.Join("], [" + TableAlias + "].[", ColumnNames) + "]";
+            return BuildFields(ColumnNames, _aggregates);
+        }
 
-            var agg = BuildAggregates(_aggregates);
+        protected virtual string BuildFields(IList<KeyValuePair<int, string>> fields, IList<Aggregate> aggregates)
+        {
+            var cols = fields.Select(f => f.Value).ToArray();
+
+            var fieldNames = "[" + TableAlias + "].[" + string.Join("], [" + TableAlias + "].[", cols) + "]";
+
+            var agg = BuildAggregates(aggregates);
 
             if (!string.IsNullOrWhiteSpace(agg))
                 return fieldNames + ", " + agg;
@@ -486,33 +490,44 @@ namespace Dapper.Accelr8.Sql
         public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
-        public virtual string[] ColumnNames { get; protected set; }
+        public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
         public virtual JoinInfo[] Joins { get; protected set; }
         public virtual TableInfo TableInfo { get; protected set; }
 
         public IEntityReader<IdType, EntityType> WithColumn(string column)
         {
-            var with = new List<string>(ColumnNames);
-            with.Add(column);
-            ColumnNames = with.ToArray();
+            var matchingColumn = this.TableInfo.ColumnNames.FirstOrDefault(c => string.Equals(c.Value, column, StringComparison.CurrentCultureIgnoreCase));
+
+            if (matchingColumn.Value == null)
+                throw new KeyNotFoundException(string.Format("column {0} not found.", column));
+
+            ColumnNames.Add(matchingColumn);
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WithoutColumn(string column)
         {
-            var without = new List<string>(ColumnNames);
-            without.Remove(column);
-            ColumnNames = without.ToArray();
+            var matchingColumn = ColumnNames
+                .FirstOrDefault(c => string.Equals(c.Value, column
+                    , StringComparison.CurrentCultureIgnoreCase));
+
+            if (matchingColumn.Value == null)
+                return this;
+
+            ColumnNames.Remove(matchingColumn);
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WithoutColumns(string[] columns)
         {
-            var without = new List<string>(ColumnNames);
-            without.RemoveAll(a => columns.Contains(a));
-            ColumnNames = without.ToArray();
+            var matchingColumns = ColumnNames
+                .Where(c => columns.Any(m => string.Equals(c.Value, m
+                    , StringComparison.CurrentCultureIgnoreCase))).ToList();
+
+            foreach (var c in matchingColumns)
+                ColumnNames.Remove(c);
 
             return this;
         }
@@ -772,7 +787,12 @@ namespace Dapper.Accelr8.Sql
             return LoadEntities(rows).Cast<object>().ToList();
         }
 
-        public virtual dynamic BuildParameters(IList<QueryElement> elements)
+        public virtual dynamic BuildParameters(int taskIndex)
+        {
+            return BuildParameters(_queries, taskIndex);
+        }
+
+        public virtual dynamic BuildParameters(IList<QueryElement> elements, int taskIndex)
         {
             var d = new ExpandoObject();
             var expand = (IDictionary<string, object>)d;
@@ -782,33 +802,36 @@ namespace Dapper.Accelr8.Sql
                 if (e.ParamNames != null && e.ParamNames.Length > 0)
                     continue;
 
+                var pc = 0;
                 if (e.Operator == Operator.In)
                     foreach (var p in e.GetUniqueParameters("q"))
-                        expand.Add(p + "_" + 0, e.ValueArray[count++]);
+                        expand.Add(p + "_" + taskIndex + "_" + count++, e.ValueArray[pc++]);
                 else if (e.Operator == Operator.StartsLike)
-                    expand.Add(e.GetUniqueParameter("q") + "_" + 0, e.Value + "%");
+                    expand.Add(e.GetUniqueParameter("q") + "_" + taskIndex + "_" + count++, "%" + e.Value);
                 else if (e.Operator == Operator.EndsLike)
-                    expand.Add(e.GetUniqueParameter("q") + "_" + 0, "%" + e.Value);
+                    expand.Add(e.GetUniqueParameter("q") + "_" + taskIndex + "_" + count++, e.Value + "%");
                 else if (e.Operator == Operator.Like)
-                    expand.Add(e.GetUniqueParameter("q") + "_" + 0, "%" + e.Value + "%");
+                    expand.Add(e.GetUniqueParameter("q") + "_" + taskIndex + "_" + count++, "%" + e.Value + "%");
                 else
-                    expand.Add(e.GetUniqueParameter("q") + "_" + 0, e.Value);
+                    expand.Add(e.GetUniqueParameter("q") + "_" + taskIndex + "_" + count++, e.Value);
             }
 
+            var cCount = 1;
             foreach (var c in _children)
-                foreach (var p in c.Item2.GetParameters())
+                foreach (var p in c.Item2.GetParameters(cCount++))
                 {
                     var f = (KeyValuePair<string, object>)p;
                     expand.Add(f.Key, f.Value);
                 }
 
+            count = 0;
             foreach (var h in _havings)
-                expand.Add(h.GetUniqueParameter() + "_" + 0, h.Value);
+                expand.Add(h.GetUniqueParameter() + "_" + count++, h.Value);
 
-            if (_top > 0)
+            if (_skip > 0 || _top > 0)
                 expand.Add("@top", _top);
 
-            if (_skip > 0)
+            if (_skip > 0 || _top > 0)
                 expand.Add("@skip", _skip);
 
             return d;
@@ -871,7 +894,7 @@ namespace Dapper.Accelr8.Sql
             return query.ToString();
         }
 
-        public virtual string GetSqlForQueries()
+        public virtual string GetSqlForQueries(int taskIndex = 0)
         {
             var query = new StringBuilder();
             var fields = string.Empty;
@@ -925,7 +948,7 @@ namespace Dapper.Accelr8.Sql
 
             if (_queries.Count > 0)
             {
-                query.Append(BuildQueryElements(_queries, 0));
+                query.Append(BuildQueryElements(_queries, taskIndex));
 
                 query.Append(Environment.NewLine);
             }
@@ -959,11 +982,11 @@ namespace Dapper.Accelr8.Sql
             return query.ToString();
         }
 
-        public virtual string GetSqlForQueries(out object parms)
+        public virtual string GetSqlForQueries(out object parms, int taskIndex = 0)
         {
-            var query = GetSqlForQueries();
+            var query = GetSqlForQueries(taskIndex);
 
-            parms = BuildParameters(_queries);
+            parms = BuildParameters(_queries, taskIndex);
 
             return query.ToString();
         }
@@ -972,14 +995,24 @@ namespace Dapper.Accelr8.Sql
         {
             var query = GetSqlForChildren();
 
-            parms = BuildParameters(_queries);
+            var count = 1;
+            IDictionary<string, object> parameters = new Dictionary<string, object>();
+
+            foreach (var c in _children)
+            {
+                foreach (var parm in ((IDictionary<string, object>)c.Item2.BuildParameters(count++)))
+                {
+                    parameters.Add(parm.Key, parm.Value);
+                }
+            }
+            parms = parameters;
 
             return query.ToString();
         }
 
-        public virtual dynamic GetParameters()
+        public virtual dynamic GetParameters(int taskIndex = 0)
         {
-            return BuildParameters(_queries);
+            return BuildParameters(_queries, taskIndex);
         }
 
         public virtual EntityType FetchById(IdType id)
@@ -1120,7 +1153,7 @@ namespace Dapper.Accelr8.Sql
                 Load = join.Load,
                 SplitOnColumnName = "SplitMe",
                 JoinAlias = join.Alias,
-                JoinFieldNames = join.Reader().ColumnNames,
+                JoinFieldNames = join.Reader().ColumnNames.Select(d => d.Value).ToArray(),
                 JoinTable = join.TableName,
                 Outer = join.Outer,
                 JoinOnQueries = join.JoinQuery
@@ -1153,7 +1186,7 @@ namespace Dapper.Accelr8.Sql
                 Load = loadVisitor,
                 SplitOnColumnName = "SplitMe",
                 JoinAlias = TableAlias + "_" + joinReader.TableAlias + alias,
-                JoinFieldNames = joinReader.ColumnNames,
+                JoinFieldNames = joinReader.ColumnNames.Select(c => c.Value).ToArray(),
                 JoinTable = joinReader.TableName,
                 Outer = outer,
                 JoinOnQueries = new JoinQueryElement[] 

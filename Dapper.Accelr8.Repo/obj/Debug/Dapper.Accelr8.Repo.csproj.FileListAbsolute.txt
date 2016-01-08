@@ -13,3 +13,10 @@ C:\Source\Dapper.Accelr8\Dapper.Accelr8.Repo\bin\Debug\Dapper.Accelr8.Domain.pdb
 C:\Source\Dapper.Accelr8\Dapper.Accelr8.Repo\obj\Debug\Dapper.Accelr8.Repo.csprojResolveAssemblyReference.cache
 C:\Source\Dapper.Accelr8\Dapper.Accelr8.Repo\obj\Debug\Dapper.Accelr8.Repo.dll
 C:\Source\Dapper.Accelr8\Dapper.Accelr8.Repo\obj\Debug\Dapper.Accelr8.Repo.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\bin\Debug\Dapper.Accelr8.Repo.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\bin\Debug\Dapper.Accelr8.Repo.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\bin\Debug\Dapper.Accelr8.Domain.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\bin\Debug\Dapper.Accelr8.Domain.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\obj\Debug\Dapper.Accelr8.Repo.csprojResolveAssemblyReference.cache
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\obj\Debug\Dapper.Accelr8.Repo.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Repo\obj\Debug\Dapper.Accelr8.Repo.pdb

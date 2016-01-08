@@ -38,12 +38,12 @@ namespace Dapper.Accelr8.Sql
             var sb = new StringBuilder();
             int count = 0;
             foreach (var e in elements)
-                sb.Append(BuildQueryElement(e, count++, taskIndex));
+                sb.Append(BuildQueryElement(e, ref count, taskIndex));
 
             return sb.ToString();
         }
 
-        public virtual string BuildQueryElement(QueryElement e, int count, int taskIndex)
+        public virtual string BuildQueryElement(QueryElement e, ref int count, int taskIndex)
         {
             var template = count == 0 ? genericWhereClause :
                 e.UseOr ? genericOrClause : genericAndClause;
@@ -52,12 +52,17 @@ namespace Dapper.Accelr8.Sql
             var closeBlock = e.CloseBlock ? ")" : string.Empty;
             var o = OperatorFormats[e.Operator];
 
-            var p = e.Operator != Operator.In ? e.GetUniqueParameter("q") + "_" + taskIndex
-                : string.Join("_" + taskIndex + ", ", e.GetUniqueParameters("q")) + "_" + taskIndex;
+            string p = string.Empty;
 
-            var valOp = string.Format(o, p);
+            if (e.Operator == Operator.In)
+                foreach (var u in e.GetUniqueParameters("q"))
+                    p += u + "_" + taskIndex + "_" + count++ + ", ";
+            else
+                p = e.GetUniqueParameter("q") + "_" + taskIndex + "_" + count++;
 
-            return string.Format(template, openBlock, e.TableAlias, e.FieldName.Replace("_spc_", ""), valOp, closeBlock);
+            var valOp = string.Format(o, p.TrimEnd(',', ' '));
+
+            return string.Format(template, openBlock, e.TableAlias, e.FieldName, valOp, closeBlock);
         }
     }
 }

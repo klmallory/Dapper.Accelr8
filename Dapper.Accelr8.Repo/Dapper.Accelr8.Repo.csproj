@@ -47,6 +47,7 @@
     <Compile Include="Domain\BaseEntity.cs" />
     <Compile Include="ExecutionContext.cs" />
     <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="IdKey.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IAccelr8Locator.cs" />

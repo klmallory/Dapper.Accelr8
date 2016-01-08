@@ -24,7 +24,7 @@ namespace Dapper.Accelr8.Sql
 
         public TableInfo(IAccelr8Locator locator)
         {
-            ColumnNames = new string[0];
+            ColumnNames = new Dictionary<int, string>();
             Joins = new JoinInfo[0];
 
             if (_locator == null)
@@ -46,20 +46,20 @@ namespace Dapper.Accelr8.Sql
             return _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)) as IEntityReader;
         }
 
-        public TableInfo(bool uniqueId, string idColumn, string tableName, string tableAlias, string[] columnNames)
+        public TableInfo(bool uniqueId, string idColumn, string tableName, string tableAlias, IDictionary<int, string> columnNames)
         {
             UniqueId = uniqueId;
             IdColumn = idColumn;
             TableName = tableName;
             TableAlias = tableAlias;
-            ColumnNames = columnNames.ToList().OrderBy(c => c).ToArray();
+            ColumnNames = columnNames;
         }
 
         public bool UniqueId { get; set; }
         public string IdColumn { get; set; }
         public string TableName { get; set; }
         public string TableAlias { get; set; }
-        public string[] ColumnNames { get; set; }
+        public IDictionary<int, string> ColumnNames { get; set; }
         public JoinInfo[] Joins { get; set; }
     }
 }

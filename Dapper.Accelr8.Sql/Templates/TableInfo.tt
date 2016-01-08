@@ -74,6 +74,7 @@ using Dapper;
 using Dapper.Accelr8.Sql;
 using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Extensions;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Contracts.Readers;
 
@@ -102,7 +103,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 			IdColumn = <#= entityType #>ColumnNames.<#= (table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName #>.ToString();
 			TableName = "<#= table.TableName #>";
 			TableAlias = "<#= table.TableAlias #>";
-			ColumnNames = Enum.GetNames(typeof(<#= entityType #>ColumnNames));
+			ColumnNames = typeof(<#= entityType #>ColumnNames).ToDataList<Type, int>();
 
 			Joins = new JoinInfo[] {
 			<# 

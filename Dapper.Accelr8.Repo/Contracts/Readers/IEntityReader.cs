@@ -13,14 +13,16 @@ namespace Dapper.Accelr8.Repo.Contracts.Readers
         bool UniqueId { get; }
         string IdColumn { get; }
         string TableName { get; }
-        string[] ColumnNames { get; }
+        IList<KeyValuePair<int, string>> ColumnNames { get; }
         string TableAlias { get; }
         object LoadEntityObject(dynamic row);
         IList<object> LoadEntityObjects(IEnumerable<dynamic> rows);
         IList<object> LoadMultiple(object reader);
-        string GetSqlForQueries();
-        string GetSqlForQueries(out object parms);
-        dynamic GetParameters();
+        string GetSqlForQueries(int taskIndex = 0);
+        string GetSqlForQueries(out object parms, int taskIndex = 0);
+        dynamic GetParameters(int taskIndex = 0);
+        dynamic BuildParameters(int taskIndex);
+        dynamic BuildParameters(IList<QueryElement> elements, int taskIndex);
 
         void ClearAllQueries();
 

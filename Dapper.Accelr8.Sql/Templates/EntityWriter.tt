@@ -112,15 +112,24 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
 		/// </summary>
 		/// <param name="results">Parameters for sql writes</param>
 		/// <param name="row"></param>
-        protected override IDictionary<string, object> GetParams(ActionType actionType, <#= entityType #> entity, int taskIndex, int count)
+        protected override IDictionary<string, object> GetParams(ActionType actionType, <#= entityType #> entity, int taskIndex, ref int count)
         {
             var parms = new Dictionary<string, object>();
-
-		<# foreach (var col in table.Columns.Where(c => !c.Ignore))
-		{#>
-	parms.Add(GetParamName(<#= entityType #>ColumnNames.<#= col.ColumnName #>.ToString(), actionType, taskIndex, count), <# if (col.CastType != null) { #> (<#= col.CastType #>) <# } #>entity.<#= col.FieldName #>);
-		<#}#>
 			
+			foreach (var f in ColumnNames)
+            {
+                switch ((<#= entityType #>ColumnNames)f.Key)
+                {
+                    
+				<# foreach (var col in table.Columns.Where(c => !c.Ignore && !c.IsPrimaryKey))
+				{#>
+	case <#= entityType #>ColumnNames.<#= col.ColumnName #>:
+						parms.Add(GetParamName(<#= entityType #>ColumnNames.<#= col.ColumnName #>.ToString(), actionType, taskIndex, ref count), <# if (col.CastType != null) { #> (<#= col.CastType #>) <# } #>entity.<#= col.FieldName #>);
+						break;
+				<#}#>
+}
+			}
+
 			return parms;
         }
 

@@ -17,8 +17,8 @@
 		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
 		public static string TableInfoDirectory = @"TableInfos";
 
-		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=Northwnd;Integrated Security=SSPI;";
-		static string _database = @"Northwnd";
+		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=EnrollmentBioStore;Integrated Security=SSPI;";
+		static string _database = @"EnrollmentBioStore";
 
 		// Change Names Here =>
 		static Dictionary<string, string> tableNames = new Dictionary<string, string>()

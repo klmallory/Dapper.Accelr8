@@ -12,7 +12,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
         bool UniqueId { get; }
         string IdColumn { get; }
         string TableName { get; }
-        string[] ColumnNames { get; }
+        IList<KeyValuePair<int, string>> ColumnNames { get; }
         string TableAlias { get; }
         int Count { get; }
         bool HasDeletes();
@@ -47,7 +47,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
         IEntityWriter<IdType, EntityType> Update(IList<EntityType> entities);
         IEntityWriter<IdType, EntityType> WithColumn(string column);
         IEntityWriter<IdType, EntityType> WithoutColumn(string column);
-        IEntityWriter<IdType, EntityType> WithoutColumn(string[] columns);
+        IEntityWriter<IdType, EntityType> WithoutColumns(string[] columns);
         IEntityWriter<IdType, EntityType> WithCascade(string cascade);
         IEntityWriter<IdType, EntityType> Delete(IList<IdType> ids);
         IEntityWriter<IdType, EntityType> Delete(EntityType entity);

@@ -298,12 +298,26 @@ public static class Accelr8or
 
 	static List<string> nonNullableTypes = new List<string>() { "string", "object", "byte[]" };
 
-	public static string GetCastForType(bool isNullable, string castType)
+	public static string GetCastForType(DbColumn col)
 	{
-		if (string.IsNullOrEmpty(castType))
-			return "";
+		if (string.IsNullOrEmpty(col.CastType))
+			return "{0}";
+		
+		if (col.CSharpType == "string" && col.CastType == "string[]")
+			return @"{0}.Split('" + col.Splits + "')";
 			
-		return "(" + castType + (isNullable ? "?" : "") + ")";
+		return "(" + col.CastType + (col.IsNullable ? "?" : "") + "){0}";
+	}
+
+	public static string GetReverseCastForType(DbColumn col)
+	{
+		if (string.IsNullOrEmpty(col.CastType))
+			return "{0}";
+
+		if (col.CSharpType == "string" && col.CastType == "string[]")
+			return @"string.Join('" + col.Splits + @"', {0})";
+
+		return "(" + col.CSharpType + (col.IsNullable ? "?" : "") + "){0}";
 	}
 
 	public static string GetNullableType(bool isNullable, string type)
