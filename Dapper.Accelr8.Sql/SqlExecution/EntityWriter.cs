@@ -269,7 +269,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual string GetSqlForInsert(ExecuteTask<EntityType> task)
         {
-            var names = ColumnNames.Where(s => s.Value != IdColumn);
+            var names = ColumnNames.Where(s => s.Value != IdColumn).Select(s => s.Value);
 
             var query = new StringBuilder();
 

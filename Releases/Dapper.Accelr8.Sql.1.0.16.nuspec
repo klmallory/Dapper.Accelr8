@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Dapper.Accelr8.Sql</id>
+        <version>1.0.16</version>
+        <title>Dapper Accelr8or</title>
+        <authors>Mallory,Kristen</authors>
+        <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/thehexgod/Dapper.Accelr8</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>This library provides a template for discovering your database model into a series of classes which build the sql needed for reads and writes dynamically. Instead of libraries which only provide fixed / hard coded SQL, this library attempts to provide parameterized sql generation on the fly. Allowing for more flexibility. It also provides a serializable query model for distributed data services.
+
+This library is a work in progress, please keep an eye out for a stable release soon.</description>
+        <copyright>Kristen Mallory</copyright>
+        <language>en-US</language>
+        <tags>Dapper, Template, Repository</tags>
+        <dependencies>
+            <group targetFramework=".NETFramework4.0">
+                <dependency id="Dapper" version="1.40" />
+                <dependency id="Dapper.Accelr8.Domain" version="1.0.12" />
+                <dependency id="Dapper.Accelr8.Repo" version="1.0.13" />
+            </group>
+        </dependencies>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.0" />
+            <frameworkAssembly assemblyName="System.Data.DataSetExtensions" targetFramework=".NETFramework4.0" />
+            <frameworkAssembly assemblyName="EnvDTE" targetFramework=".NETFramework4.0" />
+        </frameworkAssemblies>
+    </metadata>
+    <files>
+        <file src="..\Dapper.Accelr8.Sql\SqlBuilders\JoinBuilder.cs" target="content\SqlBuilders\JoinBuilder.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlBuilders\QueryBuilder.cs" target="content\SqlBuilders\QueryBuilder.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlExecution\DapperExecuter.cs" target="content\SqlExecution\DapperExecuter.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlExecution\EntityReader.cs" target="content\SqlExecution\EntityReader.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlExecution\EntityWriter.cs" target="content\SqlExecution\EntityWriter.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlExecution\ExecuteTask.cs" target="content\SqlExecution\ExecuteTask.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlExecution\JoinInfo.cs" target="content\SqlExecution\JoinInfo.cs" />
+        <file src="..\Dapper.Accelr8.Sql\SqlExecution\TableInfo.cs" target="content\SqlExecution\TableInfo.cs" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\Includes\Accelr8or.ttinclude" target="content\Templates\Includes\Accelr8or.ttinclude" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\Includes\DbHelper.ttinclude" target="content\Templates\Includes\DbHelper.ttinclude" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\Includes\Manager.ttinclude" target="content\Templates\Includes\Manager.ttinclude" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\domain.tt" target="content\Templates\domain.tt" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\EntityReader.tt" target="content\Templates\EntityReader.tt" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\EntityWriter.tt" target="content\Templates\EntityWriter.tt" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\Schema.ttinclude" target="content\Templates\Schema.ttinclude" />
+        <file src="..\Dapper.Accelr8.Sql\Templates\TableInfo.tt" target="content\Templates\TableInfo.tt" />
+    </files>
+</package>

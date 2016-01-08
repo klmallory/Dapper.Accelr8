@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Dapper.Accelr8.Repo</id>
+        <version>1.0.13</version>
+        <title>Dapper Accelr8or Repository</title>
+        <authors>Mallory,Kristen</authors>
+        <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/thehexgod/Dapper.Accelr8</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>This package contains the Dapper.Accelr8 Repository component. It is provided in a different package for those looking to break their repository out from their SQL implementation classes.</description>
+        <summary>This repository sets the base for the the Dapper.Accelr8 readers and writers into a repository / unit of work pattern. It does force you to at least provide a minimalistic service locator pattern.</summary>
+        <releaseNotes>First Release</releaseNotes>
+        <copyright>Copyright Kristen Mallory</copyright>
+        <language>en-US</language>
+        <tags>Dapper, Dapper.Accelr8, Repository, Unit Of Work</tags>
+        <dependencies>
+            <group targetFramework=".NETFramework4.0">
+                <dependency id="Dapper.Accelr8.Domain" version="1.0.12" />
+            </group>
+        </dependencies>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.0" />
+        </frameworkAssemblies>
+    </metadata>
+    <files>
+        <file src="..\Dapper.Accelr8.Repo\bin\Release\Dapper.Accelr8.Repo.dll" target="lib\net40\Dapper.Accelr8.Repo.dll" />
+        <file src="..\Dapper.Accelr8.Repo\bin\Release\Dapper.Accelr8.Repo.dll" target="lib\net45\Dapper.Accelr8.Repo.dll" />
+        <file src="..\Dapper.Accelr8.Repo\bin\Release\Dapper.Accelr8.Repo.dll" target="lib\net451\Dapper.Accelr8.Repo.dll" />
+    </files>
+</package>
