@@ -116,7 +116,7 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
         {
             var parms = new Dictionary<string, object>();
 			
-			foreach (var f in ColumnNames)
+			foreach (var f in ColumnNames.OrderBy(c => c.Value))
             {
                 switch ((<#= entityType #>ColumnNames)f.Key)
                 {
