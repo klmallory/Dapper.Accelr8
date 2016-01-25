@@ -4,7 +4,7 @@ SubSonic, and Peta Poco;
 Also https://www.nuget.org/packages/T4,
 And Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outputs-from-t4-made-easy-revisited
 
-The inspiration for this wrapper for dapper is the idea of a templating system that is more friendly for nLayer and distributed environments than most dapper tools. I've given a lot of thought to the repository pattern over the years and decided less is more, leaner is cleaner. In addition I wanted something flexible that could be manipulated to generate the sql I want without generating the sql manually. I still think it's bad practice to try to embed sql functionality into a domain, and conversely to pass sql directly accross application layer boundries. So a simple flexible query syntax was contructed for this purpose. Eventually I would like to suport linq querying directly on the repository, but that will require more time than I have now to invest in it.
+The inspiration for this wrapper for dapper is the idea of a templating system that is more friendly for nLayer and distributed environments than most dapper tools. I've given a lot of thought to the repository pattern over the years and decided less is more, leaner is cleaner. In addition I wanted something flexible that could be manipulated to generate the SQL I want without generating the sql manually. I still think it's bad practice to try to embed SQL functionality into a domain, and conversely to pass SQL directly across application layer boundaries. So a simple flexible query syntax was constructed for this purpose. Eventually I would like to support LINQ querying directly on the repository, but that will require more time than I have now to invest in it.
 
 ## How to install
 For single project data access layer run this command in your data access project:
@@ -16,7 +16,7 @@ It will automatically include these references:
   Dapper.Accelr8.Domain
   
 For distributed projects run these commands:
-Run Install-Package Dapper.Accelr8.Sql in your Sql layer.
+Run Install-Package Dapper.Accelr8.Sql in your SQL layer.
 Remove the binary references to:
 Dapper.Accelr8.Repo 
 Dapper.Accelr8.Domain
@@ -43,7 +43,7 @@ UseDirtyProperties adds dirty property tracking to your domain templates.
 UseDirtyProperties = true;
 ```
 
-These are the properties for your domain prjoect.
+These are the properties for your domain project.
 The BaseDomainEntity variable allows you to use your own base entity class as long as it can fulfill the same Dapper.Accelr8.Domain IEntity.
 ```
 
@@ -123,7 +123,7 @@ To ignore columns and foreign keys, find this line:
 //Tweak Columns / Relationships Here.
 ```
 
-Add C# code below to ignore the column child or parent relation relation.
+Add C# code below to ignore the column child or parent relation.
 ```
 tables["Region"].Children["FK_Territories_Region"].Ignore = true;
 tables["Customers"].Columns["Fax"].Ignore = true;
