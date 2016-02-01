@@ -128,3 +128,65 @@ Add C# code below to ignore the column child or parent relation.
 tables["Region"].Children["FK_Territories_Region"].Ignore = true;
 tables["Customers"].Columns["Fax"].Ignore = true;
 ```
+
+# Using Dependency Injection
+
+ Dapper Accelr8 assumes, but does not require, that the user have some sort of IOC / DI already in place. Let's take a look at an example of how to wire up the three basic parts of the Dapper Accelr8or.
+ 
+ The Accelr8 interface "IAccelr8Locator" is a dependency for the classes that need to dynamically access the other parts of repository and sql builders. It's what allows a reader to get readers for child classes and parent classes.
+ 
+ This is the signature defined by the "IAccelr8Locator" interface.
+ 
+```
+object Resolve(Type type);
+object Resolve(Type type, string name);
+I Resolve<I>();
+I Resolve<I>(string name);
+```
+ 
+ Here's an example of integrating it with Ninject (note that the _kernal variable represents an instance of the ninject Kernal class):
+ 
+```
+public virtual object Resolve(Type type)
+{
+    return _kernel.Get(type);
+}
+
+public virtual object Resolve(Type type, string name)
+{
+    return _kernel.Get(type, name);
+}
+
+public virtual I Resolve<I>()
+{
+    return _kernel.Get<I>();
+}
+
+public virtual I Resolve<I>(string name)
+{
+    return _kernel.Get<I>(name);
+}
+```
+ 
+ You will need to bind this interface before binding any of the other classes in the Dapper Accelr8or suite.
+ 
+ ### Registering the TableInfo Classes. 
+ 
+ This shows an example of registering a TableInfo class with ninject;
+ the TableInfo class is designed to be registered staticly as to reduce processing time in creating and sorting the table data everytime a reader or writer is created.
+ 
+```
+ _kernel.Bind<ProductTableInfo>().To<ProductTableInfo>(new ProductTableInfo(_kernel.Get<IAccelr8Locator>())).InSingletonScope();
+```
+ 
+### Registering the Reader Classes.
+  
+```
+_kernel.Bind<IEntityReader<int, Product>>().To<ProductReader>().WithConstructorArgument("connectionStringName", "MyConnectionString");
+```
+
+### Registering the Writer Classes.
+
+```
+_kernel.Bind<IEntityWriter<int, Product>>().To<ProductWriter>().WithConstructorArgument("connectionStringName", "MyConnectionString");
+```
