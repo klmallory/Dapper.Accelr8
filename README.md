@@ -170,7 +170,7 @@ public virtual I Resolve<I>(string name)
  
  You will need to bind this interface before binding any of the other classes in the Dapper Accelr8or suite.
  
- ### Registering the TableInfo Classes. 
+### Registering the TableInfo Classes. 
  
  This shows an example of registering a TableInfo class with ninject;
  the TableInfo class is designed to be registered staticly as to reduce processing time in creating and sorting the table data everytime a reader or writer is created.
