@@ -170,6 +170,14 @@ public virtual I Resolve<I>(string name)
  
  You will need to bind this interface before binding any of the other classes in the Dapper Accelr8or suite.
  
+ The DapperExecuter class will also need to be wired up, here is an example of doing so in ninject:
+ ```
+ServiceLocator.Current.RegisterSingleton<DapperExecuter, DapperExecuter>
+(new DapperExecuter
+    (new Dictionary<string, string>(){ {"MyConnectionString", "Data Source=.\sqlexpress;Initial Catalog=NORTHWND;Integrated Security=SSPI;"));
+ ```
+Even though this may seem like a complicated solution, remeber that IOC reduces complexity, and allows for better unit testing. For my own projects I have created a SQLLite version of the Dapper Executer.
+
 ### Registering the TableInfo Classes. 
  
  This shows an example of registering a TableInfo class with ninject;
