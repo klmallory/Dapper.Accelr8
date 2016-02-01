@@ -176,7 +176,11 @@ ServiceLocator.Current.RegisterSingleton<DapperExecuter, DapperExecuter>
 (new DapperExecuter
     (new Dictionary<string, string>(){ {"MyConnectionString", "Data Source=.\sqlexpress;Initial Catalog=NORTHWND;Integrated Security=SSPI;"));
  ```
-Even though this may seem like a complicated solution, remeber that IOC reduces complexity, and allows for better unit testing. For my own projects I have created a SQLLite version of the Dapper Executer.
+ ###Important
+ 
+ The "QueryBuilder" and "JoinBuilder" are self bindable and do not need explicit registrations in ninject. In other IOC / DI frameworks this may not be the case and they may need to be bound.
+ 
+Even though this may seem like a complicated solution, remeber that IOC reduces complexity, and allows for better unit testing. For my own projects I have created a SQLLite version of the Dapper Executer, allowing for db independent unit testing off all my applications.
 
 ### Registering the TableInfo Classes. 
  
