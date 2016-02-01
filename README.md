@@ -171,12 +171,14 @@ public virtual I Resolve<I>(string name)
  You will need to bind this interface before binding any of the other classes in the Dapper Accelr8or suite.
  
  The DapperExecuter class will also need to be wired up, here is an example of doing so in ninject:
+ 
  ```
 ServiceLocator.Current.RegisterSingleton<DapperExecuter, DapperExecuter>
 (new DapperExecuter
     (new Dictionary<string, string>(){ {"MyConnectionString", "Data Source=.\sqlexpress;Initial Catalog=NORTHWND;Integrated Security=SSPI;"));
  ```
- ###Important
+ 
+### Important
  
  The "QueryBuilder" and "JoinBuilder" are self bindable and do not need explicit registrations in ninject. In other IOC / DI frameworks this may not be the case and they may need to be bound.
  
