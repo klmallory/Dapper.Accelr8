@@ -173,8 +173,8 @@ public virtual I Resolve<I>(string name)
  The DapperExecuter class will also need to be wired up, here is an example of doing so in ninject:
  
  ```
-ServiceLocator.Current.RegisterSingleton<DapperExecuter, DapperExecuter>
-(new DapperExecuter
+ 
+ _kernel.Bind<DapperExecuter>().To<DapperExecuter>(new DapperExecuter
     (new Dictionary<string, string>(){ {"MyConnectionString", "Data Source=.\sqlexpress;Initial Catalog=NORTHWND;Integrated Security=SSPI;"));
  ```
  
