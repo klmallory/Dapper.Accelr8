@@ -204,3 +204,9 @@ _kernel.Bind<IEntityReader<int, Product>>().To<ProductReader>().WithConstructorA
 ```
 _kernel.Bind<IEntityWriter<int, Product>>().To<ProductWriter>().WithConstructorArgument("connectionStringName", "MyConnectionString");
 ```
+
+# Using the Query Language
+
+ Using the query language is simple, here is an example of pulling a user from a database / domain that has a user table:
+ 
+ var user = RepositoryProvider.Current
