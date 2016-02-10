@@ -6,6 +6,8 @@ And Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outp
 
 The inspiration for this wrapper for dapper is the idea of a templating system that is more friendly for nLayer and distributed environments than most dapper tools. I've given a lot of thought to the repository pattern over the years and decided less is more, leaner is cleaner. In addition I wanted something flexible that could be manipulated to generate the SQL I want without generating the sql manually. I still think it's bad practice to try to embed SQL functionality into a domain, and conversely to pass SQL directly across application layer boundaries. So a simple flexible query syntax was constructed for this purpose. Eventually I would like to support LINQ querying directly on the repository, but that will require more time than I have now to invest in it.
 
+Currently I only support SQL Server 2008, 2012 and above. Technically I can't see any reason why it wouldn't work in SQL Server 2005, please let me know if you find issues with any version.
+
 ## How to install
 
 For single project data access layer run this command using the nuget command line tool in your data access project:
@@ -174,8 +176,7 @@ public virtual I Resolve<I>(string name)
  The DapperExecuter class will also need to be wired up, here is an example of doing so in ninject:
  
  ```
- 
- _kernel.Bind<DapperExecuter>().To<DapperExecuter>(new DapperExecuter
+ _kernel.Bind<DapperExecuter>().ToConstant<DapperExecuter>(new DapperExecuter
     (new Dictionary<string, string>(){ {"MyConnectionString", "Data Source=.\sqlexpress;Initial Catalog=NORTHWND;Integrated Security=SSPI;"));
  ```
  
