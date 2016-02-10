@@ -210,6 +210,7 @@ _kernel.Bind<IEntityWriter<int, Product>>().To<ProductWriter>().WithConstructorA
 
  Using the query language is simple, here is an example of pulling a user from a database / domain that has a user table. I'm using Ninject for my dependency injection so you can see how to retreive the repository.
  
+ ```
  var repo = _kernal.Get<IRepository<User>>();
  var user = repo.Select(new QueryElement()
  {
@@ -217,15 +218,18 @@ _kernel.Bind<IEntityWriter<int, Product>>().To<ProductWriter>().WithConstructorA
  	Operator = Operator.Equals,
  	Value = "User1"
  }).FirstOrDefault();
+ ```
  
 Here's an example of pulling the first 10 users with names that match search criteria:
 
+```
  var users = repo.Select(new QueryElement()
  {
  	FieldName = UserColumnNames.UserName.ToString(),
  	Operator = Operator.Like,
  	Value = "Billy"
  }, 0, 10).FirstOrDefault();
+ ```
  
  the 0 indicates the amount of records to skip, and the 10 indicates the records to take. These parameters are executed in SQL.
  
