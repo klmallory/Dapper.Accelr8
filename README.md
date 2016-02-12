@@ -229,7 +229,7 @@ Here's an example of pulling the first 10 users with names that match search cri
  	FieldName = UserColumnNames.UserName.ToString(),
  	Operator = Operator.Like,
  	Value = "Billy"
- }, 0, 10).FirstOrDefault();
+ }, 0, 10);
  ```
  
  the 0 indicates the amount of records to skip, and the 10 indicates the records to take. These parameters are executed in SQL.
