@@ -69,6 +69,7 @@ using System.Text;
 using <#= SchemaHelper.DomainNamespace #>;
 using Dapper;
 using Dapper.Accelr8.Domain;
+using System.Data.SqlTypes;
 
 namespace <#= SchemaHelper.DomainNamespace #>
 {
@@ -80,16 +81,36 @@ namespace <#= SchemaHelper.DomainNamespace #>
 			
 			IsDirty = false; 
 			<# }
-				foreach (var child in table.Children.Where(c => !c.Ignore))
+				foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 		{ if (SchemaHelper.UseDirtyProperties) { 
 			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName));#>
 <#= backing #> = new List<<#= child.ChildClassName #>>();
 		<# } else { #>
 
 	<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> = new List<<#= child.ChildClassName #>>();
+		<# } }
+		
+		foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore 
+			&& Accelr8or.GetNullableType(c.IsNullable, c.CastType ?? c.CSharpType)  == "DateTime"))
+		{ if (SchemaHelper.UseDirtyProperties) { 
+			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.FieldName);#>
+<#= backing #> = (DateTime)SqlDateTime.MinValue;
+		<# } else { #>
+
+	<#= col.FieldName #> = (DateTime)SqlDateTime.MinValue;
+		<# } }
+
+		foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore 
+			&& Accelr8or.GetNullableType(c.IsNullable, c.CastType ?? c.CSharpType)  == "byte[]"))
+		{ if (SchemaHelper.UseDirtyProperties) { 
+			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.FieldName);#>
+<#= backing #> = new byte[0];
+		<# } else { #>
+
+	<#= col.FieldName #> = new byte[0];
 		<# } } #>}
 
-	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore ))
+	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore))
 	{
 		if (SchemaHelper.UseDirtyProperties)
 		{
@@ -113,9 +134,9 @@ namespace <#= SchemaHelper.DomainNamespace #>
 	//From Foreign Key <#= parent.Name #><#
 		if (SchemaHelper.UseDirtyProperties)
 		{
-		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassName);#>	
+		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassFieldName);#>	
 		protected <#= parent.ParentClassName #> <#= backing #>;
-		public <#= parent.ParentClassName #> <#= parent.ParentClassName #> 
+		public <#= parent.ParentClassName #> <#= parent.ParentClassFieldName #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -126,16 +147,36 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		} 
 		<#} else
 			{ #>
-		public <#= parent.ParentClassName #> <#= parent.ParentClassName #> { get; set; }
+		public <#= parent.ParentClassName #> <#= parent.ParentClassFieldName #> { get; set; }
 		<# } } 
-		foreach (var child in table.Children.Where(c => !c.Ignore))
+		foreach (var child in table.Children.Where(p => !p.Ignore && p.OneToOne))
+	{ #> 
+	//From Foreign Key <#= child.Name #><#
+		if (SchemaHelper.UseDirtyProperties)
+		{
+		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(child.Table);#>	
+		protected <#= child.ChildClassName #> <#= backing #>;
+		public <#= child.ChildClassName #> <#= child.Table #> 
+		{ 
+			get { return <#= backing #>; }
+			set 
+			{ 
+				<#= backing #> = value;  
+				IsDirty = true;
+			}
+		} 
+		<#} else
+			{ #>
+		public <#= child.ChildClassName #> <#= child.Table #> { get; set; }
+		<# } } 
+		foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 		{#> 
 	//From Foreign Key <#= child.Name #><#
 			if (SchemaHelper.UseDirtyProperties)
 			{
-			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName));#>	
+			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.Table));#>	
 		protected IList<<#= child.ChildClassName #>> <#= backing #>;
-		public IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> 
+		public IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.Table) #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -146,7 +187,7 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		} 
 			<#} else
 				{ #>
-		public IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> { get; set; }
+		public IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.Table) #> { get; set; }
 			<# } } #>
 		}
 }

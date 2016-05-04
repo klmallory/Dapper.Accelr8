@@ -39,7 +39,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Writers
 
     public interface IEntityWriter<IdType, EntityType> : IEntityWriter, IDisposable
         where EntityType : class, IEntity, IHaveId<IdType>
-        where IdType : struct, IComparable<IdType>, IEquatable<IdType>
+        where IdType : IComparable<IdType>, IEquatable<IdType>
     {
         IEntityWriter<IdType, EntityType> Insert(EntityType entity);
         IEntityWriter<IdType, EntityType> Insert(IList<EntityType> entities);

@@ -49,12 +49,12 @@
 		if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
 		{
 			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
-			idField = table.Columns.First(c => c.IsPrimaryKey).ColumnName;
+			idField = Accelr8or.Inflector.MakeSingular(table.Columns.First(c => c.IsPrimaryKey).ColumnName);
 		}
 		else
 		{
 			idType = table.Columns.First().CSharpType;
-			idField = table.Columns.First().ColumnName;
+			idField = Accelr8or.Inflector.MakeSingular(table.Columns.First().ColumnName);
 		}
 		
 		entityType = name;
@@ -81,9 +81,9 @@ using Dapper.Accelr8.Repo.Contracts.Readers;
 namespace <#= SchemaHelper.TableInfoNamespace #>
 {
 	public enum <#= entityType #>ColumnNames
-	{<# foreach (var col in table.Columns)
+	{<# foreach (var col in table.Columns.Where(c => !c.Ignore))
 	{#>	
-		<#= col.ColumnName #>, <# } #>	
+		<#= Accelr8or.Inflector.CamelCase(col.ColumnName) #>, <# } #>	
 	}
 
 	public enum <#= entityType #>CascadeNames
@@ -92,7 +92,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 		<#= Accelr8or.Inflector.MakeSingular(c.Table).ToLower() #>, <# } #>	
 	<# foreach (var p in table.Parents.Where(p => !p.Ignore))
 	{#>	
-		<#= Accelr8or.Inflector.MakeSingular(p.Parent).ToLower() #>, <# } #>	
+		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() #>, <# } #>	
 	}
 
 	public class <#= className #> : Dapper.Accelr8.Sql.TableInfo
@@ -100,7 +100,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 		public <#= className #>(IAccelr8Locator locator) : base(locator)
 		{
 			UniqueId = <#= table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore).ToString().ToLower() #>;
-			IdColumn = <#= entityType #>ColumnNames.<#= (table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName #>.ToString();
+			IdColumn = <#= entityType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase((table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName) #>.ToString();
 			TableName = "<#= table.TableName #>";
 			TableAlias = "<#= table.TableAlias #>";
 			ColumnNames = typeof(<#= entityType #>ColumnNames).ToDataList<Type, int>();
@@ -117,7 +117,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => GetReader(typeof(<#= pidType #>), typeof(<#= peType #>))),
 			TableName = "<#= parent.Parent #>",
-			Alias = TableAlias + "_" + "<#= parent.ParentAlias #>",
+			Alias = TableAlias + "_" + "<#= parent.ParentClassFieldName #>",
 			Outer = <#= parent.IsNullable.ToString().ToLower() #>,
 			Load = (entity, row) =>
 				{ 
@@ -130,7 +130,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 					if (row.<#= parent.Column #> == null || row.<#= parent.Column #> == default(<#= pidType #>))
 						return st;
 
-					st.<#= peType #> = reader.LoadEntityObject(row);
+					st.<#= parent.ParentClassFieldName #> = reader.LoadEntityObject(row);
 
 					return st;
 				},
@@ -138,9 +138,9 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 			{
 				new JoinQueryElement() 
 				{ 
-					JoinField = <#= peType #>ColumnNames.<#= parent.ParentColumn #>.ToString(),
+					JoinField = <#= peType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase(parent.ParentColumn) #>.ToString(),
 					Operator = Operator.Equals,
-					ParentField = <#= entityType #>ColumnNames.<#= parent.Column #>.ToString(),
+					ParentField = <#= entityType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase(parent.Column) #>.ToString(),
 					ParentTableAlias = TableAlias
 				}
 			} },

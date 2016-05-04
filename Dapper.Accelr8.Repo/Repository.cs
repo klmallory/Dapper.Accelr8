@@ -14,7 +14,7 @@ namespace Dapper.Accelr8.Repo
 {
     public class Repository<IdType, EntityType> : IRepository<IdType, EntityType>, IRepository
         where EntityType : class, IEntity, IHaveId<IdType>
-        where IdType : struct, IComparable<IdType>, IEquatable<IdType>
+        where IdType : IComparable<IdType>, IEquatable<IdType>
     {
         static int _typeHash = typeof(EntityType).GetHashCode();
 
@@ -48,7 +48,7 @@ namespace Dapper.Accelr8.Repo
 
         public IUnitOfWork BeginUnitOfWork()
         {
-            var uow = _serviceLocator.Resolve<IUnitOfWork>();
+            var uow = _serviceLocator.Resolve<IUnitOfWork>("safe");
 
             _unitStore.ActiveUnitOfWork = uow;
 
@@ -199,7 +199,7 @@ namespace Dapper.Accelr8.Repo
                 return res;
             }
         }
-        public IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering)
+        public IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering, bool withChildren = false)
         {
             using (var reader = GetReader())
             {
@@ -211,11 +211,16 @@ namespace Dapper.Accelr8.Repo
                 foreach (var o in ordering)
                     reader.OrderBy(o);
 
-                return reader.QueryResult();
+                var result = reader.QueryResult();
+
+                if (withChildren)
+                    reader.SetAllChildrenForExisting(result);
+
+                return result;
             }
         }
 
-        public IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering, int skip, int take)
+        public IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering, int skip, int take, bool withChildren = false)
         {
             using (var reader = GetReader())
             {
@@ -230,11 +235,16 @@ namespace Dapper.Accelr8.Repo
                 reader.WithSkip(skip);
                 reader.WithTop(take);
 
-                return reader.QueryResult();
+                var result = reader.QueryResult();
+
+                if (withChildren)
+                    reader.SetAllChildrenForExisting(result);
+
+                return result;
             }
         }
 
-        public IList<EntityType> Select(IList<QueryElement> query, IList<GroupBy> grouping)
+        public IList<EntityType> Select(IList<QueryElement> query, IList<GroupBy> grouping, bool withChildren = false)
         {
             using (var reader = GetReader())
             {
@@ -246,11 +256,16 @@ namespace Dapper.Accelr8.Repo
                 foreach (var g in grouping)
                     reader.GroupBy(g);
 
-                return reader.QueryResult();
+                var result = reader.QueryResult();
+
+                if (withChildren)
+                    reader.SetAllChildrenForExisting(result);
+
+                return result;
             }
         }
 
-        public IList<EntityType> Select(IList<QueryElement> query, IList<Aggregate> aggregates)
+        public IList<EntityType> Select(IList<QueryElement> query, IList<Aggregate> aggregates, bool withChildren = false)
         {
             using (var reader = GetReader())
             {
@@ -262,11 +277,16 @@ namespace Dapper.Accelr8.Repo
                 foreach (var a in aggregates)
                     reader.WithAggregate(a);
 
-                return reader.QueryResult();
+                var result = reader.QueryResult();
+
+                if (withChildren)
+                    reader.SetAllChildrenForExisting(result);
+
+                return result;
             }
         }
 
-        public IList<EntityType> Select(IList<QueryElement> query, IList<Having> havings)
+        public IList<EntityType> Select(IList<QueryElement> query, IList<Having> havings, bool withChildren = false)
         {
             using (var reader = GetReader())
             {
@@ -278,7 +298,12 @@ namespace Dapper.Accelr8.Repo
                 foreach (var h in havings)
                     reader.Having(h);
 
-                return reader.QueryResult();
+                var result = reader.QueryResult();
+
+                if (withChildren)
+                    reader.SetAllChildrenForExisting(result);
+
+                return result;
             }
         }
 
@@ -289,7 +314,8 @@ namespace Dapper.Accelr8.Repo
             , IList<Having> havings
             , IList<OrderBy> ordering
             , int skip
-            , int take)
+            , int take
+            , bool withChildren = false)
         {
             using (var reader = GetReader())
             {
@@ -316,13 +342,22 @@ namespace Dapper.Accelr8.Repo
                 if (skip > 0)
                     reader.WithSkip(skip);
 
-                return reader.QueryResult();
+                var result = reader.QueryResult();
+
+                if (withChildren)
+                    reader.SetAllChildrenForExisting(result);
+
+                return result;
             }
         }
 
-        public IList<EntityType> Select(IEntityReader<IdType, EntityType> customQuery)
+        public IList<EntityType> Select(IEntityReader<IdType, EntityType> customQuery, bool withChildren = false)
         {
-            return customQuery.QueryResult();
+            var result = customQuery.QueryResult();
+            if (withChildren)
+                GetReader().SetAllChildrenForExisting(result);
+
+            return result;
         }
 
         public void AddOrUpdate(EntityType entity, params string[] cascades)

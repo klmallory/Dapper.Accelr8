@@ -41,8 +41,8 @@ namespace Dapper.Accelr8.Repo
         void Delete(IList<object> entities, params string[] cascades);
     }
 
-    public interface IRepository<IdType, EntityType> : IRepository 
-        where EntityType : IEntity, IHaveId<IdType> 
+    public interface IRepository<IdType, EntityType> : IRepository
+        where EntityType : IEntity, IHaveId<IdType>
         where IdType : IComparable<IdType>
     {
         IEntityReader<IdType, EntityType> GetReader();
@@ -58,13 +58,13 @@ namespace Dapper.Accelr8.Repo
         IList<EntityType> Select(IList<QueryElement> query, bool withChildren = false);
         IList<EntityType> Select(QueryElement query, int skip, int take, bool withChildren = false);
         IList<EntityType> Select(IList<QueryElement> query, int skip, int take, bool withChildren = false);
-        IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering);
-        IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering, int skip, int take);
-        IList<EntityType> Select(IList<QueryElement> query, IList<GroupBy> grouping);
-        IList<EntityType> Select(IList<QueryElement> query, IList<Aggregate> aggregates);
-        IList<EntityType> Select(IList<QueryElement> query, IList<Having> havings);
-        IList<EntityType> Select(IList<QueryElement> query, IList<Aggregate> aggregates, IList<GroupBy> grouping, IList<Having> havings, IList<OrderBy> ordering, int skip, int take);
-        IList<EntityType> Select(IEntityReader<IdType, EntityType> customQuery);
+        IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering, bool withChildren = false);
+        IList<EntityType> Select(IList<QueryElement> query, IList<OrderBy> ordering, int skip, int take, bool withChildren = false);
+        IList<EntityType> Select(IList<QueryElement> query, IList<GroupBy> grouping, bool withChildren = false);
+        IList<EntityType> Select(IList<QueryElement> query, IList<Aggregate> aggregates, bool withChildren = false);
+        IList<EntityType> Select(IList<QueryElement> query, IList<Having> havings, bool withChildren = false);
+        IList<EntityType> Select(IList<QueryElement> query, IList<Aggregate> aggregates, IList<GroupBy> grouping, IList<Having> havings, IList<OrderBy> ordering, int skip, int take, bool withChildren = false);
+        IList<EntityType> Select(IEntityReader<IdType, EntityType> customQuery, bool withChildren = false);
         void Delete(EntityType entity, params string[] cascades);
         void Delete(IList<EntityType> entities, params string[] cascades);
         void Delete(IList<QueryElement> query);

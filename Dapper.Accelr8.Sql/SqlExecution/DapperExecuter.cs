@@ -91,6 +91,22 @@ namespace Dapper.Accelr8.Sql
             }
         }
 
+        protected void LogException(string query, SystemException nEx)
+        {
+            try
+            {
+                Trace.CorrelationManager.StartLogicalOperation(_type);
+
+                Trace.TraceError("Sql query failed: {0}", query);
+
+                Trace.TraceError(nEx.ToString());
+            }
+            finally
+            {
+                Trace.CorrelationManager.StopLogicalOperation();
+            }
+        }
+
         protected virtual DbConnection GetSqlConnection(string connectionStringName)
         {
             return new SqlConnection(GetConnectionString(connectionStringName));
@@ -410,6 +426,11 @@ namespace Dapper.Accelr8.Sql
                     idSetter(ids);
 
                     return ids.Count;
+                }
+                catch (NotSupportedException nEx)
+                {
+                    LogException(sql, nEx);
+                    throw;
                 }
                 catch (SqlTypeException sqlTex)
                 {

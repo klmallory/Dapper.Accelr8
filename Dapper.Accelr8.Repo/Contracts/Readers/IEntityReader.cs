@@ -13,6 +13,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Readers
         bool UniqueId { get; }
         string IdColumn { get; }
         string TableName { get; }
+        object TableInfo { get; }
         IList<KeyValuePair<int, string>> ColumnNames { get; }
         string TableAlias { get; }
         object LoadEntityObject(dynamic row);
@@ -58,6 +59,6 @@ namespace Dapper.Accelr8.Repo.Contracts.Readers
         IEntityReader<IdType, EntityType> WithChildForParentId(IEntityReader childReader, IdType id, string childJoinFieldName, Action<IList<EntityType>, IList<object>> setOnParentVisitor, bool withJoins = false);
         IEntityReader<IdType, EntityType> WithChildForParentIds(IEntityReader childReader, IdType[] ids, string childJoinFieldName, Action<IList<EntityType>, IList<object>> setOnParentVisitor, bool withJoins = false);
         IEntityReader<IdType, EntityType> WithChild(IEntityReader childReader, string childJoinFieldName, Action<IList<EntityType>, IList<object>> setOnParentVisitor);
-        IEntityReader<IdType, EntityType> WithJoin(string joinTable, string joinAlias, string[] joinFieldNames, JoinQueryElement[] joinQueries, Func<object, dynamic, object> load);
+        IEntityReader<IdType, EntityType> WithJoin(string joinTable, string joinAlias, string[] joinColumnNames, JoinQueryElement[] joinQueries, Func<object, dynamic, object> load);
     }
 }

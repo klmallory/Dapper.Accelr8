@@ -31,7 +31,7 @@ namespace Dapper.Accelr8.Repo.Parameters
         public Over? OverClause;
     }
 
-    public struct Over 
+    public struct Over
     {
         public string Rows;
         public TableFieldKey Partition;

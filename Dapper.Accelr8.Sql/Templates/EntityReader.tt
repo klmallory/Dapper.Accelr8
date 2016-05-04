@@ -28,6 +28,8 @@
 	var entityType = @"";
 	var idField = @"";
 
+	var fieldCt = 0;
+
 	var tables = SchemaHelper.GetTables();
 
 	var manager = Manager.Create(Host, GenerationEnvironment);
@@ -48,12 +50,12 @@
 		if (table.Columns.Any(c => c.IsPrimaryKey))
 		{
 			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
-			idField = table.Columns.First(c => c.IsPrimaryKey).ColumnName;
+			idField = Accelr8or.Inflector.CamelCase(table.Columns.First(c => c.IsPrimaryKey).ColumnName);
 		}
 		else
 		{
 			idType = table.Columns.First().CSharpType;
-			idField = table.Columns.First().ColumnName;
+			idField = Accelr8or.Inflector.CamelCase(table.Columns.First().ColumnName);
 		}
 
 		entityType = name;
@@ -92,12 +94,12 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 
 		//Child Count <#= table.Children.Count() #>
 		//Parent Count <#= table.Parents.Count() #>
-		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne).GroupBy(c => c.ChildClassName).Select(s => s.First()))
+		<# foreach (var child in table.Children.Where(c => !c.Ignore).GroupBy(c => c.ChildClassName).Select(s => s.First()))
 			{ 
 				//
 				//Add Methods to Resolve Other Children Readers
 				//
-				var cidType = child.CSharpType;
+				var cidType = child.ChildCSharpType ?? child.CSharpType;
 				var ceType = child.ChildClassName; 
 				var readerName = "_" + Accelr8or.Inflector.MakeInitialLowerCase(ceType) + "Reader"; 
 #>static IEntityReader<<#= cidType #> , <#= ceType #>> <#= readerName #>;
@@ -114,7 +116,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 
 		<# } #>
 
-	<# foreach (var child in table.Children)
+	<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 	{ 
 		//
 		//Add Methods to Set Children collections on the parents and set circular references.
@@ -142,7 +144,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 
 			foreach (var r in results)
 			{
-				r.<#= Accelr8or.Inflector.MakePlural(ceType) #> = typedChildren.Where(b => b.<#= child.ChildFieldName #> == r.Id).ToList();
+				r.<#= Accelr8or.Inflector.MakePlural(ceType) #> = typedChildren.Where(b => b.<#= Accelr8or.Inflector.CamelCase(child.ChildFieldName) #> == r.Id).ToList();
 				r.<#= Accelr8or.Inflector.MakePlural(ceType) #>.ToList().ForEach(b => b.<#= entityType #> = r);
 			}
 		}
@@ -166,7 +168,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 	<#}#>
 	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore && !c.IsIdentity))
 	{ var castFormat = Accelr8or.GetCastForType(col);#>
-		domain.<#= col.FieldName #> = <#= string.Format(castFormat, @"GetRowData<" + Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) + @">(dataRow, " + entityType + @"ColumnNames." + col.ColumnName + @".ToString())") #>; 
+		domain.<#= Accelr8or.Inflector.CamelCase(col.FieldName) #> = <#= string.Format(castFormat, @"GetRowData<" + Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) + @">(dataRow, " + entityType + @"ColumnNames." + Accelr8or.Inflector.CamelCase(col.ColumnName) + @".ToString())") #>; 
       <# } #>
 			
 			return domain;
@@ -206,13 +208,13 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 				var cidType = child.CSharpType;
 				var ceType = child.ChildClassName;
 #>WithChildForParentId(Get<#= ceType #>Reader(), entity.Id
-				, <#= ceType #>ColumnNames.<#= child.Column #>.ToString()
+				, <#= ceType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase(child.Column) #>.ToString()
 				, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
 
 			<# } #>
 QueryResultForChildrenOnly(new List<<#= entityType #>>() { entity });
 
-			<# foreach (var child in table.Children)
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 			{ 
 				if (child.Ignore)
 					continue;
@@ -239,7 +241,7 @@ QueryResultForChildrenOnly(new List<<#= entityType #>>() { entity });
 #>WithChildForParentIds(Get<#= ceType #>Reader()
 				, entities.Where(e => e != null)
 				.Select(s => s.Id)
-				.ToArray(), <#= ceType #>ColumnNames.<#= child.Column #>.ToString()
+				.ToArray(), <#= ceType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase(child.Column) #>.ToString()
 				, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
 
 			<# } #>		

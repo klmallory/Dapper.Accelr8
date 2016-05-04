@@ -1,4 +1,4 @@
-﻿<#+    
+﻿<#+
 	class SchemaHelper
 	{
 		public static bool CacheLocatorResults = false;
@@ -17,23 +17,29 @@
 		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
 		public static string TableInfoDirectory = @"TableInfos";
 
-		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=EnrollmentBioStore;Integrated Security=SSPI;";
-		static string _database = @"EnrollmentBioStore";
+		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=Northwnd;Integrated Security=SSPI;";
+		static string _database = @"Northwnd";
 
 		// Change Names Here =>
 		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
 		{ 
-			{ "Submissions_VW", "SubmissionView"}
+
 		};
 
 		static Dictionary<string, string> tableAliases = new Dictionary<string, string>()
 		{
-			{ "CmtTransactionEnrollmentMnemonicValue", "temv" }
+
 		};
 
-		static Dictionary<string, string> columnNames = new Dictionary<string, string>();
+		static Dictionary<string, string> columnNames = new Dictionary<string, string>()
+		{
 
-		static Dictionary<string, string> columnTypes = new Dictionary<string, string>();
+		};
+
+		static Dictionary<string, string> columnTypes = new Dictionary<string, string>()
+		{
+
+		};
 
 		static SchemaHelper()
 		{
@@ -54,6 +60,11 @@
 			TableInfoDirectory = Path.Combine(path, TableInfoDirectory);
 		}
 
+		public static bool Equals(string s1, string s2)
+		{
+			return String.Equals(s1, s2, StringComparison.InvariantCultureIgnoreCase);
+		}
+
 		public static IDictionary<string, DbTable> GetTables()
 		{
 			var helper = new SqlServerDbHelper();
@@ -62,6 +73,7 @@
 			var tables = helper.GetDbTables(_connectionString, _database);
 
 			//Tweak Tables Here.
+			tables["VersionInfo"].Ignore = true;
 
 			foreach (var t in tables)
 			{

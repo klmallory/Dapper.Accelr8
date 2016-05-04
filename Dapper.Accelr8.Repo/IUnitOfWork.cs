@@ -14,10 +14,10 @@ namespace Dapper.Accelr8.Repo
         void Add<EntityType>(IList<EntityType> entities, IEntityWriter writer) where EntityType : class, IEntity;
         void Add<EntityType>(EntityType entity, IEntityWriter writer) where EntityType : class, IEntity;
 
-        void Update<IdType, EntityType>(IList<EntityType> entities, IEntityWriter writer) 
+        void Update<IdType, EntityType>(IList<EntityType> entities, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
             where IdType : IComparable<IdType>;
-        void Update<IdType, EntityType>(IdType id, EntityType entity, IEntityWriter writer) 
+        void Update<IdType, EntityType>(IdType id, EntityType entity, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
             where IdType : IComparable<IdType>;
 

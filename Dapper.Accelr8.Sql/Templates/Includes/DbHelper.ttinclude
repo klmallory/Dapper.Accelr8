@@ -61,6 +61,7 @@
 		public string Column { get; set; }
 		public string ParentColumn { get; set; }
 		public string CSharpType { get; set; }
+		public string ChildCSharpType { get; set; }
 		public string TableAlias { get; set; }
 
 		public bool Ignore { get; set; }
@@ -86,6 +87,7 @@
 
 		public bool ParentColumnIsPrimaryKey { get; set; }
 		public string ParentClassName { get; set; }
+		public string ParentClassFieldName { get; set; }
 		public string ParentFieldName { get; set; }
 		public string ChildFieldName { get; set; }
 		public bool IsNullable { get; set; }
@@ -192,7 +194,7 @@
         {
             string sql = 
 				string.Format(@"
-                WITH indexCTE AS
+WITH indexCTE AS
                 (
                     SELECT 
                     ic.column_id,
@@ -202,19 +204,26 @@
                     join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
                     WHERE idx.is_primary_key=1
                 )
-				select OBJECT_NAME(fk.object_id) Name, 
-					OBJECT_NAME(fk.referenced_object_id) Parent, 
+				select OBJECT_NAME(fk.object_id) Name,
+					OBJECT_NAME(fk.referenced_object_id) Parent,
 					pCol.Name ParentColumn,
 					Object_Name(fk.parent_object_id) [Table],
 					col.Name [Column],
 					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
-					col.is_nullable IsNullable, 
-					pSysType.name ColumnType
+					col.is_nullable IsNullable,
+					pSysType.name ColumnType,
+					cpk.name,
+					cSysType.name ChildType
+
 				from sys.foreign_keys fk
 				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
 				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
 				join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
-				join sys.systypes pSysType on pSysType.type = pCol.system_type_id
+				join sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
+				join sys.index_columns cixc ON cixc.column_id = cixc.index_column_id and cixc.is_included_column = 0 and cixc.object_id = col.object_id
+				join sys.indexes idx on idx.index_id = cixc.index_id and idx.object_id = cixc.object_id
+				left outer join sys.columns cpk on cpk.column_id = cixc.index_column_id and cpk.object_id = cixc.object_id
+				left outer join sys.systypes cSysType on cSysType.xusertype = cpk.system_type_id
 				left outer join indexCTE ON col.column_id=indexCTE.column_id AND col.object_id=indexCTE.object_id
 				where fk.referenced_object_id = OBJECT_ID(@tableName);", database);
 
@@ -230,6 +239,7 @@
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
 				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
+				ChildCSharpType = MapCsharpType(row.Field<string>("ChildType")),
 				ChildColumnIsPrimaryKey = row.Field<bool>("IsPrimaryKey")
             }).ToList();
         }
@@ -261,7 +271,7 @@
 				join {0}.sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
 				join {0}.sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
 				join {0}.sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
-				join {0}.sys.systypes pSysType on pSysType.type = pCol.system_type_id
+				join {0}.sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
 				left outer join indexCTE ON pCol.column_id=indexCTE.column_id AND pCol.object_id=indexCTE.object_id
 				where fk.parent_object_id = OBJECT_ID(@tableName)", database);
 
@@ -273,6 +283,7 @@
 				Name = row.Field<string>("Name"),
 				Table = row.Field<string>("Table"),
 				Parent = row.Field<string>("Parent"),
+				ParentClassFieldName = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),

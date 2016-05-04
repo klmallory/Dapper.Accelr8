@@ -44,7 +44,6 @@
     <Compile Include="Contracts\Readers\IEntityReader.cs" />
     <Compile Include="Contracts\Writers\IEntityWriter.cs" />
     <Compile Include="Diagnostics.cs" />
-    <Compile Include="Domain\BaseEntity.cs" />
     <Compile Include="ExecutionContext.cs" />
     <Compile Include="Extensions\EntityExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />

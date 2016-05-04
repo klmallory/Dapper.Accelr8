@@ -17,7 +17,8 @@ namespace Dapper.Accelr8.Sql
         protected static bool _cacheReaders = true;
         static protected IAccelr8Locator _locator;
 
-        public TableInfo() : this(null)
+        public TableInfo()
+            : this(null)
         {
 
         }

@@ -493,6 +493,8 @@ namespace Dapper.Accelr8.Sql
         public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
         public virtual JoinInfo[] Joins { get; protected set; }
         public virtual TableInfo TableInfo { get; protected set; }
+        object IEntityReader.TableInfo
+        { get { return this.TableInfo; } }
 
         public IEntityReader<IdType, EntityType> WithColumn(string column)
         {
@@ -910,7 +912,7 @@ namespace Dapper.Accelr8.Sql
             {
                 foreach (var j in _joins)
                 {
-                    var joinFields = ", 0 as " + j.SplitOnColumnName + ", [" + j.JoinAlias + "].[" + string.Join("], [" + j.JoinAlias + "].[", j.JoinFieldNames) + "]";
+                    var joinFields = ", 0 as " + j.SplitOnColumnName + ", [" + j.JoinAlias + "].[" + string.Join("], [" + j.JoinAlias + "].[", j.JoinColumnNames) + "]";
 
                     fields += joinFields;
                 }
@@ -1153,7 +1155,7 @@ namespace Dapper.Accelr8.Sql
                 Load = join.Load,
                 SplitOnColumnName = "SplitMe",
                 JoinAlias = join.Alias,
-                JoinFieldNames = join.Reader().ColumnNames.Select(d => d.Value).ToArray(),
+                JoinColumnNames = join.Reader().ColumnNames.Select(d => d.Value).ToArray(),
                 JoinTable = join.TableName,
                 Outer = join.Outer,
                 JoinOnQueries = join.JoinQuery
@@ -1186,7 +1188,7 @@ namespace Dapper.Accelr8.Sql
                 Load = loadVisitor,
                 SplitOnColumnName = "SplitMe",
                 JoinAlias = TableAlias + "_" + joinReader.TableAlias + alias,
-                JoinFieldNames = joinReader.ColumnNames.Select(c => c.Value).ToArray(),
+                JoinColumnNames = joinReader.ColumnNames.Select(c => c.Value).ToArray(),
                 JoinTable = joinReader.TableName,
                 Outer = outer,
                 JoinOnQueries = new JoinQueryElement[] 
@@ -1205,13 +1207,13 @@ namespace Dapper.Accelr8.Sql
         public virtual IEntityReader<IdType, EntityType> WithJoin
             (string joinTable
             , string joinAlias
-            , string[] joinFieldNames
+            , string[] joinColumnNames
             , JoinQueryElement[] joinQueries
             , Func<object, dynamic, object> loadVisitor)
         {
             var join = new Join()
             {
-                JoinFieldNames = joinFieldNames,
+                JoinColumnNames = joinColumnNames,
                 SplitOnColumnName = "SplitOnColumn",
                 JoinTable = joinTable,
                 JoinAlias = joinAlias,

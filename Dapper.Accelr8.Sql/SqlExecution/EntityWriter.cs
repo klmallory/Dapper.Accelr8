@@ -15,7 +15,7 @@ namespace Dapper.Accelr8.Sql
 {
     public abstract class EntityWriter<IdType, EntityType> : IEntityWriter, IEntityWriter<IdType, EntityType>
         where EntityType : class, IEntity, IHaveId<IdType>
-        where IdType : struct, IComparable<IdType>, IEquatable<IdType>
+        where IdType : IComparable<IdType>, IEquatable<IdType>
     {
         protected static string _sqlIdType = "int";
         protected static int _typeHash = typeof(EntityType).GetHashCode();
@@ -153,7 +153,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual bool Cascade<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
             where EType : class, IEntity, IHaveId<IType>
-            where IType : struct, IComparable<IType>, IEquatable<IType>
+            where IType : IComparable<IType>, IEquatable<IType>
         {
             if (entity == null || !entity.IsDirty)
                 return false;
@@ -176,7 +176,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual bool CascadeDelete<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
             where EType : class, IEntity, IHaveId<IType>
-            where IType : struct, IComparable<IType>, IEquatable<IType>
+            where IType : IComparable<IType>, IEquatable<IType>
         {
             if (entity == null || !entity.IsDirty)
                 return false;
@@ -205,7 +205,7 @@ namespace Dapper.Accelr8.Sql
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
         public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
-        protected virtual TableInfo TableInfo {get; set; }
+        protected virtual TableInfo TableInfo { get; set; }
 
         public virtual int Count { get { return _tasks.Count; } }
 
@@ -229,6 +229,14 @@ namespace Dapper.Accelr8.Sql
             _parents.Add(new Tuple<IEntityWriter, EntityType>(writer, child));
 
             return this;
+        }
+
+        protected DateTime GetSqlSafeDate(DateTime dt)
+        {
+            if (dt < (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue)
+                return (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
+
+            return dt;
         }
 
         #region Sql Builders

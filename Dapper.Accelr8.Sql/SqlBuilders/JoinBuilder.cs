@@ -10,7 +10,7 @@ namespace Dapper.Accelr8.Sql
     public class JoinBuilder
     {
 
-        protected static readonly string genericJoinClause = @"join {0} [{1}] on {2}{1}.[{3}] {4}{5} "; //2 is open bracket, 5 is close bracket.
+        protected static readonly string genericJoinClause = @"join [{0}] [{1}] on {2}{1}.[{3}] {4}{5} "; //2 is open bracket, 5 is close bracket.
         protected static readonly string genericAndClause = @"and {0}[{1}].[{2}] {3}{4} "; //0 is open bracket //1 is alias
         protected static readonly string genericOrClause = @"or {0}[{1}].[{2}] {3}{4} "; //0 is open bracket //1 is alias
 

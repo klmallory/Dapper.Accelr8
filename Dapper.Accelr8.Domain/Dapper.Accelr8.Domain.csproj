@@ -42,6 +42,7 @@
     <Compile Include="..\Dapper.Accelr8.Repo\ver.cs">
       <Link>ver.cs</Link>
     </Compile>
+    <Compile Include="BaseEntity.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

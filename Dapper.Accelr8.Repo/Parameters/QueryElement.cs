@@ -21,7 +21,6 @@ namespace Dapper.Accelr8.Repo.Parameters
 
         public IList<string> GetUniqueParameters(string paramType)
         {
-            int count = 0;
             var alias = TableAlias;
             var name = FieldName;
 
