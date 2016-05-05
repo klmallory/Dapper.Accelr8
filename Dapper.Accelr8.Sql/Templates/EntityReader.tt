@@ -145,7 +145,7 @@ namespace <#= SchemaHelper.ReadersNamespace #>
 			foreach (var r in results)
 			{
 				r.<#= Accelr8or.Inflector.MakePlural(ceType) #> = typedChildren.Where(b => b.<#= Accelr8or.Inflector.CamelCase(child.ChildFieldName) #> == r.Id).ToList();
-				r.<#= Accelr8or.Inflector.MakePlural(ceType) #>.ToList().ForEach(b => b.<#= entityType #> = r);
+				r.<#= Accelr8or.Inflector.MakePlural(ceType) #>.ToList().ForEach(b => b.<#= child.ParentClassFieldName ?? entityType #> = r);
 			}
 		}
 

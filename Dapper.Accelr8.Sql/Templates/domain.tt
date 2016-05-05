@@ -110,7 +110,8 @@ namespace <#= SchemaHelper.DomainNamespace #>
 	<#= col.FieldName #> = new byte[0];
 		<# } } #>}
 
-	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore))
+
+	<# foreach (var col in table.Columns.Where(c => (!c.IsPrimaryKey || c.FieldName != "Id") && !c.Ignore))
 	{
 		if (SchemaHelper.UseDirtyProperties)
 		{
@@ -134,9 +135,9 @@ namespace <#= SchemaHelper.DomainNamespace #>
 	//From Foreign Key <#= parent.Name #><#
 		if (SchemaHelper.UseDirtyProperties)
 		{
-		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassFieldName);#>	
+		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName));#>	
 		protected <#= parent.ParentClassName #> <#= backing #>;
-		public <#= parent.ParentClassName #> <#= parent.ParentClassFieldName #> 
+		public <#= parent.ParentClassName #> <#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName) #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -147,7 +148,7 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		} 
 		<#} else
 			{ #>
-		public <#= parent.ParentClassName #> <#= parent.ParentClassFieldName #> { get; set; }
+		public <#= parent.ParentClassName #> <#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName) #> { get; set; }
 		<# } } 
 		foreach (var child in table.Children.Where(p => !p.Ignore && p.OneToOne))
 	{ #> 

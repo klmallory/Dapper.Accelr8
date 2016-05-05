@@ -92,7 +92,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 		<#= Accelr8or.Inflector.MakeSingular(c.Table).ToLower() #>, <# } #>	
 	<# foreach (var p in table.Parents.Where(p => !p.Ignore))
 	{#>	
-		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() #>, <# } #>	
+		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() + "_p" #>, <# } #>	
 	}
 
 	public class <#= className #> : Dapper.Accelr8.Sql.TableInfo
@@ -130,7 +130,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 					if (row.<#= parent.Column #> == null || row.<#= parent.Column #> == default(<#= pidType #>))
 						return st;
 
-					st.<#= parent.ParentClassFieldName #> = reader.LoadEntityObject(row);
+					st.<#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName) #> = reader.LoadEntityObject(row);
 
 					return st;
 				},

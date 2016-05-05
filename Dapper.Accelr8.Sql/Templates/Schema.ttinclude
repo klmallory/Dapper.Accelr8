@@ -73,7 +73,6 @@
 			var tables = helper.GetDbTables(_connectionString, _database);
 
 			//Tweak Tables Here.
-			tables["VersionInfo"].Ignore = true;
 
 			foreach (var t in tables)
 			{
@@ -83,6 +82,12 @@
 				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key.Replace("_spc_", " "));
 				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key.Replace("_spc_", " "));
 				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key.Replace("_spc_", " "));
+			}
+
+			foreach (var t in tables)
+			{
+				if (t.Value.Ignore)
+					continue;
 
 				if (tableNames.ContainsKey(t.Value.TableName))
 				{
@@ -104,7 +109,7 @@
 				{
 					column.ColumnName = column.ColumnName.Replace(" ", "_spc_");
 
-					if (column.IsPrimaryKey)
+					if (column == t.Value.Columns.FirstOrDefault(co => co.IsPrimaryKey))
 						column.FieldName = "Id";
 					else if (columnNames.ContainsKey(t.Value.TableName + "." + column.ColumnName))
 						column.FieldName = columnNames[t.Value.TableName + "." + column.ColumnName];
@@ -132,7 +137,9 @@
 					else
 						c.ChildClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Table));
 
-					if (c.ChildColumnIsPrimaryKey)
+					var pkCol = tables[c.Table.Replace("_spc_", " ")].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
+
+					if (pkCol != null && pkCol.ColumnName == c.Column)
 						c.ChildFieldName = "Id";
 					else if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
 						c.ChildFieldName = columnNames[t.Value.TableName + "." + c.Column];
@@ -162,7 +169,9 @@
 					else
 						c.ParentClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Parent));
 
-					if (c.ParentColumnIsPrimaryKey)
+					var pkCol = tables[c.Table].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
+
+					if (pkCol != null && pkCol.ColumnName == c.ParentColumn)
 						c.ParentFieldName = "Id";
 					if (columnNames.ContainsKey(t.Value.TableName + "." + c.ParentColumn))
 						c.ParentFieldName = columnNames[t.Value.TableName + "." + c.ParentColumn];
@@ -182,6 +191,9 @@
 			}
 
 			//Tweak Columns / Relationships Here.
+			tables["Employees"].Children.First(c => c.Name == "FK_EmployeeTerritories_Employees").ChildClassFieldName  = "EmployeeTerritories2";
+			tables["Employees"].Children.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+			tables["Employees"].Parents.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
 
 			return tables;
 		}

@@ -116,7 +116,8 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
         protected override IDictionary<string, object> GetParams(ActionType actionType, <#= entityType #> entity, int taskIndex, ref int count)
         {
             var parms = new Dictionary<string, object>();
-			
+			<# if (table.Columns.Where(c => !c.Ignore && !c.IsPrimaryKey).Count() > 0)
+			{ #>
 			foreach (var f in ColumnNames)
             {
                 switch ((<#= entityType #>ColumnNames)f.Key)
@@ -127,10 +128,10 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
 	case <#= entityType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase(col.ColumnName) #>:
 						parms.Add(GetParamName(<#= entityType #>ColumnNames.<#= Accelr8or.Inflector.CamelCase(col.ColumnName) #>.ToString(), actionType, taskIndex, ref count), <# if (col.CastType != null) { #> (<#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #>) <# } #>entity.<#= col.FieldName #>);
 						break;
-				<#}#>
+				<#} #>
 }
 			}
-
+			<# } #>
 			return parms;
         }
 
@@ -161,7 +162,7 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
 			#>
 	//From Foreign Key <#= parent.Name #>
 			var <#= writerName #> = Get<#= parent.ChildClassName #>Writer();
-		if ((_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(parent.Table).ToLower() #>.ToString()) || _cascades.Contains("all")) && entity.<#= parent.ChildClassName #> != null)
+		if ((_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(parent.Table).ToLower() + "_p" #>.ToString()) || _cascades.Contains("all")) && entity.<#= parent.ChildClassName #> != null)
 			if (Cascade(<#= writerName #>, entity.<#= parent.ChildClassName #>, context))
 				WithParent(<#= writerName #>, entity);
 
@@ -173,8 +174,8 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
 			#>
 	//From Foreign Key <#= parent.Name #>
 			var <#= writerName #> = Get<#= parent.ParentClassName #>Writer();
-		if ((_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName).ToLower() #>.ToString()) || _cascades.Contains("all")) && entity.<#= parent.ParentClassFieldName #> != null)
-			if (Cascade(<#= writerName #>, entity.<#= parent.ParentClassFieldName #>, context))
+		if ((_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName).ToLower() + "_p" #>.ToString()) || _cascades.Contains("all")) && entity.<#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName) #> != null)
+			if (Cascade(<#= writerName #>, entity.<#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName) #>, context))
 				WithParent(<#= writerName #>, entity);
 
 		<# } #>
@@ -201,22 +202,7 @@ static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
 	//Child field not found <#= child.Column #> for parent column <#= child.ParentColumn #> From Foreign Key <#= child.Name #>
 		<# } } #>
 		
-		<# foreach (var parent in table.Parents.Where(p => !p.Ignore))
-		{ 
-			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassFieldName) + varCnt++;
 
-			var pt = tables.FirstOrDefault(tb => SchemaHelper.Equals(tb.Key, parent.Parent) && tb.Value.Columns.Any(c => SchemaHelper.Equals(c.ColumnName, parent.ParentColumn)));
-
-			if (pt.Value != null)
-			{
-				var pf = pt.Value.Columns.First(c => SchemaHelper.Equals(c.ColumnName, parent.ParentColumn)); #>
-	//From Foreign Key <#= parent.Name #>
-			if (entity.<#= parent.ParentClassFieldName #> != null)
-				entity.<#= parent.ChildFieldName #> = entity.<#= parent.ParentClassFieldName #>.<#= pf.FieldName #>;
-
-		<# } else { #>
-	//Parent field not found <#= parent.ParentColumn #> for child column <#= parent.Column #> From Foreign Key <#= parent.Name #>
-		<# } } #>
 }
 
 		protected override void RemoveRelations(<#= entityType #> entity, ScriptContext context)

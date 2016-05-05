@@ -50,6 +50,66 @@
     <Compile Include="..\Dapper.Accelr8.Repo\ver.cs">
       <Link>ver.cs</Link>
     </Compile>
+    <Compile Include="Domain\AlphabeticalListOfProduct.cs" />
+    <Compile Include="Domain\Category.cs" />
+    <Compile Include="Domain\CategorySalesFor1997.cs" />
+    <Compile Include="Domain\CurrentProductList.cs" />
+    <Compile Include="Domain\Customer.cs" />
+    <Compile Include="Domain\CustomerAndSuppliersByCity.cs" />
+    <Compile Include="Domain\CustomerCustomerDemo.cs" />
+    <Compile Include="Domain\CustomerDemographic.cs" />
+    <Compile Include="Domain\Employee.cs" />
+    <Compile Include="Domain\EmployeeTerritory.cs" />
+    <Compile Include="Domain\Invoice.cs" />
+    <Compile Include="Domain\Order.cs" />
+    <Compile Include="Domain\OrderDetail.cs" />
+    <Compile Include="Domain\OrderDetailsExtended.cs" />
+    <Compile Include="Domain\OrdersQry.cs" />
+    <Compile Include="Domain\OrderSubtotal.cs" />
+    <Compile Include="Domain\Product.cs" />
+    <Compile Include="Domain\ProductsAboveAveragePrice.cs" />
+    <Compile Include="Domain\ProductSalesFor1997.cs" />
+    <Compile Include="Domain\ProductsByCategory.cs" />
+    <Compile Include="Domain\QuarterlyOrder.cs" />
+    <Compile Include="Domain\Region.cs" />
+    <Compile Include="Domain\SalesByCategory.cs" />
+    <Compile Include="Domain\SalesTotalsByAmount.cs" />
+    <Compile Include="Domain\Shipper.cs" />
+    <Compile Include="Domain\SummaryOfSalesByQuarter.cs" />
+    <Compile Include="Domain\SummaryOfSalesByYear.cs" />
+    <Compile Include="Domain\Supplier.cs" />
+    <Compile Include="Domain\Sysdiagram.cs" />
+    <Compile Include="Domain\Territory.cs" />
+    <Compile Include="Readers\AlphabeticalListOfProductReader.cs" />
+    <Compile Include="Readers\CategoryReader.cs" />
+    <Compile Include="Readers\CategorySalesFor1997Reader.cs" />
+    <Compile Include="Readers\CurrentProductListReader.cs" />
+    <Compile Include="Readers\CustomerAndSuppliersByCityReader.cs" />
+    <Compile Include="Readers\CustomerCustomerDemoReader.cs" />
+    <Compile Include="Readers\CustomerDemographicReader.cs" />
+    <Compile Include="Readers\CustomerReader.cs" />
+    <Compile Include="Readers\EmployeeReader.cs" />
+    <Compile Include="Readers\EmployeeTerritoryReader.cs" />
+    <Compile Include="Readers\InvoiceReader.cs" />
+    <Compile Include="Readers\OrderDetailReader.cs" />
+    <Compile Include="Readers\OrderDetailsExtendedReader.cs" />
+    <Compile Include="Readers\OrderReader.cs" />
+    <Compile Include="Readers\OrdersQryReader.cs" />
+    <Compile Include="Readers\OrderSubtotalReader.cs" />
+    <Compile Include="Readers\ProductReader.cs" />
+    <Compile Include="Readers\ProductsAboveAveragePriceReader.cs" />
+    <Compile Include="Readers\ProductSalesFor1997Reader.cs" />
+    <Compile Include="Readers\ProductsByCategoryReader.cs" />
+    <Compile Include="Readers\QuarterlyOrderReader.cs" />
+    <Compile Include="Readers\RegionReader.cs" />
+    <Compile Include="Readers\SalesByCategoryReader.cs" />
+    <Compile Include="Readers\SalesTotalsByAmountReader.cs" />
+    <Compile Include="Readers\ShipperReader.cs" />
+    <Compile Include="Readers\SummaryOfSalesByQuarterReader.cs" />
+    <Compile Include="Readers\SummaryOfSalesByYearReader.cs" />
+    <Compile Include="Readers\SupplierReader.cs" />
+    <Compile Include="Readers\SysdiagramReader.cs" />
+    <Compile Include="Readers\TerritoryReader.cs" />
     <Compile Include="SqlExecution\DapperExecuter.cs" />
     <Compile Include="SqlExecution\EntityReader.cs" />
     <Compile Include="SqlExecution\EntityWriter.cs" />
@@ -59,6 +119,36 @@
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
     <Compile Include="SqlExecution\TableInfo.cs" />
+    <Compile Include="TableInfos\AlphabeticalListOfProductTableInfo.cs" />
+    <Compile Include="TableInfos\CategorySalesFor1997TableInfo.cs" />
+    <Compile Include="TableInfos\CategoryTableInfo.cs" />
+    <Compile Include="TableInfos\CurrentProductListTableInfo.cs" />
+    <Compile Include="TableInfos\CustomerAndSuppliersByCityTableInfo.cs" />
+    <Compile Include="TableInfos\CustomerCustomerDemoTableInfo.cs" />
+    <Compile Include="TableInfos\CustomerDemographicTableInfo.cs" />
+    <Compile Include="TableInfos\CustomerTableInfo.cs" />
+    <Compile Include="TableInfos\EmployeeTableInfo.cs" />
+    <Compile Include="TableInfos\EmployeeTerritoryTableInfo.cs" />
+    <Compile Include="TableInfos\InvoiceTableInfo.cs" />
+    <Compile Include="TableInfos\OrderDetailsExtendedTableInfo.cs" />
+    <Compile Include="TableInfos\OrderDetailTableInfo.cs" />
+    <Compile Include="TableInfos\OrdersQryTableInfo.cs" />
+    <Compile Include="TableInfos\OrderSubtotalTableInfo.cs" />
+    <Compile Include="TableInfos\OrderTableInfo.cs" />
+    <Compile Include="TableInfos\ProductsAboveAveragePriceTableInfo.cs" />
+    <Compile Include="TableInfos\ProductSalesFor1997TableInfo.cs" />
+    <Compile Include="TableInfos\ProductsByCategoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductTableInfo.cs" />
+    <Compile Include="TableInfos\QuarterlyOrderTableInfo.cs" />
+    <Compile Include="TableInfos\RegionTableInfo.cs" />
+    <Compile Include="TableInfos\SalesByCategoryTableInfo.cs" />
+    <Compile Include="TableInfos\SalesTotalsByAmountTableInfo.cs" />
+    <Compile Include="TableInfos\ShipperTableInfo.cs" />
+    <Compile Include="TableInfos\SummaryOfSalesByQuarterTableInfo.cs" />
+    <Compile Include="TableInfos\SummaryOfSalesByYearTableInfo.cs" />
+    <Compile Include="TableInfos\SupplierTableInfo.cs" />
+    <Compile Include="TableInfos\SysdiagramTableInfo.cs" />
+    <Compile Include="TableInfos\TerritoryTableInfo.cs" />
     <Compile Include="Templates\Domain.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -79,6 +169,20 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TableInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="Writers\CategoryWriter.cs" />
+    <Compile Include="Writers\CustomerCustomerDemoWriter.cs" />
+    <Compile Include="Writers\CustomerDemographicWriter.cs" />
+    <Compile Include="Writers\CustomerWriter.cs" />
+    <Compile Include="Writers\EmployeeTerritoryWriter.cs" />
+    <Compile Include="Writers\EmployeeWriter.cs" />
+    <Compile Include="Writers\OrderDetailWriter.cs" />
+    <Compile Include="Writers\OrderWriter.cs" />
+    <Compile Include="Writers\ProductWriter.cs" />
+    <Compile Include="Writers\RegionWriter.cs" />
+    <Compile Include="Writers\ShipperWriter.cs" />
+    <Compile Include="Writers\SupplierWriter.cs" />
+    <Compile Include="Writers\SysdiagramWriter.cs" />
+    <Compile Include="Writers\TerritoryWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapper.Accelr8.Domain\Dapper.Accelr8.Domain.csproj">
@@ -116,11 +220,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Readers\" />
-    <Folder Include="TableInfos\" />
-    <Folder Include="Writers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

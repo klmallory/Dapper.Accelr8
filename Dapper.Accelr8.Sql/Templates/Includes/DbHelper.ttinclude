@@ -70,6 +70,8 @@
 		public bool ChildColumnIsPrimaryKey { get; set; }
 		public string ChildClassName { get; set; }
 		public string ChildFieldName { get; set; }
+		public string ChildClassFieldName { get; set; }
+		public string ParentClassFieldName { get; set; }
 		public bool IsNullable { get; set; }
 	}
 
@@ -128,7 +130,7 @@
 				TableType = row.Field<string>("type"),
                 Rows = row.Field<int>("rows"),
                 HasPrimaryKey = row.Field<bool>("HasPrimaryKey"),
-				ReadOnly = row.Field<string>("type") == "V"
+				ReadOnly = row.Field<string>("type").Trim() == "V"
             }).ToDictionary(c => c.TableName);
         }
         
@@ -194,16 +196,16 @@
         {
             string sql = 
 				string.Format(@"
-WITH indexCTE AS
-                (
-                    SELECT 
-                    ic.column_id,
-                    ic.index_column_id,
-                    ic.object_id
-                    FROM sys.indexes idx
-                    join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
-                    WHERE idx.is_primary_key=1
-                )
+				WITH indexCTE AS
+				(
+					SELECT 
+					ic.column_id,
+					ic.index_column_id,
+					ic.object_id
+					FROM sys.indexes idx
+					join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
+					WHERE idx.is_primary_key=1
+				)
 				select OBJECT_NAME(fk.object_id) Name,
 					OBJECT_NAME(fk.referenced_object_id) Parent,
 					pCol.Name ParentColumn,
@@ -212,7 +214,6 @@ WITH indexCTE AS
 					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
 					col.is_nullable IsNullable,
 					pSysType.name ColumnType,
-					cpk.name,
 					cSysType.name ChildType
 
 				from sys.foreign_keys fk
@@ -220,12 +221,22 @@ WITH indexCTE AS
 				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
 				join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
 				join sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
-				join sys.index_columns cixc ON cixc.column_id = cixc.index_column_id and cixc.is_included_column = 0 and cixc.object_id = col.object_id
-				join sys.indexes idx on idx.index_id = cixc.index_id and idx.object_id = cixc.object_id
+				join (select top 10000	
+						object_id, 
+						min(index_id) as index_id, 
+						min(index_column_id) as index_column_id, 
+						min(column_id) as column_id, 
+						min(key_ordinal) as key_ordinal, 
+						min(partition_ordinal) as partition_ordinal
+						 from sys.index_columns sic 
+							where sic.is_included_column = 0 
+							group by sic.object_id
+							order by column_id) as cixc on cixc.object_id = col.object_id
+				join sys.indexes idx on idx.index_id = cixc.index_id and idx.object_id = cixc.object_id and idx.is_primary_key = 1
 				left outer join sys.columns cpk on cpk.column_id = cixc.index_column_id and cpk.object_id = cixc.object_id
 				left outer join sys.systypes cSysType on cSysType.xusertype = cpk.system_type_id
-				left outer join indexCTE ON col.column_id=indexCTE.column_id AND col.object_id=indexCTE.object_id
-				where fk.referenced_object_id = OBJECT_ID(@tableName);", database);
+				left outer join indexCTE ON col.column_id = indexCTE.column_id AND col.object_id = indexCTE.object_id
+				where fk.referenced_object_id = OBJECT_ID(@tableName)", database);
 
             SqlParameter param = new SqlParameter("@tableName", SqlDbType.NVarChar, 100) { Value = string.Format("{0}.{1}.{2}", database, schema, tableName) };
             DataTable dt = GetDataTable(connectionString, sql, param);
