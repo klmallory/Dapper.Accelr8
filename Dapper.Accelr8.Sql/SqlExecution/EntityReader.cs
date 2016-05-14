@@ -489,6 +489,7 @@ namespace Dapper.Accelr8.Sql
         public virtual bool UniqueId { get; protected set; }
         public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
+        public virtual string SchemaName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
         public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
         public virtual JoinInfo[] Joins { get; protected set; }
@@ -856,7 +857,7 @@ namespace Dapper.Accelr8.Sql
                , distinct
                , ""
                , fields
-               , TableName
+               , (SchemaName != null ? SchemaName + "." : "") + TableName
                , TableAlias
                , nolock));
 
@@ -928,7 +929,7 @@ namespace Dapper.Accelr8.Sql
                , distinct
                , top
                , fields
-               , TableName
+               , (SchemaName != null ? SchemaName + "." : "") + TableName
                , TableAlias
                , nolock));
 

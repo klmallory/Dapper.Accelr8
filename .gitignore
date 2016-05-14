@@ -18,3 +18,5 @@ Dapper.Accelr8.Sql/Templates/TableInfo.cs
 *.ncrunchsolution
 *.ncrunchproject
 *.ncrunchsolution.user
+obj/
+*.csproj.user

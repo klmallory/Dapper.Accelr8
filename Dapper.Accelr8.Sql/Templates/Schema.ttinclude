@@ -17,8 +17,8 @@
 		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
 		public static string TableInfoDirectory = @"TableInfos";
 
-		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=Northwnd;Integrated Security=SSPI;";
-		static string _database = @"Northwnd";
+		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=AdventureWorks2008R2;Integrated Security=SSPI;";
+		static string _database = @"AdventureWorks2008R2";
 
 		// Change Names Here =>
 		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
@@ -79,31 +79,32 @@
 				if (t.Value.Ignore)
 					continue;
 
-				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key.Replace("_spc_", " "));
-				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key.Replace("_spc_", " "));
-				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key.Replace("_spc_", " "));
+				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key.Replace("_spc_", " "), t.Value.SchemaName);
+				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key.Replace("_spc_", " "), t.Value.SchemaName);
+				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key.Replace("_spc_", " "), t.Value.SchemaName);
 			}
 
 			foreach (var t in tables)
 			{
 				if (t.Value.Ignore)
 					continue;
+					var tName = helper.GetTableNameWithSchema(t.Value);
 
-				if (tableNames.ContainsKey(t.Value.TableName))
+				if (tableNames.ContainsKey(tName))
 				{
 					Debug.WriteLine("renaming table {0} to {1}", t.Key, tableNames[t.Value.TableName]);
 					t.Value.ClassName = tableNames[t.Value.TableName];
 				}
 				else
-					t.Value.ClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(t.Value.TableName));
+					t.Value.ClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(tName));
 
-				if (tableAliases.ContainsKey(t.Value.TableName))
+				if (tableAliases.ContainsKey(tName))
 				{
-					Debug.WriteLine("renaming table {0} to {1}", t.Key, tableAliases[t.Value.TableName]);
-					t.Value.TableAlias = tableAliases[t.Value.TableName];
+					Debug.WriteLine("renaming table {0} to {1}", t.Key, tableAliases[tName]);
+					t.Value.TableAlias = tableAliases[tName];
 				}
 				else
-					t.Value.TableAlias = Accelr8or.Inflector.MakeSingular(t.Value.TableName).ToLower();
+					t.Value.TableAlias = Accelr8or.Inflector.MakeSingular(tName).ToLower();
 
 				foreach (var column in t.Value.Columns)
 				{
@@ -191,9 +192,16 @@
 			}
 
 			//Tweak Columns / Relationships Here.
-			tables["Employees"].Children.First(c => c.Name == "FK_EmployeeTerritories_Employees").ChildClassFieldName  = "EmployeeTerritories2";
-			tables["Employees"].Children.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
-			tables["Employees"].Parents.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+			if (_database == "Northwnd")
+			{
+				tables["Employees"].Children.First(c => c.Name == "FK_EmployeeTerritories_Employees").ChildClassFieldName  = "EmployeeTerritories2";
+				tables["Employees"].Children.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+				tables["Employees"].Parents.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+			}
+			else if (_database == "AdventureWorks2008R2")
+			{
+
+			}
 
 			return tables;
 		}

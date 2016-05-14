@@ -13,6 +13,7 @@ namespace Dapper.Accelr8.Repo.Contracts.Readers
         bool UniqueId { get; }
         string IdColumn { get; }
         string TableName { get; }
+        string SchemaName { get; }
         object TableInfo { get; }
         IList<KeyValuePair<int, string>> ColumnNames { get; }
         string TableAlias { get; }
