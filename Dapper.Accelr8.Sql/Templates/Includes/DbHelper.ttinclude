@@ -1,4 +1,4 @@
-﻿﻿<#+
+﻿<#+
 	abstract internal class DbHelper
 	{
 		public abstract IDictionary<string, DbTable> GetDbTables(string connectionString, string database);
@@ -65,6 +65,7 @@
 	public class DbChild
 	{
 		public string Name { get; set; }
+		public string Schema { get; set; }
 		public string Table { get; set; }
 		public string Parent { get; set; }
 		public string Column { get; set; }
@@ -87,6 +88,7 @@
     public class DbParent
 	{
 		public string Name { get; set; }
+		public string Schema { get; set; }
 		public string Table { get; set; }
 		public string Parent { get; set; }
 		public string Column { get; set; }
@@ -113,6 +115,14 @@
 				return table.TableName;
 
 			return table.SchemaName + "." + table.TableName;
+		}
+
+		public string GetTableNameWithSchema(DbChild child)
+		{
+			if (string.IsNullOrEmpty(child.Schema) || child.Schema.ToLower() == "dbo")
+				return child.Table;
+
+			return child.Schema + "." + child.Table;
 		}
 
         public override IDictionary<string, DbTable> GetDbTables(string connectionString, string database)
@@ -223,6 +233,7 @@
 					WHERE idx.is_primary_key=1
 				)
 				select OBJECT_NAME(fk.object_id) Name,
+					sc.name [Schema],
 					OBJECT_NAME(fk.referenced_object_id) Parent,
 					pCol.Name ParentColumn,
 					Object_Name(fk.parent_object_id) [Table],
@@ -231,8 +242,10 @@
 					col.is_nullable IsNullable,
 					pSysType.name ColumnType,
 					cSysType.name ChildType
-
+					
 				from sys.foreign_keys fk
+				join sys.objects obj on obj.object_id = fk.object_id
+				join sys.schemas sc on sc.schema_id = obj.schema_id
 				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
 				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
 				join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
@@ -261,6 +274,7 @@
             {
 				Name = row.Field<string>("Name"),
 				Table = (schema != null && schema != "dbo" ? schema + "_" : "") + row.Field<string>("Table"),
+				Schema = row.Field<string>("Schema"),
 				Parent = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
 				Column = row.Field<string>("Column"),
@@ -287,6 +301,7 @@
                     WHERE idx.is_primary_key=1
                 )
 				select OBJECT_NAME(fk.object_id) Name, 
+					sc.name [Schema],
 					OBJECT_NAME(fk.referenced_object_id) Parent, 
 					pCol.Name ParentColumn, 
 					Object_Name(fk.parent_object_id) [Table], 
@@ -294,11 +309,13 @@
 					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
 					col.is_nullable IsNullable, 
 					pSysType.name ColumnType
-				from {0}.sys.foreign_keys fk
-				join {0}.sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
-				join {0}.sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
-				join {0}.sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
-				join {0}.sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
+				from sys.foreign_keys fk
+				join sys.objects obj on obj.object_id = fk.referenced_object_id
+				join sys.schemas sc on sc.schema_id = obj.schema_id
+				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
+				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
+				join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
+				join sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
 				left outer join indexCTE ON pCol.column_id=indexCTE.column_id AND pCol.object_id=indexCTE.object_id
 				where fk.parent_object_id = OBJECT_ID(@tableName)", database);
 
@@ -308,6 +325,7 @@
             return dt.Rows.Cast<DataRow>().Select(row => new DbParent()
             {
 				Name = row.Field<string>("Name"),
+				Schema = row.Field<string>("Schema"),
 				Table = row.Field<string>("Table"),
 				Parent = row.Field<string>("Parent"),
 				ParentClassFieldName = row.Field<string>("Parent"),
