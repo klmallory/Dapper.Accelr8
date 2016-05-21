@@ -43,6 +43,7 @@
 		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
 
 		className = name + "Writer";
+
 		if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
 		{
 			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;

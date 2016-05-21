@@ -79,16 +79,16 @@
 				if (t.Value.Ignore)
 					continue;
 
-				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Key.Replace("_spc_", " "), t.Value.SchemaName);
-				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Key.Replace("_spc_", " "), t.Value.SchemaName);
-				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Key.Replace("_spc_", " "), t.Value.SchemaName);
+				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, Accelr8or.Inflector.GetOriginalName(t.Key), t.Value.SchemaName);
+				t.Value.Children = helper.GetChildren(_connectionString, _database, Accelr8or.Inflector.GetOriginalName(t.Key), t.Value.SchemaName);
+				t.Value.Parents = helper.GetParents(_connectionString, _database, Accelr8or.Inflector.GetOriginalName(t.Key), t.Value.SchemaName);
 			}
 
 			foreach (var t in tables)
 			{
 				if (t.Value.Ignore)
 					continue;
-					var tName = helper.GetTableNameWithSchema(t.Value);
+					var tName = Accelr8or.Inflector.GetFriendlyName(helper.GetTableNameWithSchema(t.Value));
 
 				if (tableNames.ContainsKey(tName))
 				{
@@ -108,7 +108,7 @@
 
 				foreach (var column in t.Value.Columns)
 				{
-					column.ColumnName = column.ColumnName.Replace(" ", "_spc_");
+					column.ColumnName = Accelr8or.Inflector.GetSafeName(column.ColumnName);
 
 					if (column == t.Value.Columns.FirstOrDefault(co => co.IsPrimaryKey))
 						column.FieldName = "Id";
@@ -123,9 +123,11 @@
 
 				foreach(var c in t.Value.Children)
 				{
-					c.Column = c.Column.Replace(" ", "_spc_");
-					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
-					c.Table = c.Table.Replace(" ", "_spc_");
+					c.Column = Accelr8or.Inflector.GetSafeName(c.Column);
+					c.ParentColumn = Accelr8or.Inflector.GetSafeName(c.ParentColumn);
+					c.Table = Accelr8or.Inflector.GetFriendlyName(c.Table);
+					c.ChildClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ChildClassFieldName);
+					c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
 
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;
@@ -138,7 +140,7 @@
 					else
 						c.ChildClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Table));
 
-					var pkCol = tables[c.Table.Replace("_spc_", " ")].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
+					var pkCol = tables[Accelr8or.Inflector.GetSafeName(c.Table)].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
 
 					if (pkCol != null && pkCol.ColumnName == c.Column)
 						c.ChildFieldName = "Id";
@@ -155,9 +157,10 @@
 
 				foreach(var c in t.Value.Parents)
 				{
-					c.ParentColumn = c.ParentColumn.Replace(" ", "_spc_");
-					c.Column = c.Column.Replace(" ", "_spc_");
-					c.Parent = c.Parent.Replace(" ", "_spc_");
+					c.ParentColumn = Accelr8or.Inflector.GetSafeName(c.ParentColumn);
+					c.Column = Accelr8or.Inflector.GetSafeName(c.Column);
+					c.Parent = Accelr8or.Inflector.GetFriendlyName(c.Parent);
+					c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
 
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;

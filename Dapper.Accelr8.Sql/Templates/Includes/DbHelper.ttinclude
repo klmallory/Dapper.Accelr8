@@ -260,7 +260,7 @@
             return dt.Rows.Cast<DataRow>().Select(row => new DbChild()
             {
 				Name = row.Field<string>("Name"),
-				Table = row.Field<string>("Table"),
+				Table = (schema != null && schema != "dbo" ? schema + "_" : "") + row.Field<string>("Table"),
 				Parent = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
 				Column = row.Field<string>("Column"),

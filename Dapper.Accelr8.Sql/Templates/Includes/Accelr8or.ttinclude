@@ -150,13 +150,43 @@ public static class Accelr8or
 			return result;
 		}
 
+		public static string GetSafeName(string name)
+		{
+			if (name == null)
+				return null;
+
+			if (char.IsNumber(name[0]))
+				name = "_n_" + name;
+
+			return name.Replace(" ", "_spc_").Replace(".", "__");
+		}
+
+		public static string GetOriginalName(string name)
+		{
+			if (name == null)
+				return null;
+
+			return name.Replace("_spc_", " ").Replace("__", ".").Replace("_n_", "");
+		}
+
+		public static string GetFriendlyName(string name)
+		{
+			if (name == null)
+				return null;
+
+			if (char.IsNumber(name[0]))
+				name = "_" + name;
+
+			return name.Replace(".", "");
+		}
+
 		/// <summary>
 		/// Converts the string to title case.
 		/// </summary>
 		/// <param name="word">The word.</param>
 		/// <returns></returns>
 		public static string ToTitleCase(string word) {
-			return Regex.Replace(ToHumanCase(AddUnderscores(word)), @"\b([a-z])",
+			return Regex.Replace(word, @"[\b_]([a-z])",
 				delegate(Match match) { return match.Captures[0].Value.ToUpper(); });
 		}
 
@@ -166,7 +196,7 @@ public static class Accelr8or
 		/// <param name="lowercaseAndUnderscoredWord">The lowercase and underscored word.</param>
 		/// <returns></returns>
 		public static string ToHumanCase(string lowercaseAndUnderscoredWord) {
-			return MakeInitialCaps(Regex.Replace(lowercaseAndUnderscoredWord, @"_", " "));
+			return MakeInitialCaps(Regex.Replace(lowercaseAndUnderscoredWord, @"_", "_"));
 		}
 
 		public static string CamelCase(string humanCaseOrtitleCaseWord) {
