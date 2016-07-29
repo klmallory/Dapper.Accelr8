@@ -8,7 +8,7 @@ using Dapper.Accelr8.Domain;
 namespace Dapper.Accelr8.Repo.Domain
 {
     public abstract class BaseEntity<IdType> : IEntity, IHaveId<IdType>
-        where IdType : IComparable<IdType>
+        where IdType : IComparable
     {
         public BaseEntity()
         {

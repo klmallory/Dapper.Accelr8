@@ -83,7 +83,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 	public enum <#= entityType #>ColumnNames
 	{<# foreach (var col in table.Columns.Where(c => !c.Ignore))
 	{#>	
-		<#= Accelr8or.Inflector.CamelCase(col.ColumnName) #>, <# } #>	
+		<#= col.ColumnName #>, <# } #>	
 	}
 
 	public enum <#= entityType #>CascadeNames

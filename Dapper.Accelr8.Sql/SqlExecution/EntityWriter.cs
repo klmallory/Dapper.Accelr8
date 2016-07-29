@@ -15,7 +15,7 @@ namespace Dapper.Accelr8.Sql
 {
     public abstract class EntityWriter<IdType, EntityType> : IEntityWriter, IEntityWriter<IdType, EntityType>
         where EntityType : class, IEntity, IHaveId<IdType>
-        where IdType : IComparable<IdType>, IEquatable<IdType>
+        where IdType : IComparable
     {
         protected static string _sqlIdType = "int";
         protected static int _typeHash = typeof(EntityType).GetHashCode();
@@ -153,7 +153,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual bool Cascade<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
             where EType : class, IEntity, IHaveId<IType>
-            where IType : IComparable<IType>, IEquatable<IType>
+            where IType : IComparable
         {
             if (entity == null || !entity.IsDirty)
                 return false;
@@ -176,7 +176,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual bool CascadeDelete<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
             where EType : class, IEntity, IHaveId<IType>
-            where IType : IComparable<IType>, IEquatable<IType>
+            where IType : IComparable
         {
             if (entity == null || !entity.IsDirty)
                 return false;

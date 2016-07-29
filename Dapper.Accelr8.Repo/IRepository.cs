@@ -43,7 +43,7 @@ namespace Dapper.Accelr8.Repo
 
     public interface IRepository<IdType, EntityType> : IRepository
         where EntityType : IEntity, IHaveId<IdType>
-        where IdType : IComparable<IdType>
+        where IdType : IComparable
     {
         IEntityReader<IdType, EntityType> GetReader();
         void AddOrUpdate(EntityType entity, params string[] cascades);

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dapper.Accelr8.Domain
 {
-    public interface IHaveId<IdType> where IdType : IComparable<IdType>
+    public interface IHaveId<IdType> where IdType : IComparable
     {
         IdType Id { get; set; }
     }

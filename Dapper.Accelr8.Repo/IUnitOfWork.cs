@@ -16,13 +16,13 @@ namespace Dapper.Accelr8.Repo
 
         void Update<IdType, EntityType>(IList<EntityType> entities, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
-            where IdType : IComparable<IdType>;
+            where IdType : IComparable;
         void Update<IdType, EntityType>(IdType id, EntityType entity, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
-            where IdType : IComparable<IdType>;
+            where IdType : IComparable;
 
-        void RemoveRange<IdType>(IList<IdType> ids, int typeHash, IEntityWriter writer) where IdType : IComparable<IdType>;
-        void Remove<IdType>(IdType id, int typeHash, IEntityWriter writer) where IdType : IComparable<IdType>;
+        void RemoveRange<IdType>(IList<IdType> ids, int typeHash, IEntityWriter writer) where IdType : IComparable;
+        void Remove<IdType>(IdType id, int typeHash, IEntityWriter writer) where IdType : IComparable;
 
         void Run(IEntityWriter writer);
 

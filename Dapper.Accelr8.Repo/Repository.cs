@@ -14,7 +14,7 @@ namespace Dapper.Accelr8.Repo
 {
     public class Repository<IdType, EntityType> : IRepository<IdType, EntityType>, IRepository
         where EntityType : class, IEntity, IHaveId<IdType>
-        where IdType : IComparable<IdType>, IEquatable<IdType>
+        where IdType : IComparable
     {
         static int _typeHash = typeof(EntityType).GetHashCode();
 

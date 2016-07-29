@@ -1,5 +1,6 @@
 ﻿<#+
-	abstract internal class DbHelper
+  
+  internal abstract class DbHelper
 	{
 		public abstract IDictionary<string, DbTable> GetDbTables(string connectionString, string database);
 		public abstract List<DbColumn> GetDbColumns(string connectionString, string database, string tableName, string schema = "dbo");
@@ -11,25 +12,25 @@
 
     public class DbTable
     {
-		public DbTable()
-		{
-			Children = new List<DbChild>();
-			Columns = new List<DbColumn>();
-		}
+		  public DbTable()
+		  {
+			  Children = new List<DbChild>();
+			  Columns = new List<DbColumn>();
+		  }
 		
         public string TableName { get; set; }
         public string SchemaName { get; set; }
-		public string TableType {get; set; }
+		    public string TableType {get; set; }
         public int Rows { get; set; }
         public bool HasPrimaryKey { get; set; }
-		public List<DbColumn> Columns { get; set; }
-		public List<DbChild> Children { get; set; }
-		public List<DbParent> Parents { get; set; }
+		    public List<DbColumn> Columns { get; set; }
+		    public List<DbChild> Children { get; set; }
+		    public List<DbParent> Parents { get; set; }
 
-		public string TableAlias { get; set; }
-		public bool Ignore { get; set; }
-		public bool ReadOnly { get; set; }
-		public string ClassName { get; set; }
+		    public string TableAlias { get; set; }
+		    public bool Ignore { get; set; }
+		    public bool ReadOnly { get; set; }
+		    public string ClassName { get; set; }
 
 		public string GetTableName()
 		{
@@ -47,7 +48,7 @@
         public string ColumnName { get; set; }
         public string ColumnType { get; set; }
         public string CSharpType { get; set; }
-		public string CastType { get; set; }
+		    public string CastType { get; set; }
         public Type CommonType { get; set; }
         public int ByteLength { get; set; }
         public int CharLength { get; set; }
@@ -56,55 +57,57 @@
         public bool IsNullable { get; set; }
         public string Remark { get; set; }
 
-		public string Splits { get; set; }
-		public bool Ignore { get; set; }
-		public bool ReadOnly { get; set; }
-		public string FieldName { get; set; }
+		    public string Splits { get; set; }
+		    public bool Ignore { get; set; }
+		    public bool ReadOnly { get; set; }
+		    public string FieldName { get; set; }
     }
 
 	public class DbChild
 	{
-		public string Name { get; set; }
-		public string Schema { get; set; }
-		public string Table { get; set; }
-		public string Parent { get; set; }
-		public string Column { get; set; }
-		public string ParentColumn { get; set; }
-		public string CSharpType { get; set; }
-		public string ChildCSharpType { get; set; }
-		public string TableAlias { get; set; }
+    public string Name { get; set; }
+    public string Schema { get; set; }
+    public string Table { get; set; }
+    public string Parent { get; set; }
+    public string OriginalColumnName { get; set; }
+    public string Column { get; set; }
+    public string ParentColumn { get; set; }
+    public string CSharpType { get; set; }
+    public string ChildCSharpType { get; set; }
+    public string TableAlias { get; set; }
 
-		public bool Ignore { get; set; }
-		public bool OneToOne { get; set; }
+    public bool Ignore { get; set; }
+    public bool OneToOne { get; set; }
 
-		public bool ChildColumnIsPrimaryKey { get; set; }
-		public string ChildClassName { get; set; }
-		public string ChildFieldName { get; set; }
-		public string ChildClassFieldName { get; set; }
-		public string ParentClassFieldName { get; set; }
-		public bool IsNullable { get; set; }
+    public bool ChildColumnIsPrimaryKey { get; set; }
+    public string ChildClassName { get; set; }
+    public string ChildFieldName { get; set; }
+    public string ChildClassFieldName { get; set; }
+    public string ParentClassFieldName { get; set; }
+    public bool IsNullable { get; set; }
 	}
 
     public class DbParent
-	{
-		public string Name { get; set; }
-		public string Schema { get; set; }
-		public string Table { get; set; }
-		public string Parent { get; set; }
-		public string Column { get; set; }
-		public string ParentColumn { get; set; }
-		public string CSharpType { get; set; }
-		public string ParentAlias { get; set; }
+    {
+      public string Name { get; set; }
+      public string Schema { get; set; }
+      public string Table { get; set; }
+      public string Parent { get; set; }
+      public string OriginalColumnName { get; set; }
+      public string Column { get; set; }
+      public string ParentColumn { get; set; }
+      public string CSharpType { get; set; }
+      public string ParentAlias { get; set; }
 
-		public bool Ignore { get; set; }
+      public bool Ignore { get; set; }
 
-		public bool ParentColumnIsPrimaryKey { get; set; }
-		public string ParentClassName { get; set; }
-		public string ParentClassFieldName { get; set; }
-		public string ParentFieldName { get; set; }
-		public string ChildFieldName { get; set; }
-		public bool IsNullable { get; set; }
-	}
+      public bool ParentColumnIsPrimaryKey { get; set; }
+      public string ParentClassName { get; set; }
+      public string ParentClassFieldName { get; set; }
+      public string ParentFieldName { get; set; }
+      public string ChildFieldName { get; set; }
+      public bool IsNullable { get; set; }		
+    }
 
 	//SQL Helper
     internal class SqlServerDbHelper : DbHelper
@@ -153,11 +156,11 @@
             {
                 TableName = row.Field<string>("tablename"),
                 SchemaName = row.Field<string>("schemname"),
-				TableType = row.Field<string>("type"),
+				        TableType = row.Field<string>("type").Trim(),
                 Rows = row.Field<int>("rows"),
                 HasPrimaryKey = row.Field<bool>("HasPrimaryKey"),
-				ReadOnly = row.Field<string>("type").Trim() == "V"
-            }).ToDictionary(c => c.TableName);
+				        ReadOnly = row.Field<string>("type").Trim() == "V"
+            }).ToDictionary(c => c.SchemaName != "dbo" ? c.SchemaName + "." +  c.TableName : c.TableName);
         }
         
         public override List<DbColumn> GetDbColumns(string connectionString, string database, string tableName, string schema = "dbo")
@@ -173,7 +176,7 @@
                             INNER JOIN {0}.sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
                             WHERE  idx.object_id =OBJECT_ID(@tableName) AND idx.is_primary_key=1
                         )
-                        select
+                        select distinct
                         colm.column_id ColumnID,
                         CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
                         colm.name ColumnName,
@@ -190,8 +193,8 @@
                             end
                         ) CharLength,
                         cast(colm.precision as int) Precision,
-                        cast(colm.scale as int) Scale,
-                        prop.value Remark
+                        cast(colm.scale as int) Scale
+                        
                         from {0}.sys.columns colm
                         inner join {0}.sys.types systype on colm.system_type_id=systype.system_type_id and colm.user_type_id=systype.user_type_id
                         left join {0}.sys.extended_properties prop on colm.object_id=prop.major_id and colm.column_id=prop.minor_id
@@ -213,8 +216,7 @@
                 CharLength = row.Field<int>("CharLength"),
                 Scale = row.Field<int>("Scale"),
 				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
-				CommonType = MapCommonType(row.Field<string>("ColumnType")),
-                Remark = row["Remark"].ToString()
+				CommonType = MapCommonType(row.Field<string>("ColumnType"))
             }).ToList();
         }
         
@@ -273,10 +275,11 @@
             return dt.Rows.Cast<DataRow>().Select(row => new DbChild()
             {
 				Name = row.Field<string>("Name"),
-				Table = (schema != null && schema != "dbo" ? schema + "_" : "") + row.Field<string>("Table"),
+				Table = (row.Field<string>("Schema") != null && row.Field<string>("Schema") != "dbo" ? row.Field<string>("Schema") + "." : "") + row.Field<string>("Table"),
 				Schema = row.Field<string>("Schema"),
 				Parent = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
+        OriginalColumnName = row.Field<string>("Column"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
 				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
@@ -310,7 +313,7 @@
 					col.is_nullable IsNullable, 
 					pSysType.name ColumnType
 				from sys.foreign_keys fk
-				join sys.objects obj on obj.object_id = fk.referenced_object_id
+				join sys.objects obj on obj.object_id = fk.object_id
 				join sys.schemas sc on sc.schema_id = obj.schema_id
 				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
 				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
@@ -326,10 +329,11 @@
             {
 				Name = row.Field<string>("Name"),
 				Schema = row.Field<string>("Schema"),
-				Table = row.Field<string>("Table"),
+				Table = (row.Field<string>("Schema") != null && row.Field<string>("Schema") != "dbo" ? row.Field<string>("Schema") + "." : "") + row.Field<string>("Table"),
 				Parent = row.Field<string>("Parent"),
 				ParentClassFieldName = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
+        OriginalColumnName = row.Field<string>("Column"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
 				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
@@ -391,6 +395,7 @@
                 case "varbinary": csharpType = "byte[]"; break;
                 case "varchar": csharpType = "string"; break;
                 case "xml": csharpType = "string"; break;
+                case "hierarchyid": csharpType="Microsoft.SqlServer.Types.SqlHierarchyId"; break;
                 default: csharpType = "object"; break;
             }
             return csharpType;

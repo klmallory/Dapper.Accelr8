@@ -155,9 +155,9 @@ namespace <#= SchemaHelper.DomainNamespace #>
 	//From Foreign Key <#= child.Name #><#
 		if (SchemaHelper.UseDirtyProperties)
 		{
-		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(child.Table).Replace("_num_", "");#>	
+		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassFieldName);#>	
 		protected <#= child.ChildClassName #> <#= backing #>;
-		public virtual <#= child.ChildClassName #> <#= child.Table #> 
+		public virtual <#= child.ChildClassName #> <#= child.ChildClassFieldName #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -168,16 +168,16 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		} 
 		<#} else
 			{ #>
-		public virtual <#= child.ChildClassName #> <#= child.Table #> { get; set; }
+		public virtual <#= child.ChildClassName #> <#= child.ChildClassFieldName #> { get; set; }
 		<# } } 
 		foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 		{#> 
 	//From Foreign Key <#= child.Name #><#
 			if (SchemaHelper.UseDirtyProperties)
 			{
-			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.Table)).Replace("_num_", "");#>	
+			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassFieldName)).Replace("_num_", "");#>	
 		protected IList<<#= child.ChildClassName #>> <#= backing #>;
-		public virtual IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.Table) #> 
+		public virtual IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassFieldName) #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -188,7 +188,7 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		} 
 			<#} else
 				{ #>
-		public virtual IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.Table) #> { get; set; }
+		public virtual IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassFieldName) #> { get; set; }
 			<# } } #>
 		}
 }

@@ -79,9 +79,9 @@
 				if (t.Value.Ignore)
 					continue;
 
-				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, Accelr8or.Inflector.GetOriginalName(t.Key), t.Value.SchemaName);
-				t.Value.Children = helper.GetChildren(_connectionString, _database, Accelr8or.Inflector.GetOriginalName(t.Key), t.Value.SchemaName);
-				t.Value.Parents = helper.GetParents(_connectionString, _database, Accelr8or.Inflector.GetOriginalName(t.Key), t.Value.SchemaName);
+				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Value.TableName, t.Value.SchemaName);
+				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Value.TableName, t.Value.SchemaName);
+				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Value.TableName, t.Value.SchemaName);
 			}
 
 			foreach (var t in tables)
@@ -125,7 +125,7 @@
 				{
 					c.Column = Accelr8or.Inflector.GetSafeName(c.Column);
 					c.ParentColumn = Accelr8or.Inflector.GetSafeName(c.ParentColumn);
-					c.Table = Accelr8or.Inflector.GetFriendlyName(c.Table);
+					//c.Table = Accelr8or.Inflector.GetFriendlyName(c.Table);
 					c.ChildClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ChildClassFieldName);
 					c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
 
@@ -140,7 +140,7 @@
 					else
 						c.ChildClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Table));
 
-					var pkCol = tables[Accelr8or.Inflector.GetSafeName(c.Table)].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
+					var pkCol = tables[c.Table].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
 
 					if (pkCol != null && pkCol.ColumnName == c.Column)
 						c.ChildFieldName = "Id";
@@ -172,6 +172,9 @@
 						c.ParentClassName = tableNames[c.Parent];
 					else
 						c.ParentClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Parent));
+
+					if (!tables.ContainsKey(c.Table))
+						Debug.WriteLine("table not found" + c.Table);
 
 					var pkCol = tables[c.Table].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
 

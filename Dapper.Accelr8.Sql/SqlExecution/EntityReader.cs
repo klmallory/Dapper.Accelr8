@@ -19,7 +19,7 @@ namespace Dapper.Accelr8.Sql
     public abstract class EntityReader<IdType, EntityType>
         : IEntityReader<IdType, EntityType>
         where EntityType : class, IHaveId<IdType>
-        where IdType : IComparable<IdType>
+        where IdType : IComparable
     {
         #region Lookups
 
@@ -349,7 +349,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual EntityType LoadJoinRow<IType, EType>(object entity, dynamic row, Action<EntityType, EType> setter)
             where EType : class, IHaveId<IType>
-            where IType : IComparable<IType>
+            where IType : IComparable
         {
             var reader = _locator.Resolve<IEntityReader<IType, EType>>();
 

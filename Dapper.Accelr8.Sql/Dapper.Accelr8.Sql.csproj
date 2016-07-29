@@ -38,6 +38,10 @@
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\Solutions\packages\Microsoft.SqlServer.Types.10.50.1600.1\lib\Net20\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -141,6 +145,97 @@
     <Compile Include="Domain\SalesvStoreWithAddress.cs" />
     <Compile Include="Domain\SalesvStoreWithContact.cs" />
     <Compile Include="Domain\SalesvStoreWithDemographic.cs" />
+    <Compile Include="Readers\AWBuildVersionReader.cs" />
+    <Compile Include="Readers\DatabaseLogReader.cs" />
+    <Compile Include="Readers\ErrorLogReader.cs" />
+    <Compile Include="Readers\HumanResourcesDepartmentReader.cs" />
+    <Compile Include="Readers\HumanResourcesEmployeeDepartmentHistoryReader.cs" />
+    <Compile Include="Readers\HumanResourcesEmployeePayHistoryReader.cs" />
+    <Compile Include="Readers\HumanResourcesEmployeeReader.cs" />
+    <Compile Include="Readers\HumanResourcesJobCandidateReader.cs" />
+    <Compile Include="Readers\HumanResourcesShiftReader.cs" />
+    <Compile Include="Readers\HumanResourcesvEmployeeDepartmentHistoryReader.cs" />
+    <Compile Include="Readers\HumanResourcesvEmployeeDepartmentReader.cs" />
+    <Compile Include="Readers\HumanResourcesvEmployeeReader.cs" />
+    <Compile Include="Readers\HumanResourcesvJobCandidateEducationReader.cs" />
+    <Compile Include="Readers\HumanResourcesvJobCandidateEmploymentReader.cs" />
+    <Compile Include="Readers\HumanResourcesvJobCandidateReader.cs" />
+    <Compile Include="Readers\PersonAddressReader.cs" />
+    <Compile Include="Readers\PersonAddressTypeReader.cs" />
+    <Compile Include="Readers\PersonBusinessEntityAddressReader.cs" />
+    <Compile Include="Readers\PersonBusinessEntityContactReader.cs" />
+    <Compile Include="Readers\PersonBusinessEntityReader.cs" />
+    <Compile Include="Readers\PersonContactTypeReader.cs" />
+    <Compile Include="Readers\PersonCountryRegionReader.cs" />
+    <Compile Include="Readers\PersonEmailAddressReader.cs" />
+    <Compile Include="Readers\PersonPasswordReader.cs" />
+    <Compile Include="Readers\PersonPersonPhoneReader.cs" />
+    <Compile Include="Readers\PersonPersonReader.cs" />
+    <Compile Include="Readers\PersonPhoneNumberTypeReader.cs" />
+    <Compile Include="Readers\PersonStateProvinceReader.cs" />
+    <Compile Include="Readers\PersonvAdditionalContactInfoReader.cs" />
+    <Compile Include="Readers\PersonvStateProvinceCountryRegionReader.cs" />
+    <Compile Include="Readers\ProductionBillOfMaterialReader.cs" />
+    <Compile Include="Readers\ProductionCultureReader.cs" />
+    <Compile Include="Readers\ProductionDocumentReader.cs" />
+    <Compile Include="Readers\ProductionIllustrationReader.cs" />
+    <Compile Include="Readers\ProductionLocationReader.cs" />
+    <Compile Include="Readers\ProductionProductCategoryReader.cs" />
+    <Compile Include="Readers\ProductionProductCostHistoryReader.cs" />
+    <Compile Include="Readers\ProductionProductDescriptionReader.cs" />
+    <Compile Include="Readers\ProductionProductDocumentReader.cs" />
+    <Compile Include="Readers\ProductionProductInventoryReader.cs" />
+    <Compile Include="Readers\ProductionProductListPriceHistoryReader.cs" />
+    <Compile Include="Readers\ProductionProductModelIllustrationReader.cs" />
+    <Compile Include="Readers\ProductionProductModelProductDescriptionCultureReader.cs" />
+    <Compile Include="Readers\ProductionProductModelReader.cs" />
+    <Compile Include="Readers\ProductionProductPhotoReader.cs" />
+    <Compile Include="Readers\ProductionProductProductPhotoReader.cs" />
+    <Compile Include="Readers\ProductionProductReader.cs" />
+    <Compile Include="Readers\ProductionProductReviewReader.cs" />
+    <Compile Include="Readers\ProductionProductSubcategoryReader.cs" />
+    <Compile Include="Readers\ProductionScrapReasonReader.cs" />
+    <Compile Include="Readers\ProductionTransactionHistoryArchiveReader.cs" />
+    <Compile Include="Readers\ProductionTransactionHistoryReader.cs" />
+    <Compile Include="Readers\ProductionUnitMeasureReader.cs" />
+    <Compile Include="Readers\ProductionvProductAndDescriptionReader.cs" />
+    <Compile Include="Readers\ProductionvProductModelCatalogDescriptionReader.cs" />
+    <Compile Include="Readers\ProductionvProductModelInstructionReader.cs" />
+    <Compile Include="Readers\ProductionWorkOrderReader.cs" />
+    <Compile Include="Readers\ProductionWorkOrderRoutingReader.cs" />
+    <Compile Include="Readers\PurchasingProductVendorReader.cs" />
+    <Compile Include="Readers\PurchasingPurchaseOrderDetailReader.cs" />
+    <Compile Include="Readers\PurchasingPurchaseOrderHeaderReader.cs" />
+    <Compile Include="Readers\PurchasingShipMethodReader.cs" />
+    <Compile Include="Readers\PurchasingVendorReader.cs" />
+    <Compile Include="Readers\PurchasingvVendorWithAddressReader.cs" />
+    <Compile Include="Readers\PurchasingvVendorWithContactReader.cs" />
+    <Compile Include="Readers\SalesCountryRegionCurrencyReader.cs" />
+    <Compile Include="Readers\SalesCreditCardReader.cs" />
+    <Compile Include="Readers\SalesCurrencyRateReader.cs" />
+    <Compile Include="Readers\SalesCurrencyReader.cs" />
+    <Compile Include="Readers\SalesCustomerReader.cs" />
+    <Compile Include="Readers\SalesPersonCreditCardReader.cs" />
+    <Compile Include="Readers\SalesSalesOrderDetailReader.cs" />
+    <Compile Include="Readers\SalesSalesOrderHeaderReader.cs" />
+    <Compile Include="Readers\SalesSalesOrderHeaderSalesReasonReader.cs" />
+    <Compile Include="Readers\SalesSalesPersonQuotaHistoryReader.cs" />
+    <Compile Include="Readers\SalesSalesPersonReader.cs" />
+    <Compile Include="Readers\SalesSalesReasonReader.cs" />
+    <Compile Include="Readers\SalesSalesTaxRateReader.cs" />
+    <Compile Include="Readers\SalesSalesTerritoryHistoryReader.cs" />
+    <Compile Include="Readers\SalesSalesTerritoryReader.cs" />
+    <Compile Include="Readers\SalesShoppingCartItemReader.cs" />
+    <Compile Include="Readers\SalesSpecialOfferProductReader.cs" />
+    <Compile Include="Readers\SalesSpecialOfferReader.cs" />
+    <Compile Include="Readers\SalesStoreReader.cs" />
+    <Compile Include="Readers\SalesvIndividualCustomerReader.cs" />
+    <Compile Include="Readers\SalesvPersonDemographicReader.cs" />
+    <Compile Include="Readers\SalesvSalesPersonReader.cs" />
+    <Compile Include="Readers\SalesvSalesPersonSalesByFiscalYearReader.cs" />
+    <Compile Include="Readers\SalesvStoreWithAddressReader.cs" />
+    <Compile Include="Readers\SalesvStoreWithContactReader.cs" />
+    <Compile Include="Readers\SalesvStoreWithDemographicReader.cs" />
     <Compile Include="SqlExecution\DapperExecuter.cs" />
     <Compile Include="SqlExecution\EntityReader.cs" />
     <Compile Include="SqlExecution\EntityWriter.cs" />
@@ -150,6 +245,97 @@
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
     <Compile Include="SqlExecution\TableInfo.cs" />
+    <Compile Include="TableInfos\AWBuildVersionTableInfo.cs" />
+    <Compile Include="TableInfos\DatabaseLogTableInfo.cs" />
+    <Compile Include="TableInfos\ErrorLogTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesDepartmentTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesEmployeeDepartmentHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesEmployeePayHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesEmployeeTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesJobCandidateTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesShiftTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesvEmployeeDepartmentHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesvEmployeeDepartmentTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesvEmployeeTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesvJobCandidateEducationTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesvJobCandidateEmploymentTableInfo.cs" />
+    <Compile Include="TableInfos\HumanResourcesvJobCandidateTableInfo.cs" />
+    <Compile Include="TableInfos\PersonAddressTableInfo.cs" />
+    <Compile Include="TableInfos\PersonAddressTypeTableInfo.cs" />
+    <Compile Include="TableInfos\PersonBusinessEntityAddressTableInfo.cs" />
+    <Compile Include="TableInfos\PersonBusinessEntityContactTableInfo.cs" />
+    <Compile Include="TableInfos\PersonBusinessEntityTableInfo.cs" />
+    <Compile Include="TableInfos\PersonContactTypeTableInfo.cs" />
+    <Compile Include="TableInfos\PersonCountryRegionTableInfo.cs" />
+    <Compile Include="TableInfos\PersonEmailAddressTableInfo.cs" />
+    <Compile Include="TableInfos\PersonPasswordTableInfo.cs" />
+    <Compile Include="TableInfos\PersonPersonPhoneTableInfo.cs" />
+    <Compile Include="TableInfos\PersonPersonTableInfo.cs" />
+    <Compile Include="TableInfos\PersonPhoneNumberTypeTableInfo.cs" />
+    <Compile Include="TableInfos\PersonStateProvinceTableInfo.cs" />
+    <Compile Include="TableInfos\PersonvAdditionalContactInfoTableInfo.cs" />
+    <Compile Include="TableInfos\PersonvStateProvinceCountryRegionTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionBillOfMaterialTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionCultureTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionDocumentTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionIllustrationTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionLocationTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductCategoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductCostHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductDescriptionTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductDocumentTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductInventoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductListPriceHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductModelIllustrationTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductModelProductDescriptionCultureTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductModelTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductPhotoTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductProductPhotoTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductReviewTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductSubcategoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionProductTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionScrapReasonTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionTransactionHistoryArchiveTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionTransactionHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionUnitMeasureTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionvProductAndDescriptionTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionvProductModelCatalogDescriptionTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionvProductModelInstructionTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionWorkOrderRoutingTableInfo.cs" />
+    <Compile Include="TableInfos\ProductionWorkOrderTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingProductVendorTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingPurchaseOrderDetailTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingPurchaseOrderHeaderTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingShipMethodTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingVendorTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingvVendorWithAddressTableInfo.cs" />
+    <Compile Include="TableInfos\PurchasingvVendorWithContactTableInfo.cs" />
+    <Compile Include="TableInfos\SalesCountryRegionCurrencyTableInfo.cs" />
+    <Compile Include="TableInfos\SalesCreditCardTableInfo.cs" />
+    <Compile Include="TableInfos\SalesCurrencyRateTableInfo.cs" />
+    <Compile Include="TableInfos\SalesCurrencyTableInfo.cs" />
+    <Compile Include="TableInfos\SalesCustomerTableInfo.cs" />
+    <Compile Include="TableInfos\SalesPersonCreditCardTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesOrderDetailTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesOrderHeaderSalesReasonTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesOrderHeaderTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesPersonQuotaHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesPersonTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesReasonTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesTaxRateTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesTerritoryHistoryTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSalesTerritoryTableInfo.cs" />
+    <Compile Include="TableInfos\SalesShoppingCartItemTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSpecialOfferProductTableInfo.cs" />
+    <Compile Include="TableInfos\SalesSpecialOfferTableInfo.cs" />
+    <Compile Include="TableInfos\SalesStoreTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvIndividualCustomerTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvPersonDemographicTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvSalesPersonSalesByFiscalYearTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvSalesPersonTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvStoreWithAddressTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvStoreWithContactTableInfo.cs" />
+    <Compile Include="TableInfos\SalesvStoreWithDemographicTableInfo.cs" />
     <Compile Include="Templates\Domain.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -170,7 +356,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TableInfo.tt</DependentUpon>
     </Compile>
-    <Compile Include="Writers\AwBuildVersionWriter.cs" />
+    <Compile Include="Writers\AWBuildVersionWriter.cs" />
     <Compile Include="Writers\DatabaseLogWriter.cs" />
     <Compile Include="Writers\ErrorLogWriter.cs" />
     <Compile Include="Writers\HumanResourcesDepartmentWriter.cs" />
@@ -262,13 +448,13 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EntityWriter.cs</LastGenOutput>
     </None>
+    <None Include="Templates\Includes\DBHelper.ttinclude" />
     <None Include="Templates\Schema.ttinclude" />
     <None Include="Templates\EntityReader.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EntityReader.cs</LastGenOutput>
     </None>
     <None Include="Templates\Includes\Accelr8or.ttinclude" />
-    <None Include="Templates\Includes\DbHelper.ttinclude" />
     <None Include="Templates\Includes\Manager.ttinclude" />
     <None Include="Templates\TableInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -277,10 +463,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Readers\" />
-    <Folder Include="TableInfos\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

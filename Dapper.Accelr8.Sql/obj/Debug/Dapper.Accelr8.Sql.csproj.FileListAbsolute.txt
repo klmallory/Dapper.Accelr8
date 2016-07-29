@@ -48,3 +48,15 @@ C:\Source\Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Domain.pdb
 C:\Source\Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.pdb
 C:\Source\Accelr8\Dapper.Accelr8.Sql\bin\Debug\Dapper.xml
 C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.csprojResolveAssemblyReference.cache
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Sql.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Sql.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Domain.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Repo.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Microsoft.SqlServer.Types.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Domain.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.Accelr8.Repo.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.pdb
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.xml
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.dll
+C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.pdb

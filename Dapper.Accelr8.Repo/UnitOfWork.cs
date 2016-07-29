@@ -41,7 +41,7 @@ namespace Dapper.Accelr8.Repo
 
         protected void PushUpdate<IdType, EntityType>(IdType id, EntityType entity, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             lock (_syncRoot)
             {
@@ -60,7 +60,7 @@ namespace Dapper.Accelr8.Repo
 
         protected void PushUpdates<IdType, EntityType>(IList<EntityType> entities, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             var hash = entities.First().GetTypeHashCode();
 
@@ -82,7 +82,7 @@ namespace Dapper.Accelr8.Repo
         }
 
         protected void PushDelete<IdType>(IdType id, int typeHash, IEntityWriter writer)
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             var key = new IdKey(id, typeHash);
 
@@ -99,7 +99,7 @@ namespace Dapper.Accelr8.Repo
         }
 
         protected void PushDelete<IdType>(IList<IdType> ids, int typeHash, IEntityWriter writer)
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             foreach (var id in ids)
             {
@@ -144,7 +144,7 @@ namespace Dapper.Accelr8.Repo
 
         public void Update<IdType, EntityType>(IdType id, EntityType entity, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             if (entity == null)
                 return;
@@ -157,7 +157,7 @@ namespace Dapper.Accelr8.Repo
 
         public void Update<IdType, EntityType>(IList<EntityType> entities, IEntityWriter writer)
             where EntityType : class, IEntity, IHaveId<IdType>
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             if (entities == null || entities.Count < 1)
                 return;
@@ -168,13 +168,13 @@ namespace Dapper.Accelr8.Repo
         }
 
         public void Remove<IdType>(IdType id, int typeHash, IEntityWriter writer)
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             PushDelete(id, typeHash, writer);
         }
 
         public void RemoveRange<IdType>(IList<IdType> ids, int typeHash, IEntityWriter writer)
-            where IdType : IComparable<IdType>
+            where IdType : IComparable
         {
             PushDelete(ids, typeHash, writer);
         }
