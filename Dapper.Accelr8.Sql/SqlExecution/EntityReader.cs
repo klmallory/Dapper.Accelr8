@@ -81,15 +81,15 @@ namespace Dapper.Accelr8.Sql
 
         static protected IAccelr8Locator _locator;
 
-        string _connectionStringName;
-        DapperExecuter _executer;
+        protected string _connectionStringName;
+        protected DapperExecuter _executer;
         protected QueryBuilder _queryBuilder;
         protected JoinBuilder _joinBuilder;
 
-        bool _distinct;
-        int _top;
-        int _skip;
-        bool _noLock;
+        protected bool _distinct;
+        protected int _top;
+        protected int _skip;
+        protected bool _noLock;
 
         public EntityReader
             (TableInfo tableInfo
@@ -372,10 +372,16 @@ namespace Dapper.Accelr8.Sql
             if (entity == null)
                 return entity;
 
+            entity.Loaded = false;
+
             if (_joins.Count == 1 && _joins[0].Load != null)
-                return _joins[0].Load(entity, join) as EntityType;
+                entity = _joins[0].Load(entity, join) as EntityType;
             else
                 throw new InvalidOperationException("Invalid number of joins, or Load function was null");
+
+            entity.IsDirty = false;
+            entity.Loaded = true;
+            return entity;
         }
 
         protected virtual EntityType LoadJoinEntities(dynamic row, dynamic join, dynamic join2)
@@ -385,6 +391,8 @@ namespace Dapper.Accelr8.Sql
             if (entity == null)
                 return entity;
 
+            entity.Loaded = false;
+
             if (_joins.Count != 2)
                 throw new InvalidOperationException("Invalid number of joins, or Load function was null");
 
@@ -393,7 +401,11 @@ namespace Dapper.Accelr8.Sql
 
             entity = _joins[0].Load(entity, join) as EntityType;
 
-            return _joins[1].Load(entity, join2) as EntityType;
+            entity = _joins[1].Load(entity, join2) as EntityType;
+
+            entity.IsDirty = false;
+            entity.Loaded = true;
+            return entity;
         }
 
         protected virtual EntityType LoadJoinEntities(dynamic row, dynamic join, dynamic join2, dynamic join3)
@@ -402,6 +414,8 @@ namespace Dapper.Accelr8.Sql
 
             if (entity == null)
                 return entity;
+
+            entity.Loaded = false;
 
             if (_joins.Count != 3)
                 throw new InvalidOperationException("Invalid number of joins, or Load function was null");
@@ -413,7 +427,11 @@ namespace Dapper.Accelr8.Sql
 
             entity = _joins[1].Load(entity, join2) as EntityType;
 
-            return _joins[2].Load(entity, join3) as EntityType;
+            entity = _joins[2].Load(entity, join3) as EntityType;
+
+            entity.IsDirty = false;
+            entity.Loaded = true;
+            return entity;
         }
 
         protected virtual EntityType LoadJoinEntities(dynamic row, dynamic join, dynamic join2, dynamic join3, dynamic join4)
@@ -422,6 +440,8 @@ namespace Dapper.Accelr8.Sql
 
             if (entity == null)
                 return entity;
+
+            entity.Loaded = false;
 
             if (_joins.Count != 4)
                 throw new InvalidOperationException("Invalid number of joins, or Load function was null");
@@ -435,7 +455,11 @@ namespace Dapper.Accelr8.Sql
 
             entity = _joins[2].Load(entity, join3) as EntityType;
 
-            return _joins[3].Load(entity, join4) as EntityType;
+            entity = _joins[3].Load(entity, join4) as EntityType;
+
+            entity.IsDirty = false;
+            entity.Loaded = true;
+            return entity;
         }
 
         protected virtual EntityType LoadJoinEntities(dynamic row, dynamic join, dynamic join2, dynamic join3, dynamic join4, dynamic join5)
@@ -444,6 +468,8 @@ namespace Dapper.Accelr8.Sql
 
             if (entity == null)
                 return entity;
+
+            entity.Loaded = false;
 
             if (_joins.Count != 5)
                 throw new InvalidOperationException("Invalid number of joins, or Load function was null");
@@ -459,7 +485,11 @@ namespace Dapper.Accelr8.Sql
 
             entity = _joins[3].Load(entity, join4) as EntityType;
 
-            return _joins[4].Load(entity, join5) as EntityType;
+            entity = _joins[4].Load(entity, join5) as EntityType;
+
+            entity.IsDirty = false;
+            entity.Loaded = true;
+            return entity;
         }
         protected virtual EntityType LoadJoinEntities(dynamic row, dynamic join, dynamic join2, dynamic join3, dynamic join4, dynamic join5, dynamic join6)
         {
@@ -468,8 +498,10 @@ namespace Dapper.Accelr8.Sql
             if (entity == null)
                 return entity;
 
-            if (_joins.Count != 6)
-                throw new InvalidOperationException("Invalid number of joins, or Load function was null");
+            entity.Loaded = false;
+
+            //if (_joins.Count != 6)
+            //    throw new InvalidOperationException("Invalid number of joins, or Load function was null");
 
             if (_joins[0].Load == null || _joins[1].Load == null || _joins[2].Load == null || _joins[3].Load == null || _joins[4].Load == null || _joins[5].Load == null)
                 throw new InvalidOperationException("Invalid number of joins, or Load function was null");
@@ -484,8 +516,13 @@ namespace Dapper.Accelr8.Sql
 
             entity = _joins[4].Load(entity, join5) as EntityType;
 
-            return _joins[5].Load(entity, join6) as EntityType;
+            entity = _joins[5].Load(entity, join6) as EntityType;
+
+            entity.IsDirty = false;
+            entity.Loaded = true;
+            return entity;
         }
+
         public virtual bool UniqueId { get; protected set; }
         public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
@@ -496,6 +533,12 @@ namespace Dapper.Accelr8.Sql
         public virtual TableInfo TableInfo { get; protected set; }
         object IEntityReader.TableInfo
         { get { return this.TableInfo; } }
+
+        public void ClearJoins()
+        {
+            _joins.Clear();
+            Joins = new JoinInfo[0];
+        }
 
         public IEntityReader<IdType, EntityType> WithColumn(string column)
         {
@@ -606,6 +649,14 @@ namespace Dapper.Accelr8.Sql
                                 , string.Join(",", _joins.Select(j => j.SplitOnColumnName)), true)
                                 .ToList();
                         break;
+                    case 8:
+                        results = gridReader.Read<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, EntityType>
+                            (new Func<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, EntityType>
+                                ((r, j, j2, j3, j4, j5, j6) => LoadJoinEntities(r, j, j2, j3, j4, j5, j6))
+                                , string.Join(",", _joins.Select(j => j.SplitOnColumnName)), true)
+                                .ToList();
+                        break;
+
                     default:
                         throw new NotSupportedException("More than 6 joins not supported.");
                 }
@@ -769,6 +820,10 @@ namespace Dapper.Accelr8.Sql
                             , new Func<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, EntityType>((r, j, j2, j3, j4, j5) => LoadJoinEntities(r, j, j2, j3, j4, j5)));
                         break;
                     case 6:
+                        res = _executer.Execute(_connectionStringName, query.ToString(), parms, _joins
+                            , new Func<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, EntityType>((r, j, j2, j3, j4, j5, j6) => LoadJoinEntities(r, j, j2, j3, j4, j5, j6)));
+                        break;
+                    case 8:
                         res = _executer.Execute(_connectionStringName, query.ToString(), parms, _joins
                             , new Func<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, dynamic, EntityType>((r, j, j2, j3, j4, j5, j6) => LoadJoinEntities(r, j, j2, j3, j4, j5, j6)));
                         break;

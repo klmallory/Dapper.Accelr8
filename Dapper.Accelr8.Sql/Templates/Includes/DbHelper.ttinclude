@@ -18,11 +18,11 @@
 			  Columns = new List<DbColumn>();
 		  }
 		
-        public string TableName { get; set; }
-        public string SchemaName { get; set; }
+			public string TableName { get; set; }
+			public string SchemaName { get; set; }
 		    public string TableType {get; set; }
-        public int Rows { get; set; }
-        public bool HasPrimaryKey { get; set; }
+			public int Rows { get; set; }
+			public bool HasPrimaryKey { get; set; }
 		    public List<DbColumn> Columns { get; set; }
 		    public List<DbChild> Children { get; set; }
 		    public List<DbParent> Parents { get; set; }
@@ -48,7 +48,7 @@
         public string ColumnName { get; set; }
         public string ColumnType { get; set; }
         public string CSharpType { get; set; }
-		    public string CastType { get; set; }
+		public string CastType { get; set; }
         public Type CommonType { get; set; }
         public int ByteLength { get; set; }
         public int CharLength { get; set; }
@@ -56,57 +56,56 @@
         public bool IsIdentity { get; set; }
         public bool IsNullable { get; set; }
         public string Remark { get; set; }
-
-		    public string Splits { get; set; }
-		    public bool Ignore { get; set; }
-		    public bool ReadOnly { get; set; }
-		    public string FieldName { get; set; }
+		public string Splits { get; set; }
+		public bool Ignore { get; set; }
+		public bool ReadOnly { get; set; }
+		public string FieldName { get; set; }
     }
 
 	public class DbChild
 	{
-    public string Name { get; set; }
-    public string Schema { get; set; }
-    public string Table { get; set; }
-    public string Parent { get; set; }
-    public string OriginalColumnName { get; set; }
-    public string Column { get; set; }
-    public string ParentColumn { get; set; }
-    public string CSharpType { get; set; }
-    public string ChildCSharpType { get; set; }
-    public string TableAlias { get; set; }
+		public string Name { get; set; }
+		public string Schema { get; set; }
+		public string Table { get; set; }
+		public string Parent { get; set; }
+		public string OriginalColumnName { get; set; }
+		public string Column { get; set; }
+		public string ParentColumn { get; set; }
+		public string CSharpType { get; set; }
+		public string ChildCSharpType { get; set; }
+		public string TableAlias { get; set; }
 
-    public bool Ignore { get; set; }
-    public bool OneToOne { get; set; }
+		public bool Ignore { get; set; }
+		public bool OneToOne { get; set; }
 
-    public bool ChildColumnIsPrimaryKey { get; set; }
-    public string ChildClassName { get; set; }
-    public string ChildFieldName { get; set; }
-    public string ChildClassFieldName { get; set; }
-    public string ParentClassFieldName { get; set; }
-    public bool IsNullable { get; set; }
+		public bool ChildColumnIsPrimaryKey { get; set; }
+		public string ChildClassName { get; set; }
+		public string ChildFieldName { get; set; }
+		public string ChildClassFieldName { get; set; }
+		public string ParentClassFieldName { get; set; }
+		public bool IsNullable { get; set; }
 	}
 
     public class DbParent
     {
-      public string Name { get; set; }
-      public string Schema { get; set; }
-      public string Table { get; set; }
-      public string Parent { get; set; }
-      public string OriginalColumnName { get; set; }
-      public string Column { get; set; }
-      public string ParentColumn { get; set; }
-      public string CSharpType { get; set; }
-      public string ParentAlias { get; set; }
+		public string Name { get; set; }
+		public string Schema { get; set; }
+		public string Table { get; set; }
+		public string Parent { get; set; }
+		public string OriginalColumnName { get; set; }
+		public string Column { get; set; }
+		public string ParentColumn { get; set; }
+		public string CSharpType { get; set; }
+		public string ParentAlias { get; set; }
 
-      public bool Ignore { get; set; }
+		public bool Ignore { get; set; }
 
-      public bool ParentColumnIsPrimaryKey { get; set; }
-      public string ParentClassName { get; set; }
-      public string ParentClassFieldName { get; set; }
-      public string ParentFieldName { get; set; }
-      public string ChildFieldName { get; set; }
-      public bool IsNullable { get; set; }		
+		public bool ParentColumnIsPrimaryKey { get; set; }
+		public string ParentClassName { get; set; }
+		public string ParentClassFieldName { get; set; }
+		public string ParentFieldName { get; set; }
+		public string ChildFieldName { get; set; }
+		public bool IsNullable { get; set; }		
     }
 
 	//SQL Helper
@@ -156,10 +155,10 @@
             {
                 TableName = row.Field<string>("tablename"),
                 SchemaName = row.Field<string>("schemname"),
-				        TableType = row.Field<string>("type").Trim(),
+				TableType = row.Field<string>("type").Trim(),
                 Rows = row.Field<int>("rows"),
                 HasPrimaryKey = row.Field<bool>("HasPrimaryKey"),
-				        ReadOnly = row.Field<string>("type").Trim() == "V"
+				ReadOnly = row.Field<string>("type").Trim() == "V"
             }).ToDictionary(c => c.SchemaName != "dbo" ? c.SchemaName + "." +  c.TableName : c.TableName);
         }
         
@@ -222,52 +221,51 @@
         
         public override List<DbChild> GetChildren(string connectionString, string database, string tableName, string schema = "dbo")
         {
-            string sql = 
-				string.Format(@"
-				WITH indexCTE AS
-				(
-					SELECT 
-					ic.column_id,
-					ic.index_column_id,
-					ic.object_id
-					FROM sys.indexes idx
-					join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
-					WHERE idx.is_primary_key=1
-				)
-				select OBJECT_NAME(fk.object_id) Name,
-					sc.name [Schema],
-					OBJECT_NAME(fk.referenced_object_id) Parent,
-					pCol.Name ParentColumn,
-					Object_Name(fk.parent_object_id) [Table],
-					col.Name [Column],
-					CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
-					col.is_nullable IsNullable,
-					pSysType.name ColumnType,
-					cSysType.name ChildType
+            string sql = string.Format(@"
+				    WITH indexCTE AS
+				    (
+					    SELECT 
+					    ic.column_id,
+					    ic.index_column_id,
+					    ic.object_id
+					    FROM sys.indexes idx
+					    join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
+					    WHERE idx.is_primary_key=1
+				    )
+				    select OBJECT_NAME(fk.object_id) Name,
+					    sc.name [Schema],
+					    OBJECT_NAME(fk.referenced_object_id) Parent,
+					    pCol.Name ParentColumn,
+					    Object_Name(fk.parent_object_id) [Table],
+					    col.Name [Column],
+					    CAST(CASE WHEN indexCTE.column_id IS NULL THEN 0 ELSE 1 END AS BIT) IsPrimaryKey,
+					    col.is_nullable IsNullable,
+					    pSysType.name ColumnType,
+					    cSysType.name ChildType
 					
-				from sys.foreign_keys fk
-				join sys.objects obj on obj.object_id = fk.object_id
-				join sys.schemas sc on sc.schema_id = obj.schema_id
-				join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
-				join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
-				join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
-				join sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
-				join (select top 10000	
-						object_id, 
-						min(index_id) as index_id, 
-						min(index_column_id) as index_column_id, 
-						min(column_id) as column_id, 
-						min(key_ordinal) as key_ordinal, 
-						min(partition_ordinal) as partition_ordinal
-						 from sys.index_columns sic 
-							where sic.is_included_column = 0 
-							group by sic.object_id
-							order by column_id) as cixc on cixc.object_id = col.object_id
-				join sys.indexes idx on idx.index_id = cixc.index_id and idx.object_id = cixc.object_id and idx.is_primary_key = 1
-				left outer join sys.columns cpk on cpk.column_id = cixc.index_column_id and cpk.object_id = cixc.object_id
-				left outer join sys.systypes cSysType on cSysType.xusertype = cpk.system_type_id
-				left outer join indexCTE ON col.column_id = indexCTE.column_id AND col.object_id = indexCTE.object_id
-				where fk.referenced_object_id = OBJECT_ID(@tableName)", database);
+				    from sys.foreign_keys fk
+				    join sys.objects obj on obj.object_id = fk.object_id
+				    join sys.schemas sc on sc.schema_id = obj.schema_id
+				    join sys.foreign_key_columns fkc on fkc.constraint_object_id = fk.object_id
+				    join sys.columns pCol on pCol.column_id = fkc.constraint_column_id  and pCol.object_id = fk.referenced_object_id
+				    join sys.columns col on col.column_id = fkc.parent_column_id and col.object_id = fk.parent_object_id
+				    join sys.systypes pSysType on pSysType.xusertype = pCol.system_type_id
+				    join (select top 10000	
+						    object_id, 
+						    min(index_id) as index_id, 
+						    min(index_column_id) as index_column_id, 
+						    min(column_id) as column_id, 
+						    min(key_ordinal) as key_ordinal, 
+						    min(partition_ordinal) as partition_ordinal
+						     from sys.index_columns sic 
+							    where sic.is_included_column = 0 
+							    group by sic.object_id
+							    order by column_id) as cixc on cixc.object_id = col.object_id
+				    join sys.indexes idx on idx.index_id = cixc.index_id and idx.object_id = cixc.object_id and idx.is_primary_key = 1
+				    left outer join sys.columns cpk on cpk.column_id = cixc.index_column_id and cpk.object_id = cixc.object_id
+				    left outer join sys.systypes cSysType on cSysType.xusertype = cpk.system_type_id
+				    left outer join indexCTE ON col.column_id = indexCTE.column_id AND col.object_id = indexCTE.object_id
+				    where fk.referenced_object_id = OBJECT_ID(@tableName)", database);
 
             SqlParameter param = new SqlParameter("@tableName", SqlDbType.NVarChar, 100) { Value = string.Format("{0}.{1}.{2}", database, schema, tableName) };
             DataTable dt = GetDataTable(connectionString, sql, param);
@@ -279,7 +277,7 @@
 				Schema = row.Field<string>("Schema"),
 				Parent = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
-        OriginalColumnName = row.Field<string>("Column"),
+				OriginalColumnName = row.Field<string>("Column"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
 				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),
@@ -290,14 +288,13 @@
         
 		public override List<DbParent> GetParents(string connectionString, string database, string tableName, string schema = "dbo")
         {
-            string sql = 
-				string.Format(@"
+            string sql = string.Format(@"
                 WITH indexCTE AS
                 (
                     SELECT 
                     ic.column_id,
                     ic.index_column_id,
-					ic.object_id,
+					          ic.object_id,
                     OBJECT_NAME(ic.object_id) name
                     FROM sys.indexes idx
                     join sys.index_columns ic ON idx.index_id = ic.index_id AND idx.object_id = ic.object_id
@@ -333,7 +330,7 @@
 				Parent = row.Field<string>("Parent"),
 				ParentClassFieldName = row.Field<string>("Parent"),
 				IsNullable = row.Field<bool>("IsNullable"),
-        OriginalColumnName = row.Field<string>("Column"),
+				OriginalColumnName = row.Field<string>("Column"),
 				Column = row.Field<string>("Column"),
 				ParentColumn = row.Field<string>("ParentColumn"),
 				CSharpType = MapCsharpType(row.Field<string>("ColumnType")),

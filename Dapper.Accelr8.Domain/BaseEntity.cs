@@ -12,9 +12,10 @@ namespace Dapper.Accelr8.Repo.Domain
     {
         public BaseEntity()
         {
-            IsDirty = true;
+
         }
 
+        public bool Loaded { get; set; }
         public bool IsDirty { get; set; }
 
         public IdType Id { get; set; }

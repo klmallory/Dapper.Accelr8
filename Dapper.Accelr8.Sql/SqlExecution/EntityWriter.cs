@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -62,7 +63,7 @@ namespace Dapper.Accelr8.Sql
         protected static readonly string insertTemplate = @"insert into [{0}] ({1}) OUTPUT Inserted.{2} INTO @affectedRows values ({3}); ";
         protected static readonly string insertNoFieldsTemplate = @"insert into [{0}] OUTPUT Inserted.{1} INTO @affectedRows default values; ";
 
-        protected static readonly string updateTemplate = @"update [{1}] {2} from [{0}] [{1}]";
+        protected static readonly string updateTemplate = @"update [{1}] {2} OUTPUT Inserted.{3} INTO @affectedRows from [{0}] [{1}]";
         protected static readonly string setTemplate = @"[{0}] = {1}";
 
         protected static readonly string deleteTemplate = @"delete [{1}] from [{0}] [{1}]";
@@ -115,14 +116,14 @@ namespace Dapper.Accelr8.Sql
                     string.Format
                     (setTemplate
                     , field.Value.Replace("_spc_", " ")
-                    , GetParamName(field.Value, "u", task.Index, ref count)));
+                    , GetParamName(field.Value, "u", task.Index, ref count, true)));
 
             var s = string.Join(", ", fieldSets);
 
             return "set " + s.TrimEnd(',', ' ');
         }
 
-        protected virtual string BuildInsertParameters(int taskIndex)
+        protected virtual string BuildInsertParameters(int taskIndex, bool cast = false)
         {
             int count = 0;
 
@@ -133,7 +134,8 @@ namespace Dapper.Accelr8.Sql
                 (ColumnNames
                 .Where(f => f.Value != IdColumn)
                 .OrderBy(f => f.Value)
-                .Select(s => GetParamName(s.Value, "i", taskIndex, ref count) + ", "));
+                .Select(s => GetParamName(s.Value, "i", taskIndex, ref count, cast) + ", "));
+
 
             return fieldNames.TrimEnd(',', ' ');
         }
@@ -143,12 +145,22 @@ namespace Dapper.Accelr8.Sql
             var s = actionType == ActionType.Add ? "i"
                 : actionType == ActionType.Update ? "u" : "d";
 
-            return GetParamName(fieldName, s, taskIndex, ref count);
+            var pName = GetParamName(fieldName, s, taskIndex, ref count, false);
+
+            return pName;
         }
 
-        protected virtual string GetParamName(string fieldName, string paramType, int taskIndex, ref int count)
+        protected virtual string GetParamName(string fieldName, string paramType, int taskIndex, ref int count, bool cast = false)
         {
-            return "@" + TableAlias + fieldName + "_" + paramType + "_" + taskIndex + "_" + count++;
+            var pName = "@" + TableAlias + fieldName + "_" + paramType + "_" + taskIndex + "_" + count++;
+
+            if (cast && fieldName == "Thumbnail")
+                pName = "cast(" + pName + " as varbinary(4096))";
+
+            if (cast && fieldName == "ImageData")
+                pName = "cast(" + pName + " as varbinary(max))";
+
+            return pName;
         }
 
         protected virtual bool Cascade<IType, EType>(IEntityWriter<IType, EType> writer, EType entity, ScriptContext context)
@@ -205,6 +217,7 @@ namespace Dapper.Accelr8.Sql
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
         public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
+        public virtual IList<KeyValuePair<string, string>> ColumCasts { get; protected set; }
         protected virtual TableInfo TableInfo { get; set; }
 
         public virtual int Count { get { return _tasks.Count; } }
@@ -253,7 +266,17 @@ namespace Dapper.Accelr8.Sql
                 switch (task.TaskType)
                 {
                     case ActionType.Add:
-                        sb.Append(GetSqlForInsert(task));
+                        if (task.Entity != null && !task.Entity.IsNew())
+                        {
+                            task.TaskType = ActionType.Update;
+                            task.Queries.Add(new QueryElement() { FieldName = IdColumn, Operator = Operator.Equals, Value = task.Entity.Id, TableAlias = TableAlias });
+
+                            parms = BuildParameters(_tasks);
+                            sb.Append(GetSqlForUpdate(task));
+                            Trace.TraceWarning("Duplicate 'Insert' detected, falling back to update for {0} with Id {1}", task.Entity, task.Entity.Id);
+                        }
+                        else
+                            sb.Append(GetSqlForInsert(task));
                         break;
                     case ActionType.Update:
                         sb.Append(GetSqlForUpdate(task));
@@ -287,7 +310,7 @@ namespace Dapper.Accelr8.Sql
                    , TableName
                    , "[" + String.Join("], [", names.ToArray()).Replace("_spc_", " ") + "]"
                    , IdColumn
-                   , BuildInsertParameters(task.Index)));
+                   , BuildInsertParameters(task.Index, true)));
             }
             else
             {
@@ -308,7 +331,8 @@ namespace Dapper.Accelr8.Sql
             query.Append(string.Format(updateTemplate
                , TableName
                , TableAlias
-               , BuildSetParamaters(task)));
+               , BuildSetParamaters(task)
+               , IdColumn));
 
             query.Append(Environment.NewLine);
 
@@ -717,7 +741,7 @@ namespace Dapper.Accelr8.Sql
 
             var count = 0;
 
-            foreach (var p in _parents)
+            foreach (var p in _parents.Where(p => p != null && !p.Item2.IsDirty))
             {
                 count += p.Item1.Execute(context);
                 UpdateIdsFromReferences(_cascades, p.Item2);
@@ -730,7 +754,7 @@ namespace Dapper.Accelr8.Sql
             }
 
             //if the entity was already inserted via cascade since the task was initiated, remove it.
-            _tasks.RemoveAll(d => d.Entity != null && d.TaskType == ActionType.Add && !d.Entity.IsDirty);
+            _tasks.RemoveAll(d => d.Entity != null && d.TaskType == ActionType.Update && !d.Entity.IsDirty);
             //_tasks.RemoveAll(d => d.Entity != null && d.TaskType != ActionType.Remove && !d.Entity.IsDirty);
 
             if (_tasks.Count < 1)
@@ -753,6 +777,10 @@ namespace Dapper.Accelr8.Sql
 
                 count += c.Item1.Execute(context);
             }
+
+            foreach (var d in _tasks)
+                if (d.Entity != null)
+                    d.Entity.IsDirty = false;
 
             return count;
         }

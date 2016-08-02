@@ -88,7 +88,8 @@
 			{
 				if (t.Value.Ignore)
 					continue;
-					var tName = Accelr8or.Inflector.GetFriendlyName(helper.GetTableNameWithSchema(t.Value));
+					
+				var tName = Accelr8or.Inflector.GetFriendlyName(helper.GetTableNameWithSchema(t.Value));
 
 				if (tableNames.ContainsKey(tName))
 				{
@@ -126,8 +127,8 @@
 					c.Column = Accelr8or.Inflector.GetSafeName(c.Column);
 					c.ParentColumn = Accelr8or.Inflector.GetSafeName(c.ParentColumn);
 					//c.Table = Accelr8or.Inflector.GetFriendlyName(c.Table);
-					c.ChildClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ChildClassFieldName);
-					c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
+					//c.ChildClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ChildClassFieldName);
+					//c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
 
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;
@@ -160,7 +161,7 @@
 					c.ParentColumn = Accelr8or.Inflector.GetSafeName(c.ParentColumn);
 					c.Column = Accelr8or.Inflector.GetSafeName(c.Column);
 					c.Parent = Accelr8or.Inflector.GetFriendlyName(c.Parent);
-					c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
+					//c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
 
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;

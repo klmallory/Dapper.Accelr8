@@ -60,3 +60,4 @@ C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.pdb
 C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\bin\Debug\Dapper.xml
 C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.dll
 C:\Source\Dapper.Acceler8\Dapper.Accelr8.Sql\obj\Debug\Dapper.Accelr8.Sql.pdb
+C:\Source\Accelr8\Dapper.Accelr8.Sql\bin\Debug\Microsoft.SqlServer.Types.dll

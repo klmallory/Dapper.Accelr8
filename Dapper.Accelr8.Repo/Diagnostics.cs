@@ -26,7 +26,8 @@ namespace Dapper.Accelr8.Repo
         }
 
         public static decimal ScriptsRunPerMinute;
-        
+        public static bool LogAllSql;
+
         public static void Increment(int count)
         {
             _recent += count;

@@ -448,7 +448,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EntityWriter.cs</LastGenOutput>
     </None>
-    <None Include="Templates\Includes\DBHelper.ttinclude" />
+    <None Include="Templates\Includes\dbHelper.ttinclude" />
     <None Include="Templates\Schema.ttinclude" />
     <None Include="Templates\EntityReader.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

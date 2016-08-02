@@ -39,10 +39,16 @@ namespace Dapper.Accelr8.Sql
                             _connectionStringContainer.Add(c.Key, c.Value);
         }
 
-        protected void LogSqlException(string query, SqlTypeException sqlEx)
+        protected void LogSqlException(string query, object parms, SqlTypeException sqlEx)
         {
             try
             {
+                foreach (var p in (IDictionary<string, object>)parms)
+                    query = query.Replace(p.Key,
+                        p.Value == null ? "null" :
+                        p.Value is string ? "'" + p.Value.ToString() + "'" :
+                        p.Value is Enum ? ((long)p.Value).ToString() : p.Value.ToString());
+
                 Trace.CorrelationManager.StartLogicalOperation(_type);
 
                 Trace.TraceError("Sql query failed: {0}", query);
@@ -55,10 +61,16 @@ namespace Dapper.Accelr8.Sql
             }
         }
 
-        protected void LogSqlException(string query, SqlException sqlEx)
+        protected void LogSqlException(string query, object parms, SqlException sqlEx)
         {
             try
             {
+                foreach (var p in (IDictionary<string, object>)parms)
+                    query = query.Replace(p.Key,
+                        p.Value == null ? "null" :
+                        p.Value is string ? "'" + p.Value.ToString() + "'" :
+                        p.Value is Enum ? ((long)p.Value).ToString() : p.Value.ToString());
+
                 Trace.CorrelationManager.StartLogicalOperation(_type);
 
                 Trace.TraceError("Sql query failed: {0}", query);
@@ -75,10 +87,16 @@ namespace Dapper.Accelr8.Sql
             }
         }
 
-        protected void LogSqlException(string query, DbException dbEx)
+        protected void LogSqlException(string query, object parms, DbException dbEx)
         {
             try
             {
+                foreach (var p in (IDictionary<string, object>)parms)
+                    query = query.Replace(p.Key,
+                        p.Value == null ? "null" :
+                        p.Value is string ? "'" + p.Value.ToString() + "'" :
+                        p.Value is Enum ? ((long)p.Value).ToString() : p.Value.ToString());
+
                 Trace.CorrelationManager.StartLogicalOperation(_type);
 
                 Trace.TraceError("Sql query failed: {0}", query);
@@ -91,15 +109,45 @@ namespace Dapper.Accelr8.Sql
             }
         }
 
-        protected void LogException(string query, SystemException nEx)
+        protected void LogException(string query, object parms, SystemException nEx)
         {
             try
             {
+                foreach (var p in (IDictionary<string, object>)parms)
+                    query = query.Replace(p.Key,
+                        p.Value == null ? "null" :
+                        p.Value is string ? "'" + p.Value.ToString() + "'" :
+                        p.Value is Enum ? ((long)p.Value).ToString() : p.Value.ToString());
+
                 Trace.CorrelationManager.StartLogicalOperation(_type);
 
                 Trace.TraceError("Sql query failed: {0}", query);
 
                 Trace.TraceError(nEx.ToString());
+            }
+            finally
+            {
+                Trace.CorrelationManager.StopLogicalOperation();
+            }
+        }
+
+        protected void LogSql(string query, object parms)
+        {
+            try
+            {
+                foreach (var p in (IDictionary<string, object>)parms)
+                    query = query.Replace(p.Key,
+                        p.Value == null ? "null" :
+                        p.Value is string ? "'" + p.Value.ToString() + "'" :
+                        p.Value is Enum ? ((int)p.Value).ToString() : p.Value.ToString());
+
+                Trace.CorrelationManager.StartLogicalOperation(_type);
+
+                Trace.TraceInformation("Sql debug: {0}", query);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
             }
             finally
             {
@@ -124,13 +172,16 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     var results = connection.Query(query, param: parameters);
 
                     return visitor(results);
                 }
                 catch (DbException dbEx)
                 {
-                    LogSqlException(query, dbEx);
+                    LogSqlException(query, parameters, dbEx);
                     throw;
                 }
                 finally
@@ -156,6 +207,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     return connection.Query
                         (query
                         , map: load
@@ -165,7 +219,7 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (DbException dbEx)
                 {
-                    LogSqlException(query, dbEx);
+                    LogSqlException(query, parameters, dbEx);
                     throw;
                 }
                 finally
@@ -192,6 +246,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     return connection.Query
                         (query
                         , map: load
@@ -201,7 +258,7 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (DbException dbEx)
                 {
-                    LogSqlException(query, dbEx);
+                    LogSqlException(query, parameters, dbEx);
                     throw;
                 }
                 finally
@@ -229,6 +286,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     return connection.Query
                         (query
                         , map: load
@@ -238,7 +298,7 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (DbException dbEx)
                 {
-                    LogSqlException(query, dbEx);
+                    LogSqlException(query, parameters, dbEx);
                     throw;
                 }
                 finally
@@ -267,6 +327,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     return connection.Query
                         (query
                         , map: load
@@ -276,7 +339,7 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (DbException dbEx)
                 {
-                    LogSqlException(query, dbEx);
+                    LogSqlException(query, parameters, dbEx);
                     throw;
                 }
                 finally
@@ -306,6 +369,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     return connection.Query
                         (query
                         , map: load
@@ -315,7 +381,7 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (SqlException sqlEx)
                 {
-                    LogSqlException(query, sqlEx);
+                    LogSqlException(query, parameters, sqlEx);
                     throw;
                 }
                 finally
@@ -346,6 +412,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parameters);
+
                     return connection.Query
                         (query
                         , map: load
@@ -355,7 +424,7 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (SqlException sqlEx)
                 {
-                    LogSqlException(query, sqlEx);
+                    LogSqlException(query, parameters, sqlEx);
                     throw;
                 }
                 finally
@@ -375,11 +444,14 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(query, parms);
+
                     return loader(connection.QueryMultiple(query, parms));
                 }
                 catch (DbException dbEx)
                 {
-                    LogSqlException(query, dbEx);
+                    LogSqlException(query, parms, dbEx);
                     throw;
                 }
                 finally
@@ -398,11 +470,14 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(sql, parms);
+
                     return connection.Query(sql, parms).Count();
                 }
                 catch (DbException sqlEx)
                 {
-                    LogSqlException(sql, sqlEx);
+                    LogSqlException(sql, parms, sqlEx);
                     throw;
                 }
                 finally
@@ -421,6 +496,9 @@ namespace Dapper.Accelr8.Sql
 
                 try
                 {
+                    if (Accelr8.Repo.Diagnostics.LogAllSql)
+                        LogSql(sql, parms);
+
                     var ids = connection.Query<IdType>(sql, param: parms).ToList();
 
                     idSetter(ids);
@@ -429,17 +507,17 @@ namespace Dapper.Accelr8.Sql
                 }
                 catch (NotSupportedException nEx)
                 {
-                    LogException(sql, nEx);
+                    LogException(sql, parms, nEx);
                     throw;
                 }
                 catch (SqlTypeException sqlTex)
                 {
-                    LogSqlException(sql, sqlTex);
+                    LogSqlException(sql, parms, sqlTex);
                     throw;
                 }
                 catch (SqlException sqlEx)
                 {
-                    LogSqlException(sql, sqlEx);
+                    LogSqlException(sql, parms, sqlEx);
                     throw;
                 }
                 finally
