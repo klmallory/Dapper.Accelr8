@@ -21,3 +21,4 @@ Dapper.Accelr8.Sql/Templates/TableInfo.cs
 obj/
 *.csproj.user
 Solutions/_NCrunch_Dapper.Accelr8/Dapper.Accelr8.crunchsolution.cache
+obj/
