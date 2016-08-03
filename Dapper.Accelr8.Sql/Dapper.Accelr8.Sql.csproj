@@ -40,7 +40,7 @@
     </Reference>
     <Reference Include="Microsoft.SqlServer.Types, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\Solutions\packages\Microsoft.SqlServer.Types.10.50.1600.1\lib\Net20\Microsoft.SqlServer.Types.dll</HintPath>
+      <HintPath>..\Solutions\packages\HashFoo.SqlServer.SpatialTypes.10.0.0.0\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -245,6 +245,7 @@
     <Compile Include="SqlBuilders\JoinBuilder.cs" />
     <Compile Include="SqlBuilders\QueryBuilder.cs" />
     <Compile Include="SqlExecution\TableInfo.cs" />
+    <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="TableInfos\AWBuildVersionTableInfo.cs" />
     <Compile Include="TableInfos\DatabaseLogTableInfo.cs" />
     <Compile Include="TableInfos\ErrorLogTableInfo.cs" />
@@ -448,7 +449,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EntityWriter.cs</LastGenOutput>
     </None>
-    <None Include="Templates\Includes\dbHelper.ttinclude" />
+    <None Include="Templates\Includes\DBHelper.ttinclude" />
     <None Include="Templates\Schema.ttinclude" />
     <None Include="Templates\EntityReader.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -463,6 +464,25 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Solutions\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x64\msvcr100.dll">
+      <Link>SqlServerTypes\x64\msvcr100.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Solutions\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x64\SqlServerSpatial110.dll">
+      <Link>SqlServerTypes\x64\SqlServerSpatial110.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Solutions\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x86\msvcr100.dll">
+      <Link>SqlServerTypes\x86\msvcr100.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Solutions\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x86\SqlServerSpatial110.dll">
+      <Link>SqlServerTypes\x86\SqlServerSpatial110.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\readme.htm" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

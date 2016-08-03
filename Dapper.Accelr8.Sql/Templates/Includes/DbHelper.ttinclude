@@ -32,12 +32,57 @@
 		    public bool ReadOnly { get; set; }
 		    public string ClassName { get; set; }
 
+
+
 		public string GetTableName()
 		{
 			if (string.IsNullOrEmpty(SchemaName) || SchemaName.ToLower() == "dbo")
 				return TableName;
 
 			return SchemaName + "." + TableName;
+		}
+
+		public string GetEntityTypeName()
+		{
+		}
+
+		public string GetTypeName()
+		{
+			var name = TableName;
+
+			if (name == null)
+				return null;
+
+			if (char.IsNumber(name[0]))
+				name = "_n_" + name;
+
+			return name.Replace(".", "");
+		}
+
+		public string GetFieldName()
+		{
+			var name = TableName;
+
+			if (name == null)
+				return null;
+
+			if (char.IsNumber(name[0]))
+				name = "_n_" + name;
+
+			return name.Replace(".", "");
+		}
+
+		public string GetAlias()
+		{
+			var name = TableName;
+
+			if (name == null)
+				return null;
+
+			if (char.IsNumber(name[0]))
+				name = "_n_" + name;
+
+			return name.Replace(".", "").ToLower();
 		}
     }
 
@@ -84,6 +129,18 @@
 		public string ChildClassFieldName { get; set; }
 		public string ParentClassFieldName { get; set; }
 		public bool IsNullable { get; set; }
+
+		public string GetEntityTypeName()
+		{
+		}
+
+		public string GetTypeName()
+		{
+		}
+
+		public string GetFieldName()
+		{
+		}
 	}
 
     public class DbParent
@@ -105,7 +162,19 @@
 		public string ParentClassFieldName { get; set; }
 		public string ParentFieldName { get; set; }
 		public string ChildFieldName { get; set; }
-		public bool IsNullable { get; set; }		
+		public bool IsNullable { get; set; }
+
+		public string GetEntityTypeName()
+		{
+		}
+
+		public string GetTypeName()
+		{
+		}
+
+		public string GetFieldName()
+		{
+		}
     }
 
 	//SQL Helper
@@ -119,12 +188,20 @@
 			return table.SchemaName + "." + table.TableName;
 		}
 
-		public string GetTableNameWithSchema(DbChild child)
+		public string GetParentNameWithSchema(DbChild child)
 		{
 			if (string.IsNullOrEmpty(child.Schema) || child.Schema.ToLower() == "dbo")
-				return child.Table;
+				return child.Parent;
 
-			return child.Schema + "." + child.Table;
+			return child.Schema + "." + child.Parent;
+		}
+
+		public string GetParentNameWithSchema(DbParent parent)
+		{
+			if (string.IsNullOrEmpty(parent.Schema) || parent.Schema.ToLower() == "dbo")
+				return parent.Parent;
+
+			return parent.Schema + "." + parent.Parent;
 		}
 
         public override IDictionary<string, DbTable> GetDbTables(string connectionString, string database)

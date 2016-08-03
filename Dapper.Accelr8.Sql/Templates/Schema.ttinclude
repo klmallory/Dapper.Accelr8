@@ -133,7 +133,7 @@
 					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
 						c.Ignore = true;
 
-					if (!tables.ContainsKey(c.Parent) || tables[c.Parent].Ignore)
+					if (!tables.ContainsKey(helper.GetParentNameWithSchema(c)) || tables[helper.GetParentNameWithSchema(c)].Ignore)
 						c.Ignore = true;
 
 					if (tableNames.ContainsKey(c.Table))
@@ -156,45 +156,45 @@
 						c.TableAlias = Accelr8or.Inflector.MakeSingular(c.Table).ToLower();
 				}
 
-				foreach(var c in t.Value.Parents)
+				foreach(var p in t.Value.Parents)
 				{
-					c.ParentColumn = Accelr8or.Inflector.GetSafeName(c.ParentColumn);
-					c.Column = Accelr8or.Inflector.GetSafeName(c.Column);
-					c.Parent = Accelr8or.Inflector.GetFriendlyName(c.Parent);
-					//c.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(c.ParentClassFieldName);
+					p.ParentColumn = Accelr8or.Inflector.GetSafeName(p.ParentColumn);
+					p.Column = Accelr8or.Inflector.GetSafeName(p.Column);
+					p.Parent = Accelr8or.Inflector.GetFriendlyName(p.Parent);
+					//p.ParentClassFieldName = Accelr8or.Inflector.GetFriendlyName(p.ParentClassFieldName);
 
-					if (!tables.ContainsKey(c.Table) || tables[c.Table].Ignore)
-						c.Ignore = true;
+					if (!tables.ContainsKey(p.Table) || tables[p.Table].Ignore)
+						p.Ignore = true;
 
-					if (!tables.ContainsKey(c.Parent) || tables[c.Parent].Ignore)
-						c.Ignore = true;
+					if (!tables.ContainsKey(helper.GetParentNameWithSchema(c)) || tables[helper.GetParentNameWithSchema(c)].Ignore)
+						p.Ignore = true;
 
-					if (tableNames.ContainsKey(c.Parent))
-						c.ParentClassName = tableNames[c.Parent];
+					if (tableNames.ContainsKey(p.Parent))
+						p.ParentClassName = tableNames[p.Parent];
 					else
-						c.ParentClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Parent));
+						p.ParentClassName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(p.Parent));
 
-					if (!tables.ContainsKey(c.Table))
-						Debug.WriteLine("table not found" + c.Table);
+					if (!tables.ContainsKey(p.Table))
+						Debug.WriteLine("table not found" + p.Table);
 
-					var pkCol = tables[c.Table].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
+					var pkCol = tables[p.Table].Columns.FirstOrDefault(cd => cd.IsPrimaryKey);
 
-					if (pkCol != null && pkCol.ColumnName == c.ParentColumn)
-						c.ParentFieldName = "Id";
-					if (columnNames.ContainsKey(t.Value.TableName + "." + c.ParentColumn))
-						c.ParentFieldName = columnNames[t.Value.TableName + "." + c.ParentColumn];
+					if (pkCol != null && pkCol.ColumnName == p.ParentColumn)
+						p.ParentFieldName = "Id";
+					if (columnNames.ContainsKey(t.Value.TableName + "." + p.ParentColumn))
+						p.ParentFieldName = columnNames[t.Value.TableName + "." + p.ParentColumn];
 					else
-						c.ParentFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.ParentColumn));
+						p.ParentFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(p.ParentColumn));
 
-					if (columnNames.ContainsKey(t.Value.TableName + "." + c.Column))
-						c.ChildFieldName = columnNames[t.Value.TableName + "." + c.Column];
+					if (columnNames.ContainsKey(t.Value.TableName + "." + p.Column))
+						p.ChildFieldName = columnNames[t.Value.TableName + "." + p.Column];
 					else
-						c.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(c.Column));
+						p.ChildFieldName = Accelr8or.Inflector.MakeSingular(Accelr8or.Inflector.CamelCase(p.Column));
 
-					if (tableAliases.ContainsKey(c.Parent))
-						c.ParentAlias = tableAliases[c.Parent];
+					if (tableAliases.ContainsKey(p.Parent))
+						p.ParentAlias = tableAliases[p.Parent];
 					else
-						c.ParentAlias = Accelr8or.Inflector.MakeSingular(c.Parent).ToLower();
+						p.ParentAlias = Accelr8or.Inflector.MakeSingular(p.Parent).ToLower();
 				}
 			}
 

@@ -17,10 +17,7 @@
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
 <#@ import namespace="System.Runtime.InteropServices" #>
 <#@ output extension=".cs" #>
-<#@ include file="Includes\\Accelr8or.ttinclude" #>
-<#@ include file="Includes\\DbHelper.ttinclude" #>
-<#@ include file="Includes\\Manager.ttinclude" #>
-<#@ include file="Schema.ttinclude" #>
+<#@ include file="Includes\\Accelr8or.ttinclude" #><#@ include file="Includes\\DBHelper.ttinclude" #><#@ include file="Includes\\Manager.ttinclude" #><#@ include file="Schema.ttinclude" #>
 
 <#
 	var className = @"";
@@ -87,13 +84,12 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 	}
 
 	public enum <#= entityType #>CascadeNames
-	{<# foreach (var c in table.Children.Where(c => !c.Ignore))
+	{<# foreach (var c in table.Children.Where(c => !c.Ignore).Distinct(c => c.Table))
 	{#>	
 		<#= Accelr8or.Inflector.MakeSingular(c.Table).ToLower() #>, <# } #>	
-	<# foreach (var p in table.Parents.Where(p => !p.Ignore))
+	<# foreach (var p in table.Parents.Where(p => !p.Ignore).Distinct(p => p.ParentClassFieldName))
 	{#>	
-		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() + "_p" #>, <# } #>	
-		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() #>, <# } #>	
+		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() + "_p" #>, <# } #>
 	}
 
 	public class <#= className #> : Dapper.Accelr8.Sql.TableInfo
@@ -152,7 +148,10 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 		}
 	}
 }
-		<# manager.EndBlock();
-	}
-	manager.Process(true);
+
+		<# 
+		manager.EndBlock();
+		}
+	manager.Process(true); 
+
 #>
