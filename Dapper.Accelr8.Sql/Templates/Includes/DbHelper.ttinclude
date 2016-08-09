@@ -42,6 +42,11 @@
 			return SchemaName + "." + TableName;
 		}
 
+		public string Key
+		{
+			get { return SchemaName + "." + TableName; }
+		}
+
 		public string GetEntityTypeName()
 		{
 		}

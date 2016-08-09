@@ -98,6 +98,7 @@ namespace <#= SchemaHelper.TableInfoNamespace #>
 		{
 			UniqueId = <#= table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore).ToString().ToLower() #>;
 			IdColumn = <#= entityType #>ColumnNames.<#= (table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName #>.ToString();
+			Schema = "<#= table.TableName #>";
 			TableName = "<#= table.TableName #>";
 			TableAlias = "<#= table.TableAlias #>";
 			ColumnNames = typeof(<#= entityType #>ColumnNames).ToDataList<Type, int>();
