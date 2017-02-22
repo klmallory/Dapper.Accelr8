@@ -17,10 +17,10 @@
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
 <#@ import namespace="System.Runtime.InteropServices" #>
 <#@ output extension=".cs" #>
-<#@ include file="Includes\\Accelr8or.ttinclude" #>
-<#@ include file="Includes\\DbHelper.ttinclude" #>
-<#@ include file="Includes\\Manager.ttinclude" #>
-<#@ include file="Schema.ttinclude" #>
+<#@ include file="Includes\\Accelr8or.txt" #>
+<#@ include file="Includes\\DbHelper.txt" #>
+<#@ include file="Includes\\Manager.txt" #>
+<#@ include file="Schema.txt" #>
 
 <#
 	var className = @"";
@@ -93,31 +93,31 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore 
 			&& Accelr8or.GetNullableType(c.IsNullable, c.CastType ?? c.CSharpType)  == "DateTime"))
 		{ if (SchemaHelper.UseDirtyProperties) { 
-			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.FieldName).Replace("_num_", "");#>
+			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.ColumnFieldName).Replace("_num_", "");#>
 <#= backing #> = (DateTime)SqlDateTime.MinValue;
 		<# } else { #>
 
-	<#= col.FieldName #> = (DateTime)SqlDateTime.MinValue;
+	<#= col.ColumnFieldName #> = (DateTime)SqlDateTime.MinValue;
 		<# } }
 
 		foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore 
 			&& Accelr8or.GetNullableType(c.IsNullable, c.CastType ?? c.CSharpType)  == "byte[]"))
 		{ if (SchemaHelper.UseDirtyProperties) { 
-			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.FieldName).Replace("_num_", "");#>
+			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.ColumnFieldName).Replace("_num_", "");#>
 <#= backing #> = new byte[0];
 		<# } else { #>
 
-	<#= col.FieldName #> = new byte[0];
+	<#= col.ColumnFieldName #> = new byte[0];
 		<# } } #>}
 
 
-	<# foreach (var col in table.Columns.Where(c => (!c.IsPrimaryKey || c.FieldName != "Id") && !c.Ignore))
+	<# foreach (var col in table.Columns.Where(c => (!c.IsPrimaryKey || c.ColumnFieldName != "Id") && !c.Ignore))
 	{
 		if (SchemaHelper.UseDirtyProperties)
 		{
-		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.FieldName).Replace("_num_", "");#>	
+		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.ColumnFieldName).Replace("_num_", "");#>	
 		protected <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= backing #>;
-		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= col.FieldName #> 
+		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= col.ColumnFieldName #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -128,7 +128,7 @@ namespace <#= SchemaHelper.DomainNamespace #>
 		} 
 		<#} else
 			{ #>
-		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #> <#= col.FieldName #> { get; set; }
+		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) #> <#= col.ColumnFieldName #> { get; set; }
 		<# } } 
 		foreach (var parent in table.Parents.Where(p => !p.Ignore))
 	{ #> 

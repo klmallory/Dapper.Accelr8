@@ -1,0 +1,224 @@
+﻿<#+
+	class SchemaHelper
+	{
+		public static string defaultSchema = "dbo";
+		public static string defaultIdField = "Id";
+
+		public static bool CacheLocatorResults = false;
+		public static bool UseDirtyProperties = true;
+		public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
+		public static string DomainProject = "Dapper.Accelr8.Sql";
+		public static string DomainNamespace = @"Dapper.Accelr8.Domain";
+		public static string DomainDirectory = @"Domain";
+		public static string WritersProject = "Dapper.Accelr8.Sql";
+		public static string WritersNamespace = @"Dapper.Accelr8.Writers";
+		public static string WritersDirectory = @"Writers";
+		public static string ReadersProject = "Dapper.Accelr8.Sql";
+		public static string ReadersNamespace = @"Dapper.Accelr8.Readers";
+		public static string ReadersDirectory = @"Readers";
+		public static string TableInfoProject = "Dapper.Accelr8.Sql";
+		public static string TableInfoNamespace = @"Dapper.Accelr8.TableInfos";
+		public static string TableInfoDirectory = @"TableInfos";
+
+		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=AdventureWorks2008R2;Integrated Security=SSPI;";
+		static string _database = @"AdventureWorks2008R2";
+
+		// Change Names Here =>
+		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
+		{ 
+
+		};
+
+		static Dictionary<string, string> tableAliases = new Dictionary<string, string>()
+		{
+
+		};
+
+		static Dictionary<string, string> columnNames = new Dictionary<string, string>()
+		{
+
+		};
+
+		static Dictionary<string, string> columnTypes = new Dictionary<string, string>()
+		{
+
+		};
+
+		static SchemaHelper()
+		{
+			var project = Accelr8or.GetLibraryProject(DomainProject);
+			var path = Accelr8or.GetProjectPath(project);
+			DomainDirectory = Path.Combine(path, DomainDirectory);
+
+			project = Accelr8or.GetLibraryProject(WritersProject);
+			path = Accelr8or.GetProjectPath(project);
+			WritersDirectory = Path.Combine(path, WritersDirectory);
+
+			project = Accelr8or.GetLibraryProject(ReadersProject);
+			path = Accelr8or.GetProjectPath(project);
+			ReadersDirectory = Path.Combine(path, ReadersDirectory);
+
+			project = Accelr8or.GetLibraryProject(TableInfoProject);
+			path = Accelr8or.GetProjectPath(project);
+			TableInfoDirectory = Path.Combine(path, TableInfoDirectory);
+		}
+
+		public static bool Equals(string s1, string s2)
+		{
+			return String.Equals(s1, s2, StringComparison.InvariantCultureIgnoreCase);
+		}
+
+		public static IDictionary<string, DbTable> GetTables()
+		{
+			var helper = new SqlServerDbHelper(defaultSchema, defaultIdField);
+
+			// Read schema
+			var tables = helper.GetDbTables(_connectionString, _database);
+
+			//Tweak Tables Here.
+			foreach (var t in tables)
+			{
+				if (t.Value.Ignore)
+					continue;
+
+				t.Value.Columns = helper.GetDbColumns(_connectionString, _database, t.Value.TableName, t.Value.SchemaName);
+				t.Value.Children = helper.GetChildren(_connectionString, _database, t.Value.TableName, t.Value.SchemaName);
+				t.Value.Parents = helper.GetParents(_connectionString, _database, t.Value.TableName, t.Value.SchemaName);
+			}
+
+			foreach (var a in tableAliases)
+			{
+				if (tables.ContainsKey(a.Key))
+				{
+					var ta = tableAliases[a.Key];
+					var t = tables[a.Key];
+
+					if (t.Ignore)
+						continue;
+
+					Debug.WriteLine("renaming tablealias {0} to {1}", t.TableAlias, ta);
+					t.TableAlias = ta;
+				}
+
+				var ps = tables.Values.SelectMany<DbTable, DbParent>(tb => tb.Parents.Where(p => p.Key == a.Key)).ToList();
+
+				foreach (var p in ps)
+				{
+					p.ParentAlias = tableAliases[a.Key];
+				}
+
+				var pcs = tables.Values.SelectMany<DbTable, DbParent>(tb => tb.Parents.Where(p => p.ChildKey == a.Key)).ToList();
+				
+				foreach (var pc in pcs)
+				{
+					pc.TableAlias = tableAliases[a.Key];
+				}
+
+				var cs = tables.Values.SelectMany<DbTable, DbChild>(tb => tb.Children.Where(c => c.Key == a.Key)).ToList();
+
+				foreach (var c in cs)
+				{
+					c.TableAlias = tableAliases[a.Key];
+				}
+
+				var cps = tables.Values.SelectMany<DbTable, DbChild>(tb => tb.Children.Where(c => c.ParentKey == a.Key)).ToList();
+				
+				foreach (var c in cps)
+				{
+					c.ParentAlias = tableAliases[a.Key];
+				}
+			}
+
+			foreach (var cn in columnNames)
+			{
+				foreach (var tb in tables)
+				{
+					foreach (var cl in tb.Value.Columns.Where(c => string.Compare(tb.Key + "." + c.ColumnName, cn.Value, true) == 0))
+					{
+						cl.ColumnFieldName = cn.Value;
+					}
+
+					foreach (var c in tb.Value.Children)
+					{
+						if (string.Compare(c.Key + "." + c.OriginalColumnName, cn.Key) == 0)
+							c.ChildColumn = cn.Value;
+
+						if (string.Compare(c.ParentKey + "." + c.OriginalParentColumn, cn.Key)== 0)
+							c.ParentColumn = cn.Value;
+					}
+
+					foreach (var p in tb.Value.Parents)
+					{
+						if (string.Compare(p.ChildKey + "." + p.OriginalColumnName, cn.Key) == 0)
+							p.Table = cn.Value;
+
+						if (string.Compare(p.Key + "." + p.OriginalParentColumn, cn.Key)== 0)
+							p.Parent = cn.Value;
+					}
+				}
+			}
+
+			foreach (var ct in columnTypes)
+			{
+				foreach (var tb in tables)
+				{
+					foreach (var c in tb.Value.Columns.Where(c => string.Compare(tb.Value.TableName + "." + c.ColumnName, ct.Key, true) == 0))
+					{
+						c.ColumnFieldName = ct.Value;
+					}
+				}
+			}
+
+			foreach (var n in tableNames)
+			{
+				if (tables.ContainsKey(n.Key))
+				{
+					var tname = tableNames[n.Key];
+					var t = tables[n.Key];
+
+					if (t.Ignore)
+						continue;
+
+					Debug.WriteLine("renaming table {0} to {1}", t.Key, tname);
+					t.ClassName = tname;
+
+					foreach (var tb in tables.Values)
+					{
+						foreach (var c in tb.Children)
+						{
+							if (string.Compare(c.Key, n.Key) == 0)
+								c.Table = tname;
+
+							if (string.Compare(c.ParentKey, n.Key)== 0)
+								c.Parent = tname;
+						}
+
+						foreach (var p in tb.Parents)
+						{
+							if (string.Compare(p.ChildKey, n.Key) == 0)
+								p.Table = tname;
+
+							if (string.Compare(p.Key, n.Key)== 0)
+								p.Parent = tname;
+						}
+					}
+				}
+			}
+
+
+			//Tweak Columns / Relationships Here.
+			if (_database == "Northwnd")
+			{
+				tables["Employees"].Children.First(c => c.Name == "FK_EmployeeTerritories_Employees").ChildClassFieldName  = "EmployeeTerritories2";
+				tables["Employees"].Children.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+				tables["Employees"].Parents.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+			}
+			else if (_database == "AdventureWorks2008R2")
+			{
+
+			}
+
+			return tables;
+		}
+	}
+#>

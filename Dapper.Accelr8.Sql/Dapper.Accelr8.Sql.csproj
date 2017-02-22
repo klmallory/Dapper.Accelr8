@@ -337,25 +337,25 @@
     <Compile Include="TableInfos\SalesvStoreWithAddressTableInfo.cs" />
     <Compile Include="TableInfos\SalesvStoreWithContactTableInfo.cs" />
     <Compile Include="TableInfos\SalesvStoreWithDemographicTableInfo.cs" />
-    <Compile Include="Templates\Domain.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Include="Templates\Domain1.cs">
+      <DependentUpon>Domain.txt</DependentUpon>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Domain.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Include="Templates\EntityReader.cs">
+    <Compile Include="Templates\EntityReader1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>EntityReader.tt</DependentUpon>
+      <DependentUpon>EntityReader.txt</DependentUpon>
     </Compile>
-    <Compile Include="Templates\EntityWriter.cs">
+    <Compile Include="Templates\EntityWriter1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>EntityWriter.tt</DependentUpon>
+      <DependentUpon>EntityWriter.txt</DependentUpon>
     </Compile>
-    <Compile Include="Templates\TableInfo.cs">
+    <Compile Include="Templates\TableInfo1.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>TableInfo.tt</DependentUpon>
+      <DependentUpon>TableInfo.txt</DependentUpon>
     </Compile>
     <Compile Include="Writers\AWBuildVersionWriter.cs" />
     <Compile Include="Writers\DatabaseLogWriter.cs" />
@@ -441,26 +441,29 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Templates\Domain.tt">
+    <Content Include="Templates\Domain.txt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Domain.cs</LastGenOutput>
-    </None>
-    <None Include="Templates\EntityWriter.tt">
+      <LastGenOutput>Domain1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\EntityWriter.txt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>EntityWriter.cs</LastGenOutput>
-    </None>
-    <None Include="Templates\Includes\DBHelper.ttinclude" />
-    <None Include="Templates\Schema.ttinclude" />
-    <None Include="Templates\EntityReader.tt">
+      <LastGenOutput>EntityWriter1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Includes\Accelr8or.txt">
+      <LastGenOutput>Accelr8or.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Schema.txt" />
+    <Content Include="Templates\EntityReader.txt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>EntityReader.cs</LastGenOutput>
-    </None>
-    <None Include="Templates\Includes\Accelr8or.ttinclude" />
-    <None Include="Templates\Includes\Manager.ttinclude" />
-    <None Include="Templates\TableInfo.tt">
+      <LastGenOutput>EntityReader1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\Includes\Manager.txt">
+      <LastGenOutput>Manager.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\TableInfo.txt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>TableInfo.cs</LastGenOutput>
-    </None>
+      <LastGenOutput>TableInfo1.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -483,8 +486,20 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="Templates\Includes\DBHelper.txt">
+      <LastGenOutput>DBHelper.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AW2008Readers\" />
+    <Folder Include="AW2008TableInfos\" />
+    <Folder Include="AW2008Writers\" />
+    <Folder Include="NW2008Readers\" />
+    <Folder Include="NW2008TableInfos\" />
+    <Folder Include="NW2008Writers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

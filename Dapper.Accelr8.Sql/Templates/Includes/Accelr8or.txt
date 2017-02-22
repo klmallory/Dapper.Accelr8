@@ -1,7 +1,38 @@
-﻿<#+
+﻿<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Collections.Generic" #><#+
 
 public static class Accelr8or
 {
+	public static string GetSafeName(string name, string schema = null)
+	{
+		if (name == null)
+			return null;
+
+		if (char.IsNumber(name[0]))
+			name = "_n_" + name;
+
+		name = name.Replace(" ", "_spc_").Replace(".", "__");
+
+		if (!string.IsNullOrEmpty(schema))
+			name = name.Replace(schema + "__", schema);
+
+		return name;
+	}
+
+	public static string GetOriginalName(string name)
+	{
+		if (name == null)
+			return null;
+
+		return name.Replace("_spc_", " ").Replace("__", ".").Replace("_n_", "");
+	}
+
 	/// <summary>
 	/// Summary for the Inflector class
 	/// </summary>
@@ -148,36 +179,6 @@ public static class Accelr8or
 				}
 			}
 			return result;
-		}
-
-		public static string GetSafeName(string name)
-		{
-			if (name == null)
-				return null;
-
-			if (char.IsNumber(name[0]))
-				name = "_n_" + name;
-
-			return name.Replace(" ", "_spc_").Replace(".", "__");
-		}
-
-		public static string GetOriginalName(string name)
-		{
-			if (name == null)
-				return null;
-
-			return name.Replace("_spc_", " ").Replace("__", ".").Replace("_n_", "");
-		}
-
-		public static string GetFriendlyName(string name)
-		{
-			if (name == null)
-				return null;
-
-			if (char.IsNumber(name[0]))
-				name = "_" + name;
-
-			return name.Replace(".", "");
 		}
 
 		/// <summary>
@@ -363,7 +364,13 @@ public static class Accelr8or
 
 	public static List<Project> GetProjects()
     {
-        var dte = (DTE)Marshal.GetActiveObject(string.Format(@"VisualStudio.DTE.{0}.0", 12));
+		//var version = 10;
+		//var version = 11;
+		//var version = 12;
+		var version = 13;
+		//var version = 14;
+
+        var dte = (DTE)Marshal.GetActiveObject(string.Format(@"VisualStudio.DTE.{0}.0", version));
         var projects = dte.Solution.OfType<Project>().ToList();
         return projects;
     }
