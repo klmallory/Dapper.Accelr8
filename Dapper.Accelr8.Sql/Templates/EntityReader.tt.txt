@@ -1,0 +1,274 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.DataSetExtensions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="System.Runtime.InteropServices" #>
+<#@ output extension=".txt" #>
+<#@ include file="Includes\\Accelr8or.tt.txt" #>
+<#@ include file="Includes\\DbHelper.tt.txt" #>
+<#@ include file="Includes\\Manager.tt.txt" #>
+<#@ include file="Schema.tt.txt" #>
+
+<#
+	var className = @"";
+	var idType = @"";
+	var entityType = @"";
+	var idField = @"";
+
+	var fieldCt = 0;
+
+	var tables = SchemaHelper.GetTables();
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	// Generate EntityReaders
+	foreach (var t in tables)
+	{
+		var table = t.Value;
+
+		if (table.Ignore)
+			continue;
+
+		Debug.WriteLine("Starting EntityReader for Table {0} ", t.Key);
+
+		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
+
+		className = name + "Reader";
+		if (table.Columns.Any(c => c.IsPrimaryKey))
+		{
+			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
+			idField = Accelr8or.Inflector.CamelCase(table.Columns.First(c => c.IsPrimaryKey).ColumnName);
+		}
+		else
+		{
+			idType = table.Columns.First().CSharpType;
+			idField = Accelr8or.Inflector.CamelCase(table.Columns.First().ColumnName);
+		}
+
+		entityType = name;
+
+		manager.StartNewFile(Path.Combine(SchemaHelper.ReadersDirectory, name + "Reader.cs")); #>
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+
+using <#= SchemaHelper.DAONamespace #>;
+using <#= SchemaHelper.TableInfoNamespace #>;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Domain;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts;
+
+namespace <#= SchemaHelper.ReadersNamespace #>
+{
+    public class <#= className #> : EntityReader<<#= idType #>, <#= entityType #>>
+    {
+        public <#= className #>(
+            <#= entityType #>TableInfo tableInfo
+            , string connectionStringName
+            , DapperExecuter executer
+            , QueryBuilder queryBuilder
+            , JoinBuilder joinBuilder
+            , ILoc8 loc8r) 
+            : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
+        { }
+
+		//Child Count <#= table.Children.Count() #>
+		//Parent Count <#= table.Parents.Count() #>
+		<# foreach (var child in table.Children.Where(c => !c.Ignore).GroupBy(c => c.ChildClassName).Select(s => s.First()))
+			{ 
+				//
+				//Add Methods to Resolve Other Children Readers
+				//
+				var cidType = child.ChildCSharpType ?? child.CSharpType;
+				var ceType = child.ChildClassName; 
+				var readerName = "_" + Accelr8or.Inflector.MakeInitialLowerCase(ceType) + "Reader"; 
+#>static IEntityReader<<#= cidType #> , <#= ceType #>> <#= readerName #>;
+		protected static IEntityReader<<#= cidType #> , <#= ceType #>> Get<#= ceType #>Reader()
+		{
+		<# if (SchemaHelper.CacheLocatorResults) {
+#>	if (<#= readerName #> == null)
+				<#= readerName #> = _locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>>();
+
+			return <#= readerName #>;
+		<# } else {  
+#>	return _locator.Resolve<IEntityReader<<#= cidType #> , <#= ceType #>>>();
+		<# } #>}
+
+		<# } #>
+
+	<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+	{ 
+		//
+		//Add Methods to Set Children collections on the parents and set circular references.
+		//
+		if (child.Ignore)
+			continue;
+
+		var cidType = child.CSharpType;
+		var ceType = Accelr8or.Inflector.MakeSingular(child.ChildClassName);
+	#>	/// <summary>
+		/// Sets the children of type <#= ceType #> on the parent on <#= Accelr8or.Inflector.MakePlural(ceType) #>.
+		/// From foriegn key <#= child.Name #>
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>(IList<<#= entityType #>> results, IList<object> children)
+		{
+			//Child Id Type: <#= cidType #>
+			//Child Type: <#= ceType #>
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<<#= ceType #>>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				r.<#= Accelr8or.Inflector.MakePlural(ceType) #> = typedChildren.Where(b => b.<#= Accelr8or.Inflector.CamelCase(child.ChildClassFieldName) #> == r.Id).ToList();
+				r.<#= Accelr8or.Inflector.MakePlural(ceType) #>.ToList().ForEach(b => { b.Loaded = false; b.<#= entityType #> = r; b.Loaded = true; });
+				r.Loaded = true;
+			}
+		}
+
+	<# } #>
+		/// <summary>
+		/// Loads the table <#= table.TableName #> into class <#= entityType #>
+		/// </summary>
+		/// <param name="results"><#= entityType #></param>
+		/// <param name="row"></param>
+        public override <#= entityType #> LoadEntity(dynamic row)
+        {
+            var dataRow = (IDictionary<string, object>)row;
+            var domain = new <#= entityType #>();
+			domain.Loaded = false;
+
+	<# if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
+	{
+		var pkCol = table.Columns.First(c => c.IsPrimaryKey || c.IsIdentity);
+	#>
+		domain.Id = GetRowData<<#= pkCol.CSharpType #>>(dataRow, IdColumn);
+	<#}#>
+	<# foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore && !c.IsIdentity))
+	{ var castFormat = Accelr8or.GetCastForType(col);#>
+		domain.<#= col.ColumnFieldName #> = <#= string.Format(castFormat, @"GetRowData<" + Accelr8or.GetNullableType(col.IsNullable, col.CSharpType) + ">(dataRow, \"" + col.ColumnName + "\")") #>; 
+      <# } #>
+			
+			domain.IsDirty = false;
+			domain.Loaded = true;
+			return domain;
+		}
+
+		/// <summary>
+		/// Add All the children to the query for the specified <#= idType #> Id.
+		/// </summary>
+		/// <param name="results">IEntityReader<<#= idType #>, <#= entityType #>></param>
+		/// <param name="id"><#= idType #></param>
+        public override IEntityReader<<#= idType #>, <#= entityType #>> WithAllChildrenForId(<#= idType #> id)
+        {
+			base.WithAllChildrenForId(id);
+
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+			{ 
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName;
+			#>
+
+			WithChildForParentId(Get<#= ceType #>Reader(), id, IdColumn, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+			<# } #>
+
+            return this;
+        }
+
+        public override void SetAllChildrenForExisting(<#= entityType #> entity)
+        {
+			<# if (table.Children != null && table.Children.Count > 0) { 
+#>ClearAllQueries();
+
+            if (entity == null)
+                return;
+
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+			{ 
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName;
+#>WithChildForParentId(Get<#= ceType #>Reader(), entity.Id
+				, <#= ceType #>ColumnNames.<#= child.OriginalColumnName #>.ToString()
+				, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+
+			<# } #>
+QueryResultForChildrenOnly(new List<<#= entityType #>>() { entity });
+			entity.Loaded = false;
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+			{ 
+				if (child.Ignore)
+					continue;
+
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName;
+#>Get<#= ceType #>Reader().SetAllChildrenForExisting(entity.<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+			<# } }#>	
+			entity.Loaded = true;
+		}
+
+		public override void SetAllChildrenForExisting(IList<<#= entityType #>> entities)
+        {
+			<# if (table.Children != null && table.Children.Count > 0) { 
+#>ClearAllQueries();
+
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities == null || entities.Count < 1)
+                return;
+
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+			{ 
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName;
+
+#>WithChildForParentIds(Get<#= ceType #>Reader()
+				, entities
+				.Select(s => s.Id)
+				.ToArray(), <#= ceType #>ColumnNames.<#= child.OriginalColumnName #>.ToString()
+				, SetChildren<#= Accelr8or.Inflector.MakePlural(ceType) #>);
+
+			<# } #>		
+			QueryResultForChildrenOnly(entities);
+
+			<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+			{ 
+				var cidType = child.CSharpType;
+				var ceType = child.ChildClassName;	
+				
+#>Get<#= ceType #>Reader().SetAllChildrenForExisting(entities.SelectMany(e => e.<#= Accelr8or.Inflector.MakePlural(ceType) #>).ToList());
+			<# } } #>		
+		}
+    }
+}
+		<# manager.EndBlock();
+	}
+
+	manager.Process(true);
+#>

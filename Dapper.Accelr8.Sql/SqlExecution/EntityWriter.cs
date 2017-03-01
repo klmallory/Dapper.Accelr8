@@ -11,6 +11,7 @@ using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.Sql
 {
@@ -20,7 +21,7 @@ namespace Dapper.Accelr8.Sql
     {
         protected static string _sqlIdType = "int";
         protected static int _typeHash = typeof(EntityType).GetHashCode();
-        static protected IAccelr8Locator _locator;
+        protected ILoc8 _loc8r;
 
         static EntityWriter()
         {
@@ -36,15 +37,14 @@ namespace Dapper.Accelr8.Sql
                 _sqlIdType = "nvarchar(512)";
         }
 
-        public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder, IAccelr8Locator serviceLocator)
+        public EntityWriter(TableInfo tableInfo, string connectionStringName, DapperExecuter executer, QueryBuilder queryBuilder, JoinBuilder joinBuilder, ILoc8 loc8r)
         {
             _connectionStringName = connectionStringName;
             _executer = executer;
             _queryBuilder = queryBuilder;
             _joinBuilder = joinBuilder;
 
-            if (_locator == null)
-                _locator = serviceLocator;
+            _loc8r = loc8r;
 
             UniqueId = tableInfo.UniqueId;
             IdColumn = tableInfo.IdColumn;

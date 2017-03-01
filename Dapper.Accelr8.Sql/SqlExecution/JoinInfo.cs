@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Dapper.Accelr8.Repo.Contracts.Readers;
+using Dapper.Accelr8.Repo.Contracts;
 using Dapper.Accelr8.Repo.Parameters;
 
 namespace Dapper.Accelr8.Sql

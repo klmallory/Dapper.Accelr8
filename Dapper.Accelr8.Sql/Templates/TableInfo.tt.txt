@@ -1,0 +1,318 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.DataSetExtensions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="System.Runtime.InteropServices" #>
+<#@ output extension=".txt" #>
+<#@ include file="Includes\\Accelr8or.tt.txt" #>
+<#@ include file="Includes\\DBHelper.tt.txt" #>
+<#@ include file="Includes\\Manager.tt.txt" #>
+<#@ include file="Schema.tt.txt" #>
+
+<#
+	var className = @"";
+	var idType = @"";
+	var entityType = @"";
+	var idField = @"";
+
+	var tables = SchemaHelper.GetTables();
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	// Generate EntityReaders
+	foreach (var t in tables)
+	{
+		var table = t.Value;
+
+		if (table.Ignore)
+			continue;
+
+		Debug.WriteLine("Starting Entity domain for Table {0} ", t.Key);
+
+		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
+
+		className = name + "TableInfo";
+
+		if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
+		{
+			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
+			idField = Accelr8or.Inflector.MakeSingular(table.Columns.First(c => c.IsPrimaryKey).ColumnName);
+		}
+		else
+		{
+			idType = table.Columns.First().CSharpType;
+			idField = Accelr8or.Inflector.MakeSingular(table.Columns.First().ColumnName);
+		}
+		
+		entityType = name;
+
+		manager.StartNewFile(Path.Combine(SchemaHelper.TableInfoDirectory, className + ".cs")); #>
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+
+using <#= SchemaHelper.DAONamespace #>;
+using <#= SchemaHelper.TableInfoNamespace #>;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Domain;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Extensions;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts;
+
+namespace <#= SchemaHelper.TableInfoNamespace #>
+{
+	public enum <#= entityType #>ColumnNames
+	{<# foreach (var col in table.Columns.Where(c => !c.Ignore))
+	{#>	
+		<#= col.SafeColumnName #>, <# } #>	
+	}
+
+	public enum <#= entityType #>CascadeNames
+	{<# foreach (var c in table.Children.Where(c => !c.Ignore).GroupBy(c => c.Table).Select(g => g.First()))
+	{#>	
+		<#= c.ChildClassFieldName.ToLower() #>, <# } #>	
+	<# foreach (var p in table.Parents.Where(p => !p.Ignore).GroupBy(p => p.ParentClassFieldName).Select(g => g.First()))
+	{#>	
+		<#= Accelr8or.Inflector.MakeSingular(p.ParentClassFieldName).ToLower() + "_p" #>, <# } #>
+	}
+
+	public class <#= className #> : Dapper.Accelr8.Sql.TableInfo
+	{
+		public <#= className #>(ILoc8 loc8r) : base(loc8r)
+		{
+			UniqueId = <#= table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore).ToString().ToLower() #>;
+			IdColumn = <#= entityType #>ColumnNames.<#= (table.Columns.FirstOrDefault(c => c.IsPrimaryKey && !c.Ignore) ?? table.Columns.First()).ColumnName #>.ToString();
+			//Schema = "<#= table.TableName #>";
+			TableName = "<#= table.TableName #>";
+			TableAlias = "<#= table.TableAlias #>";
+			ColumnNames = typeof(<#= entityType #>ColumnNames).ToDataList<Type, int>();
+
+			Joins = new JoinInfo[] {
+			<# 
+			//*************************************
+			foreach (var parent in table.Parents.Where(p => !p.Ignore).OrderBy(p => p.IsNullable))
+			{ 
+				var pidType = parent.CSharpType;
+				var peType = Accelr8or.Inflector.MakeSingular(parent.ParentClassName);
+			#>
+			//For Key <#= parent.Name #>
+			new JoinInfo() {
+			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<<#= pidType #>, <#= peType #>>("<#= peType #>")),
+			TableName = "<#= parent.Parent #>",
+			Alias = TableAlias + "_" + "<#= parent.ParentClassFieldName #>",
+			Outer = <#= parent.IsNullable.ToString().ToLower() #>,
+			Load = (entity, row) =>
+				{ 
+					var reader = Loc8r.GetReader<<#= pidType #>, <#= peType #>>("<#= peType #>");
+					var st = (entity as <#= entityType #>);
+
+					if (st == null || row == null)
+						return st;
+
+					if (row.<#= parent.ParentColumn #> == null || row.<#= parent.ParentColumn #> == default(<#= pidType #>))
+						return st;
+
+					st.<#= parent.ParentClassFieldName #> = reader.LoadEntityObject(row);
+
+					return st;
+				},
+			JoinQuery = new JoinQueryElement[]
+			{
+				new JoinQueryElement() 
+				{ 
+					//<#= peType #>ColumnNames.   .ToString()
+					//<#= entityType #>ColumnNames.      .ToString()
+					JoinField = "<#= parent.OriginalParentColumn #>",
+					Operator = Operator.Equals,
+					ParentField = "<#= parent.OriginalColumnName #>",
+					ParentTableAlias = TableAlias
+				}
+			} },
+			<# } 
+			//*************************************
+			#>
+			};
+		}
+	}
+}
+
+		<# 
+		manager.EndBlock();
+	}
+
+var locName = "Loc8" + SchemaHelper.Database;
+
+manager.StartNewFile(Path.Combine("..", locName + ".cs")); #>
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+
+using ArcIDPortal.DAO;
+using ArcIDPortal.Sql.Portal.TableInfos;
+using ArcIDPortal.Sql.Portal.Readers;
+using ArcIDPortal.Sql.Portal.Writers;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Domain;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Extensions;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts.Readers;
+using Dapper.Accelr8.Repo.Contracts.Writers;
+using System.Configuration;
+using Dapper.Accelr8.Repo.Contracts;
+
+namespace Dapper.Accelr8.Sql
+{
+	public class <#= locName #> : ILoc8
+	{
+		static ILoc8 _instance = new <#= locName #>();
+        public static ILoc8 Current { get { return _instance; } set { _instance = value; } }
+
+        DapperExecuter _executer;
+        JoinBuilder _joinBuilder;
+        QueryBuilder _queryBuilder;
+        IDictionary<string, Func<IEntityReader>> _readers = new Dictionary<string, Func<IEntityReader>>();
+        IDictionary<string, Func<IEntityWriter>> _writers= new Dictionary<string, Func<IEntityWriter>>();
+        IDictionary<string, TableInfo> _tableInfos = new Dictionary<string, TableInfo>();
+
+		public IDictionary<Type, Type> ClassesToRegister { get; private set; }
+        public string ConnectionStringName { get; set; }
+        public IDictionary<string, string> ConnectionStringContainer { get; set; }
+
+		public IUnitOfWork GetUnitOfWork(string type = null)
+		{
+			return new UnitOfWork(type);
+		}
+
+        public virtual IEntityReader<IdType, EntityType> GetReader<IdType, EntityType>()
+            where EntityType : class, IHaveId<IdType>
+            where IdType : IComparable<IdType>, IEquatable<IdType>
+        {
+            return _readers[typeof(EntityType).Name].Invoke() as IEntityReader<IdType, EntityType>;
+        }
+
+        public virtual IEntityWriter<IdType, EntityType> GetWriter<IdType, EntityType>()
+            where EntityType : class, IHaveId<IdType>
+            where IdType : IComparable<IdType>, IEquatable<IdType>
+        {
+            return _writers[typeof(EntityType).Name].Invoke() as IEntityWriter<IdType, EntityType>;
+        }
+
+        public virtual IEntityReader<IdType, EntityType> GetReader<IdType, EntityType>(string className)
+            where EntityType : class, IHaveId<IdType>
+            where IdType : IComparable<IdType>, IEquatable<IdType>
+        {
+            return _readers[className].Invoke() as IEntityReader<IdType, EntityType>;
+        }
+
+        public virtual IEntityWriter<IdType, EntityType> GetWriter<IdType, EntityType>(string className)
+            where EntityType : class, IHaveId<IdType>
+            where IdType : IComparable<IdType>, IEquatable<IdType>
+        {
+            return _writers[className].Invoke() as IEntityWriter<IdType, EntityType>;
+        }
+
+        public TableInfo GetTableInfo<IdType, EntityType>(string className)
+        {
+            return _tableInfos[className];
+        }
+
+        protected <#= locName #>()
+        {
+			ConnectionStringName = "";	
+            ConnectionStringContainer = new Dictionary<string, string>();
+
+            if (ConfigurationManager.ConnectionStrings != null)
+            {
+                foreach (var c in ConfigurationManager.ConnectionStrings)
+                {
+                    var cs = (c as ConnectionStringSettings);
+
+                    if (cs == null)
+                        continue;
+
+                    ConnectionStringContainer.Add(cs.Name, cs.ConnectionString);
+                }
+            }
+
+            ClassesToRegister = new Dictionary<Type,Type>();
+            _executer = new DapperExecuter(ConnectionStringContainer);
+            _joinBuilder = new JoinBuilder();
+            _queryBuilder = new QueryBuilder();
+
+			<# foreach (var t in tables.Where(t => !t.Value.Ignore))
+			{
+				var name = Accelr8or.Inflector.MakeSingular(t.Value.ClassName ?? t.Value.TableName);
+				var i = (t.Value.Columns.FirstOrDefault(c => c.IsPrimaryKey) ?? t.Value.Columns.First()).CSharpType;
+
+				#> ClassesToRegister.Add(typeof(IEntityReader<<#= i #>, <#= name #>>), typeof(<#= name + "Reader" #>));
+				ClassesToRegister.Add(typeof(IEntityWriter<<#= i #>, <#= name #>>), typeof(<#= name + "Writer" #>));
+				ClassesToRegister.Add(typeof(<#= name + "TableInfo" #>), typeof(<#= name + "TableInfo" #>));
+				<#
+			} #>
+
+			<# foreach (var t in tables.Where(t => !t.Value.Ignore))
+			{
+				var name = Accelr8or.Inflector.MakeSingular(t.Value.ClassName ?? t.Value.TableName);
+				#> _readers.Add("<#= name #>", new Func<IEntityReader>(() => new <#= name + "Reader" #>
+				(
+					_tableInfos["<#= name #>"] as  <#= name + "TableInfo" #>,
+					ConnectionStringName,
+					_executer,
+					_queryBuilder,
+					_joinBuilder,
+					this
+				))); <#
+			}  #>
+
+			<# foreach (var t in tables.Where(tb => !tb.Value.Ignore && !tb.Value.ReadOnly))
+			{
+				var name = Accelr8or.Inflector.MakeSingular(t.Value.ClassName ?? t.Value.TableName);
+				#> _writers.Add("<#= name #>", new Func<IEntityWriter>(() => new <#= name + "Writer" #>
+				(
+					_tableInfos["<#= name #>"] as  <#= name + "TableInfo" #>,
+					ConnectionStringName,
+					_executer,
+					_queryBuilder,
+					_joinBuilder,
+					this
+				))); <#
+			}#>
+
+			<# foreach (var t in tables.Where(tb => !tb.Value.Ignore))
+			{
+				var name = Accelr8or.Inflector.MakeSingular(t.Value.ClassName ?? t.Value.TableName);
+				#> 
+				_tableInfos.Add("<#= name #>", new <#= name + "TableInfo" #>(this)); <#
+			} #>
+        }
+	}
+}
+
+<# manager.EndBlock();  	
+
+manager.Process(true); #>

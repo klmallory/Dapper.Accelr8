@@ -30,13 +30,18 @@ namespace Dapper.Accelr8.Repo
 
         protected TransactionScope _scope;
 
-        public UnitOfWork() : this(Guid.NewGuid()) { }
+        public UnitOfWork(LockType lockType = LockType.Safe) : this(Guid.NewGuid(), lockType) { }
 
-        public UnitOfWork(Guid context)
+        public UnitOfWork(Guid context, LockType lockType)
         {
             DataContextHandle = context;
 
-            _scope = new System.Transactions.TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted });
+            if (lockType == LockType.Locked)
+                _scope = new System.Transactions.TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions() { IsolationLevel = IsolationLevel.Serializable });
+            else if(lockType == LockType.Unsafe)
+                _scope = new System.Transactions.TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions() { IsolationLevel = IsolationLevel.ReadUncommitted });
+            else
+                _scope = new System.Transactions.TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted });
         }
 
         protected void PushUpdate<IdType, EntityType>(IdType id, EntityType entity, IEntityWriter writer)

@@ -41,8 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contracts\Readers\IEntityReader.cs" />
-    <Compile Include="Contracts\Writers\IEntityWriter.cs" />
+    <Compile Include="CompoundKey.cs" />
+    <Compile Include="Contracts\IEntityReader.cs" />
+    <Compile Include="Contracts\IEntityWriter.cs" />
+    <Compile Include="Contracts\ILoc8.cs" />
     <Compile Include="Diagnostics.cs" />
     <Compile Include="ExecutionContext.cs" />
     <Compile Include="Extensions\EntityExtensions.cs" />
@@ -51,6 +53,7 @@
     <Compile Include="IRepository.cs" />
     <Compile Include="IAccelr8Locator.cs" />
     <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="LockType.cs" />
     <Compile Include="Parameters\Aggregate.cs" />
     <Compile Include="Parameters\GroupBy.cs" />
     <Compile Include="Parameters\JoinQueryElement.cs" />

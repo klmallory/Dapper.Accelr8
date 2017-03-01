@@ -1,0 +1,245 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.DataSetExtensions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="System.Runtime.InteropServices" #>
+<#@ output extension=".txt" #>
+<#@ include file="Includes\\Accelr8or.tt.txt" #>
+<#@ include file="Includes\\DbHelper.tt.txt" #>
+<#@ include file="Includes\\Manager.tt.txt" #>
+<#@ include file="Schema.tt.txt" #>
+
+<#
+	var className = @"";
+	var idType = @"";
+	var entityType = @"";
+	var idField = @"";
+
+	var varCnt = 1;
+	var tables = SchemaHelper.GetTables();
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	// Generate EntityWriters
+	foreach (var t in tables.Where(tb => !tb.Value.Ignore && !tb.Value.ReadOnly))
+	{
+		var table = t.Value;
+
+		Debug.WriteLine("Starting EntityWriter for Table {0} ", t.Key);
+
+		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
+
+		className = name + "Writer";
+		if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
+		{
+			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
+			idField = table.Columns.First(c => c.IsPrimaryKey).ColumnName;
+		}
+		else
+		{
+			idType = table.Columns.First().CSharpType;
+			idField = table.Columns.First().ColumnName;
+		}
+
+		entityType = name;
+
+		manager.StartNewFile(Path.Combine(SchemaHelper.WritersDirectory, name + "Writer.cs")); #>
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+
+using <#= SchemaHelper.DAONamespace #>;
+using <#= SchemaHelper.TableInfoNamespace #>;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Domain;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts;
+
+namespace <#= SchemaHelper.WritersNamespace #>
+{
+    public class <#= className #> : EntityWriter<<#= idType #>, <#= entityType #>>
+    {
+        public <#= className #>
+			(<#= entityType #>TableInfo tableInfo
+            , string connectionStringName
+            , DapperExecuter executer
+            , QueryBuilder queryBuilder
+            , JoinBuilder joinBuilder
+			, ILoc8 loc8r) 
+            : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
+		{
+
+		}
+
+		<# foreach (var child in table.Children.Where(c => !c.Ignore).GroupBy(c => c.ChildClassName).Select(s => s.First()))
+			{ 
+				var cidType = child.ChildCSharpType ?? child.CSharpType;
+				var ceType = child.ChildClassName;
+#>
+static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
+		{ return _locator.Resolve<IEntityWriter<<#= cidType #>, <#= ceType #>>>(); }
+		<# } #>
+
+		<# foreach (var parent in table.Parents.Where(p => !p.Ignore && !table.Children.Any(c => !c.Ignore && c.ChildClassName == p.ParentClassName)).GroupBy(p => p.ParentClassName).Select(s => s.First()))
+			{ 
+				var cidType = parent.CSharpType;
+				var ceType = parent.ParentClassName;
+#>
+static IEntityWriter<<#= cidType #>, <#= ceType #>> Get<#= ceType #>Writer()
+		{ return _locator.Resolve<IEntityWriter<<#= cidType #>, <#= ceType #>>>(); }
+		<# } #>
+
+		/// <summary>
+		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
+		/// </summary>
+		/// <param name="results">Parameters for sql writes</param>
+		/// <param name="row"></param>
+        protected override IDictionary<string, object> GetParams(ActionType actionType, <#= entityType #> entity, int taskIndex, ref int count)
+        {
+            var parms = new Dictionary<string, object>();
+			
+			foreach (var f in ColumnNames)
+            {
+                switch ((<#= entityType #>ColumnNames)f.Key)
+                {
+                    
+				<# foreach (var col in table.Columns.Where(c => !c.Ignore && !c.IsPrimaryKey))
+				{#>
+	case <#= entityType #>ColumnNames.<#= col.ColumnFieldName #>:
+						parms.Add(GetParamName("<#= col.ColumnName #>", actionType, taskIndex, ref count), <# if (col.CastType != null) { #> (<#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #>) <# } #>entity.<#= col.ColumnFieldName #>);
+						break;
+				<#}#>
+}
+			}
+
+			return parms;
+        }
+
+
+		protected override void CascadeRelations(<#= entityType #> entity, ScriptContext context)
+        {
+            if (entity == null)
+                return;
+
+		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName) + varCnt++;
+			#>
+	//From Foreign Key <#= child.Name #>
+			var <#= writerName #> = Get<#= child.ChildClassName #>Writer();
+			if (_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(child.Table).ToLower() #>.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #>)
+					Cascade(<#= writerName #>, item, context);
+
+			if (<#= writerName #>.Count > 0)
+				WithChild(<#= writerName #>, entity);
+
+		<# } #>
+
+		<# foreach (var parent in table.Children.Where(c => !c.Ignore && c.OneToOne))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(parent.ChildClassName) + varCnt++;
+			#>
+	//From Foreign Key <#= parent.Name #>
+			var <#= writerName #> = Get<#= parent.ChildClassName #>Writer();
+		if ((_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(parent.Table).ToLower() #>.ToString()) || _cascades.Contains("all")) && entity.<#= parent.ChildClassName #> != null)
+			if (Cascade(<#= writerName #>, entity.<#= parent.ChildClassName #>, context))
+				WithParent(<#= writerName #>, entity);
+
+		<# } #>
+
+		<# foreach (var parent in table.Parents.Where(p => !p.Ignore))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassName) + varCnt++;
+			#>
+	//From Foreign Key <#= parent.Name #>
+			var <#= writerName #> = Get<#= parent.ParentClassName #>Writer();
+		if ((_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName).ToLower() #>.ToString()) || _cascades.Contains("all")) && entity.<#= parent.ParentClassFieldName #> != null)
+			if (Cascade(<#= writerName #>, entity.<#= parent.ParentClassFieldName #>, context))
+				WithParent(<#= writerName #>, entity);
+
+		<# } #>
+		}
+
+		protected override void UpdateIdsFromReferences(IList<string> cascades, <#= entityType #> entity)
+        {
+            if (entity == null)
+                return;
+
+		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName) + varCnt++;
+
+			if (table.Columns.Any(c => SchemaHelper.Equals(c.ColumnName, child.ParentColumn)))
+			{
+				var pf = table.Columns.First(c => SchemaHelper.Equals(c.ColumnName, child.ParentColumn)); #>
+	//From Foreign Key <#= child.Name #>
+			if (entity.<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> != null && entity.<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #>.Count > 0)
+				foreach (var rel in entity.<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #>)
+					rel.<#= child.ChildClassFieldName #> = entity.<#= pf.ColumnFieldName #>;
+
+		<# } else { #>
+	//Child field not found <#= child.ChildColumn #> for parent column <#= child.ParentColumn #> From Foreign Key <#= child.Name #>
+		<# } } #>
+		
+		<# foreach (var parent in table.Parents.Where(p => !p.Ignore))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassFieldName) + varCnt++;
+
+			var pt = tables.FirstOrDefault(tb => SchemaHelper.Equals(tb.Key, parent.Parent) && tb.Value.Columns.Any(c => SchemaHelper.Equals(c.ColumnName, parent.ParentColumn)));
+
+			if (pt.Value != null)
+			{
+				var pf = pt.Value.Columns.First(c => SchemaHelper.Equals(c.ColumnName, parent.ParentColumn)); #>
+	//From Foreign Key <#= parent.Name #>
+			if (entity.<#= parent.ParentClassFieldName #> != null)
+				entity.<#= parent.ChildClassFieldName #> = entity.<#= parent.ParentClassFieldName #>.<#= pf.ColumnFieldName #>;
+
+		<# } else { #>
+	//Parent field not found <#= parent.ParentColumn #> for child column <#= parent.ChildColumn #> From Foreign Key <#= parent.Name #>
+		<# } } #>
+}
+
+		protected override void RemoveRelations(<#= entityType #> entity, ScriptContext context)
+        {
+		<# foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
+		{ 
+			var writerName = Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName) + varCnt++;
+			#>
+			//From Foreign Key <#= child.Name #>
+			var <#= writerName #> = Get<#= child.ChildClassName #>Writer();
+			if (_cascades.Contains(<#= entityType #>CascadeNames.<#= Accelr8or.Inflector.MakeSingular(child.Table).ToLower() #>.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #>)
+					CascadeDelete(<#= writerName #>, item, context);
+
+			if (<#= writerName #>.Count > 0)
+				WithChild(<#= writerName #>, entity);
+
+		<# } #>
+		}
+	}
+}
+		<# manager.EndBlock();
+	}
+
+	manager.Process(true);
+#>

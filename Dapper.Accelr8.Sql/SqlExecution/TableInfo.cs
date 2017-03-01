@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 
 using Dapper.Accelr8.Repo;
-using Dapper.Accelr8.Repo.Contracts.Readers;
-using Dapper.Accelr8.Repo.Contracts.Writers;
+using Dapper.Accelr8.Repo.Contracts;
+using System.Data;
 
 namespace Dapper.Accelr8.Sql
 {
@@ -15,36 +15,14 @@ namespace Dapper.Accelr8.Sql
         protected static object _syncRoot = new object();
         protected static Dictionary<string, object> _readers = new Dictionary<string, object>();
         protected static bool _cacheReaders = true;
-        static protected IAccelr8Locator _locator;
+        protected ILoc8 Loc8r { get; set; }
 
-        public TableInfo()
-            : this(null)
-        {
-
-        }
-
-        public TableInfo(IAccelr8Locator locator)
+        public TableInfo(ILoc8 loc8r)
         {
             ColumnNames = new Dictionary<int, string>();
             Joins = new JoinInfo[0];
 
-            if (_locator == null)
-                _locator = locator;
-        }
-
-        protected IEntityReader GetReader(Type idType, Type entityType)
-        {
-            if (_cacheReaders)
-            {
-                var key = idType + "." + entityType;
-                lock (_syncRoot)
-                    if (!_readers.ContainsKey(key))
-                        _readers.Add(key, _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)));
-
-                return _readers[key] as IEntityReader;
-            }
-
-            return _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)) as IEntityReader;
+            Loc8r = loc8r;
         }
 
         public TableInfo(bool uniqueId, string idColumn, string tableName, string tableAlias, IDictionary<int, string> columnNames)

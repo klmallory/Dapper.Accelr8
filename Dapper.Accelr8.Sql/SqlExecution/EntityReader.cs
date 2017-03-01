@@ -13,6 +13,7 @@ using EnvDTE;
 using System.Runtime.InteropServices;
 using System.Globalization;
 using Dapper.Accelr8.Domain;
+using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.Sql
 {
@@ -79,7 +80,7 @@ namespace Dapper.Accelr8.Sql
         protected List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>> _children
             = new List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>>();
 
-        static protected IAccelr8Locator _locator;
+        protected ILoc8 _loc8r;
 
         protected string _connectionStringName;
         protected DapperExecuter _executer;
@@ -97,15 +98,15 @@ namespace Dapper.Accelr8.Sql
             , DapperExecuter executer
             , QueryBuilder queryBuilder
             , JoinBuilder joinBuilder
-            , IAccelr8Locator serviceLocator)
+            , ILoc8 loc8r)
         {
             _connectionStringName = connectionStringName;
             _executer = executer;
             _queryBuilder = queryBuilder;
             _joinBuilder = joinBuilder;
 
-            if (_locator == null)
-                _locator = serviceLocator;
+            if (_loc8r == null)
+                _loc8r = loc8r;
 
             UniqueId = tableInfo.UniqueId;
             IdColumn = tableInfo.IdColumn;
@@ -114,21 +115,6 @@ namespace Dapper.Accelr8.Sql
             ColumnNames = tableInfo.ColumnNames.OrderBy(c => c.Value).ToList();
             Joins = (JoinInfo[])tableInfo.Joins.Clone();
             TableInfo = tableInfo;
-        }
-
-        protected IEntityReader GetReader(Type idType, Type entityType)
-        {
-            if (_cacheReaders)
-            {
-                var key = idType + "." + entityType;
-                lock (_syncRoot)
-                    if (!_readers.ContainsKey(key))
-                        _readers.Add(key, _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)));
-
-                return _readers[key] as IEntityReader;
-            }
-
-            return _locator.Resolve(typeof(IEntityReader<,>).MakeGenericType(idType, entityType)) as IEntityReader;
         }
 
         protected ReturnType GetRowData<ReturnType>(IDictionary<string, object> dataRow, string property)
@@ -349,9 +335,9 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual EntityType LoadJoinRow<IType, EType>(object entity, dynamic row, Action<EntityType, EType> setter)
             where EType : class, IHaveId<IType>
-            where IType : IComparable
+            where IType : IComparable<IType>, IEquatable<IType>
         {
-            var reader = _locator.Resolve<IEntityReader<IType, EType>>();
+            var reader = _loc8r.GetReader<IType, EType>();
 
             var boffer = entity as EntityType;
 
