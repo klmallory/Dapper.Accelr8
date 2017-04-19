@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PurchasingPurchaseOrderHeader : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PurchasingPurchaseOrderHeader : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public PurchasingPurchaseOrderHeader()
-		{			
+		{
+							
 			IsDirty = false; 
 			_purchasingPurchaseOrderDetails = new List<PurchasingPurchaseOrderDetail>();
 		_orderDate = (DateTime)SqlDateTime.MinValue;
@@ -24,6 +26,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected byte _revisionNumber;
 		public byte RevisionNumber 

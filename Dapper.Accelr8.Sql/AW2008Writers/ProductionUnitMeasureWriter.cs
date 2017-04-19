@@ -28,13 +28,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PurchasingProductVendor> GetPurchasingProductVendorWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingProductVendor>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingProductVendor>(); }
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		
 		/// <summary>
@@ -48,13 +51,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionUnitMeasureColumnNames)f.Key)
+                switch ((ProductionUnitMeasureFieldNames)f.Key)
                 {
                     
-					case ProductionUnitMeasureColumnNames.Name:
+					case ProductionUnitMeasureFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case ProductionUnitMeasureColumnNames.ModifiedDate:
+					case ProductionUnitMeasureFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -71,7 +74,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductVendor_UnitMeasure_UnitMeasureCode
 			var purchasingProductVendor414 = GetPurchasingProductVendorWriter();
-			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.purchasing.productvendor.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.purchasingproductvendors.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingProductVendors)
 					Cascade(purchasingProductVendor414, item, context);
 
@@ -80,8 +83,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Product_UnitMeasure_SizeUnitMeasureCode
 			var productionProduct415 = GetProductionProductWriter();
-			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.production.product.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.ProductionProducts)
+			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.productionproducts1.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.ProductionProducts1s)
 					Cascade(productionProduct415, item, context);
 
 			if (productionProduct415.Count > 0)
@@ -89,8 +92,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Product_UnitMeasure_WeightUnitMeasureCode
 			var productionProduct416 = GetProductionProductWriter();
-			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.production.product.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.ProductionProducts)
+			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.productionproducts2.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.ProductionProducts2s)
 					Cascade(productionProduct416, item, context);
 
 			if (productionProduct416.Count > 0)
@@ -108,17 +111,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_ProductVendor_UnitMeasure_UnitMeasureCode
 			if (entity.PurchasingProductVendors != null && entity.PurchasingProductVendors.Count > 0)
 				foreach (var rel in entity.PurchasingProductVendors)
-					rel.PurchasingProductVendor = entity.Id;
+					rel.UnitMeasureCode = entity.Id;
 
 			//From Foreign Key FK_Product_UnitMeasure_SizeUnitMeasureCode
 			if (entity.ProductionProducts != null && entity.ProductionProducts.Count > 0)
 				foreach (var rel in entity.ProductionProducts)
-					rel.ProductionProduct = entity.Id;
+					rel.SizeUnitMeasureCode = entity.Id;
 
 			//From Foreign Key FK_Product_UnitMeasure_WeightUnitMeasureCode
 			if (entity.ProductionProducts != null && entity.ProductionProducts.Count > 0)
 				foreach (var rel in entity.ProductionProducts)
-					rel.ProductionProduct = entity.Id;
+					rel.WeightUnitMeasureCode = entity.Id;
 
 				
 		}
@@ -127,7 +130,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_ProductVendor_UnitMeasure_UnitMeasureCode
 			var purchasingProductVendor420 = GetPurchasingProductVendorWriter();
-			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.purchasing.productvendor.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.purchasingproductvendor.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingProductVendors)
 					CascadeDelete(purchasingProductVendor420, item, context);
 
@@ -136,7 +139,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_Product_UnitMeasure_SizeUnitMeasureCode
 			var productionProduct421 = GetProductionProductWriter();
-			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.production.product.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.productionproduct.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProducts)
 					CascadeDelete(productionProduct421, item, context);
 
@@ -145,7 +148,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_Product_UnitMeasure_WeightUnitMeasureCode
 			var productionProduct422 = GetProductionProductWriter();
-			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.production.product.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionUnitMeasureCascadeNames.productionproduct.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProducts)
 					CascadeDelete(productionProduct422, item, context);
 

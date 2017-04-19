@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class ProductionProductModelProductDescriptionCultureWriter : EntityWriter<int, ProductionProductModelProductDescriptionCulture>
+    public class ProductionProductModelProductDescriptionCultureWriter : EntityWriter<CompoundKey, ProductionProductModelProductDescriptionCulture>
     {
         public ProductionProductModelProductDescriptionCultureWriter
 			(ProductionProductModelProductDescriptionCultureTableInfo tableInfo
@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionProductModel> GetProductionProductModelWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductModel>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductModel>(); }
 		static IEntityWriter<string, ProductionCulture> GetProductionCultureWriter()
-		{ return _locator.Resolve<IEntityWriter<string, ProductionCulture>>(); }
+		{ return s_loc8r.GetWriter<string, ProductionCulture>(); }
 		static IEntityWriter<int, ProductionProductDescription> GetProductionProductDescriptionWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductDescription>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductDescription>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,10 +53,10 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductModelProductDescriptionCultureColumnNames)f.Key)
+                switch ((ProductionProductModelProductDescriptionCultureFieldNames)f.Key)
                 {
                     
-					case ProductionProductModelProductDescriptionCultureColumnNames.ModifiedDate:
+					case ProductionProductModelProductDescriptionCultureFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -72,19 +75,19 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
 			var productionProductModel253 = GetProductionProductModelWriter();
-		if ((_cascades.Contains(ProductionProductModelProductDescriptionCultureCascadeNames.productionproductmodel.ToString()) || _cascades.Contains("all")) && entity.ProductionProductModel != null)
+		if ((_cascades.Contains(ProductionProductModelProductDescriptionCultureCascadeNames.productionproductmodel_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProductModel != null)
 			if (Cascade(productionProductModel253, entity.ProductionProductModel, context))
 				WithParent(productionProductModel253, entity);
 
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_Culture_CultureID
 			var productionCulture254 = GetProductionCultureWriter();
-		if ((_cascades.Contains(ProductionProductModelProductDescriptionCultureCascadeNames.productionculture.ToString()) || _cascades.Contains("all")) && entity.ProductionCulture != null)
+		if ((_cascades.Contains(ProductionProductModelProductDescriptionCultureCascadeNames.productionculture_p.ToString()) || _cascades.Contains("all")) && entity.ProductionCulture != null)
 			if (Cascade(productionCulture254, entity.ProductionCulture, context))
 				WithParent(productionCulture254, entity);
 
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductDescription_ProductDescriptionID
 			var productionProductDescription255 = GetProductionProductDescriptionWriter();
-		if ((_cascades.Contains(ProductionProductModelProductDescriptionCultureCascadeNames.productionproductdescription.ToString()) || _cascades.Contains("all")) && entity.ProductionProductDescription != null)
+		if ((_cascades.Contains(ProductionProductModelProductDescriptionCultureCascadeNames.productionproductdescription_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProductDescription != null)
 			if (Cascade(productionProductDescription255, entity.ProductionProductDescription, context))
 				WithParent(productionProductDescription255, entity);
 
@@ -98,15 +101,15 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
 			if (entity.ProductionProductModel != null)
-				entity.ProductionProductModelProductDescriptionCulture = entity.ProductionProductModel.Id;
+				entity.ProductModelID = entity.ProductionProductModel.Id;
 
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_Culture_CultureID
 			if (entity.ProductionCulture != null)
-				entity.ProductionProductModelProductDescriptionCulture = entity.ProductionCulture.Id;
+				entity.CultureID = entity.ProductionCulture.Id;
 
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductDescription_ProductDescriptionID
 			if (entity.ProductionProductDescription != null)
-				entity.ProductionProductModelProductDescriptionCulture = entity.ProductionProductDescription.Id;
+				entity.ProductDescriptionID = entity.ProductionProductDescription.Id;
 
 		}
 

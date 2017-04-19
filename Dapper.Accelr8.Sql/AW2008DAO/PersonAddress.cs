@@ -8,23 +8,26 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PersonAddress : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PersonAddress : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public PersonAddress()
-		{			
+		{
+							
 			IsDirty = false; 
 			_personBusinessEntityAddresses = new List<PersonBusinessEntityAddress>();
-		_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
-		_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
+		_salesSalesOrderHeaders1 = new List<SalesSalesOrderHeader>();
+		_salesSalesOrderHeaders2 = new List<SalesSalesOrderHeader>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected string _addressLine1;
 		public string AddressLine1 
@@ -139,25 +142,25 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		} 
 			 
 	//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID	
-		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders;
-		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders 
+		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders1;
+		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders1 
 		{ 
-			get { return _salesSalesOrderHeaders; }
+			get { return _salesSalesOrderHeaders1; }
 			set 
 			{ 
-				_salesSalesOrderHeaders = value;  
+				_salesSalesOrderHeaders1 = value;  
 				IsDirty = true;
 			}
 		} 
 			 
 	//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID	
-		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders;
-		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders 
+		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders2;
+		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders2 
 		{ 
-			get { return _salesSalesOrderHeaders; }
+			get { return _salesSalesOrderHeaders2; }
 			set 
 			{ 
-				_salesSalesOrderHeaders = value;  
+				_salesSalesOrderHeaders2 = value;  
 				IsDirty = true;
 			}
 		} 

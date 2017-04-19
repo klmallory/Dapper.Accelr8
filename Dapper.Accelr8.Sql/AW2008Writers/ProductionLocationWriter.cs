@@ -28,13 +28,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, ProductionProductInventory> GetProductionProductInventoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductInventory>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductInventory>(); }
 		static IEntityWriter<int, ProductionWorkOrderRouting> GetProductionWorkOrderRoutingWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionWorkOrderRouting>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionWorkOrderRouting>(); }
 		
 		
 		/// <summary>
@@ -48,19 +51,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionLocationColumnNames)f.Key)
+                switch ((ProductionLocationFieldNames)f.Key)
                 {
                     
-					case ProductionLocationColumnNames.Name:
+					case ProductionLocationFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case ProductionLocationColumnNames.CostRate:
+					case ProductionLocationFieldNames.CostRate:
 						parms.Add(GetParamName("CostRate", actionType, taskIndex, ref count), entity.CostRate);
 						break;
-					case ProductionLocationColumnNames.Availability:
+					case ProductionLocationFieldNames.Availability:
 						parms.Add(GetParamName("Availability", actionType, taskIndex, ref count), entity.Availability);
 						break;
-					case ProductionLocationColumnNames.ModifiedDate:
+					case ProductionLocationFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -77,7 +80,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductInventory_Location_LocationID
 			var productionProductInventory138 = GetProductionProductInventoryWriter();
-			if (_cascades.Contains(ProductionLocationCascadeNames.production.productinventory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionLocationCascadeNames.productionproductinventories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductInventories)
 					Cascade(productionProductInventory138, item, context);
 
@@ -86,7 +89,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_WorkOrderRouting_Location_LocationID
 			var productionWorkOrderRouting139 = GetProductionWorkOrderRoutingWriter();
-			if (_cascades.Contains(ProductionLocationCascadeNames.production.workorderrouting.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionLocationCascadeNames.productionworkorderroutings.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionWorkOrderRoutings)
 					Cascade(productionWorkOrderRouting139, item, context);
 
@@ -105,12 +108,12 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_ProductInventory_Location_LocationID
 			if (entity.ProductionProductInventories != null && entity.ProductionProductInventories.Count > 0)
 				foreach (var rel in entity.ProductionProductInventories)
-					rel.ProductionProductInventory = entity.Id;
+					rel.LocationID = entity.Id;
 
 			//From Foreign Key FK_WorkOrderRouting_Location_LocationID
 			if (entity.ProductionWorkOrderRoutings != null && entity.ProductionWorkOrderRoutings.Count > 0)
 				foreach (var rel in entity.ProductionWorkOrderRoutings)
-					rel.ProductionWorkOrderRouting = entity.Id;
+					rel.LocationID = entity.Id;
 
 				
 		}
@@ -119,7 +122,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_ProductInventory_Location_LocationID
 			var productionProductInventory142 = GetProductionProductInventoryWriter();
-			if (_cascades.Contains(ProductionLocationCascadeNames.production.productinventory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionLocationCascadeNames.productionproductinventory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductInventories)
 					CascadeDelete(productionProductInventory142, item, context);
 
@@ -128,7 +131,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_WorkOrderRouting_Location_LocationID
 			var productionWorkOrderRouting143 = GetProductionWorkOrderRoutingWriter();
-			if (_cascades.Contains(ProductionLocationCascadeNames.production.workorderrouting.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionLocationCascadeNames.productionworkorderrouting.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionWorkOrderRoutings)
 					CascadeDelete(productionWorkOrderRouting143, item, context);
 

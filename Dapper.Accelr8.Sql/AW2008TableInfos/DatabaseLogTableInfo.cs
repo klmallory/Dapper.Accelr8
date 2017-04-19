@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum DatabaseLogColumnNames
+	public enum DatabaseLogFieldNames
 	{	
-		DatabaseLogID, 	
+		Id, 	
 		PostTime, 	
 		DatabaseUser, 	
 		Event, 	
@@ -35,15 +35,36 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class DatabaseLogTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> DatabaseLogColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)DatabaseLogFieldNames.Id, "DatabaseLogID" }, 
+						{ (int)DatabaseLogFieldNames.PostTime, "PostTime" }, 
+						{ (int)DatabaseLogFieldNames.DatabaseUser, "DatabaseUser" }, 
+						{ (int)DatabaseLogFieldNames.Event, "Event" }, 
+						{ (int)DatabaseLogFieldNames.Schema, "Schema" }, 
+						{ (int)DatabaseLogFieldNames.Object, "Object" }, 
+						{ (int)DatabaseLogFieldNames.TSQL, "TSQL" }, 
+						{ (int)DatabaseLogFieldNames.XmlEvent, "XmlEvent" }, 
+				};	
+
+		public static readonly IDictionary<int, string> DatabaseLogIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)DatabaseLogFieldNames.Id, "DatabaseLogID" }, 
+				};
+
 		public DatabaseLogTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = DatabaseLogColumnNames.DatabaseLogID.ToString();
-			//Schema = "DatabaseLog";
+			Schema = "dbo";
 			TableName = "DatabaseLog";
 			TableAlias = "databaselog";
-			ColumnNames = typeof(DatabaseLogColumnNames).ToDataList<Type, int>();
+			Columns = DatabaseLogColumnNames;
+			IdColumns = DatabaseLogIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

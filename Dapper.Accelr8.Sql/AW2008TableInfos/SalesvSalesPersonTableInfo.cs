@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesvSalesPersonColumnNames
+	public enum SalesvSalesPersonFieldNames
 	{	
 		BusinessEntityID, 	
 		Title, 	
@@ -49,15 +49,50 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class SalesvSalesPersonTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesvSalesPersonColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesvSalesPersonFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesvSalesPersonFieldNames.Title, "Title" }, 
+						{ (int)SalesvSalesPersonFieldNames.FirstName, "FirstName" }, 
+						{ (int)SalesvSalesPersonFieldNames.MiddleName, "MiddleName" }, 
+						{ (int)SalesvSalesPersonFieldNames.LastName, "LastName" }, 
+						{ (int)SalesvSalesPersonFieldNames.Suffix, "Suffix" }, 
+						{ (int)SalesvSalesPersonFieldNames.JobTitle, "JobTitle" }, 
+						{ (int)SalesvSalesPersonFieldNames.PhoneNumber, "PhoneNumber" }, 
+						{ (int)SalesvSalesPersonFieldNames.PhoneNumberType, "PhoneNumberType" }, 
+						{ (int)SalesvSalesPersonFieldNames.EmailAddress, "EmailAddress" }, 
+						{ (int)SalesvSalesPersonFieldNames.EmailPromotion, "EmailPromotion" }, 
+						{ (int)SalesvSalesPersonFieldNames.AddressLine1, "AddressLine1" }, 
+						{ (int)SalesvSalesPersonFieldNames.AddressLine2, "AddressLine2" }, 
+						{ (int)SalesvSalesPersonFieldNames.City, "City" }, 
+						{ (int)SalesvSalesPersonFieldNames.StateProvinceName, "StateProvinceName" }, 
+						{ (int)SalesvSalesPersonFieldNames.PostalCode, "PostalCode" }, 
+						{ (int)SalesvSalesPersonFieldNames.CountryRegionName, "CountryRegionName" }, 
+						{ (int)SalesvSalesPersonFieldNames.TerritoryName, "TerritoryName" }, 
+						{ (int)SalesvSalesPersonFieldNames.TerritoryGroup, "TerritoryGroup" }, 
+						{ (int)SalesvSalesPersonFieldNames.SalesQuota, "SalesQuota" }, 
+						{ (int)SalesvSalesPersonFieldNames.SalesYTD, "SalesYTD" }, 
+						{ (int)SalesvSalesPersonFieldNames.SalesLastYear, "SalesLastYear" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesvSalesPersonIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)SalesvSalesPersonFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public SalesvSalesPersonTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = SalesvSalesPersonColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.vSalesPerson";
+			Schema = "Sales";
 			TableName = "Sales.vSalesPerson";
 			TableAlias = "salesvsalesperson";
-			ColumnNames = typeof(SalesvSalesPersonColumnNames).ToDataList<Type, int>();
+			Columns = SalesvSalesPersonColumnNames;
+			IdColumns = SalesvSalesPersonIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

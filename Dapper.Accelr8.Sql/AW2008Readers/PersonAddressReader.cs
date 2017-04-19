@@ -27,20 +27,25 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 3
 		//Parent Count 1
-		static IEntityReader<int , PersonBusinessEntityAddress> _personBusinessEntityAddressReader;
-		protected static IEntityReader<int , PersonBusinessEntityAddress> GetPersonBusinessEntityAddressReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonBusinessEntityAddress> GetPersonBusinessEntityAddressReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonBusinessEntityAddress>>();
+			return s_loc8r.GetReader<CompoundKey , PersonBusinessEntityAddress>();
 		}
 
-		static IEntityReader<int , SalesSalesOrderHeader> _salesSalesOrderHeaderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesSalesOrderHeader> GetSalesSalesOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesOrderHeader>>();
+			return s_loc8r.GetReader<int , SalesSalesOrderHeader>();
 		}
 
 		
@@ -52,7 +57,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonBusinessEntityAddresses(IList<PersonAddress> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonBusinessEntityAddress
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -65,8 +70,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonBusinessEntityAddresses = typedChildren.Where(b => b.PersonBusinessEntityAddress == r.Id).ToList();
+				
+
+				r.PersonBusinessEntityAddresses = typedChildren.Where(b =>  b.AddressID == r.Id ).ToList();
 				r.PersonBusinessEntityAddresses.ToList().ForEach(b => { b.Loaded = false; b.PersonAddress = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -77,7 +85,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results"></param>
 		/// <param name="children"></param>
-		public void SetChildrenSalesSalesOrderHeaders(IList<PersonAddress> results, IList<object> children)
+		public void SetChildrenSalesSalesOrderHeaders1(IList<PersonAddress> results, IList<object> children)
 		{
 			//Child Id Type: int
 			//Child Type: SalesSalesOrderHeader
@@ -92,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaders = typedChildren.Where(b => b.SalesSalesOrderHeader == r.Id).ToList();
-				r.SalesSalesOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.PersonAddress = r; b.Loaded = true; });
+				
+
+				r.SalesSalesOrderHeaders1 = typedChildren.Where(b =>  b.BillToAddressID == r.Id ).ToList();
+				r.SalesSalesOrderHeaders1.ToList().ForEach(b => { b.Loaded = false; b.PersonAddress1 = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -104,7 +115,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results"></param>
 		/// <param name="children"></param>
-		public void SetChildrenSalesSalesOrderHeaders(IList<PersonAddress> results, IList<object> children)
+		public void SetChildrenSalesSalesOrderHeaders2(IList<PersonAddress> results, IList<object> children)
 		{
 			//Child Id Type: int
 			//Child Type: SalesSalesOrderHeader
@@ -119,8 +130,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaders = typedChildren.Where(b => b.SalesSalesOrderHeader == r.Id).ToList();
-				r.SalesSalesOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.PersonAddress = r; b.Loaded = true; });
+				
+
+				r.SalesSalesOrderHeaders2 = typedChildren.Where(b =>  b.ShipToAddressID == r.Id ).ToList();
+				r.SalesSalesOrderHeaders2.ToList().ForEach(b => { b.Loaded = false; b.PersonAddress2 = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -136,8 +150,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonAddress();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.AddressLine1 = GetRowData<string>(dataRow, "AddressLine1"); 
+			domain.Id = GetRowData<int>(dataRow, "AddressID"); 
+      		domain.AddressLine1 = GetRowData<string>(dataRow, "AddressLine1"); 
       		domain.AddressLine2 = GetRowData<string>(dataRow, "AddressLine2"); 
       		domain.City = GetRowData<string>(dataRow, "City"); 
       		domain.StateProvinceID = GetRowData<int>(dataRow, "StateProvinceID"); 
@@ -156,19 +170,24 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonAddress></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonAddress> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonAddress> WithAllChildrenForExisting(PersonAddress existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonBusinessEntityAddressReader(), id, IdColumn, SetChildrenPersonBusinessEntityAddresses);
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaders);
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaders);
+						WithChildForParentValues(GetPersonBusinessEntityAddressReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "AddressID",  }
+				, SetChildrenPersonBusinessEntityAddresses);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BillToAddressID",  }
+				, SetChildrenSalesSalesOrderHeaders1);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ShipToAddressID",  }
+				, SetChildrenSalesSalesOrderHeaders2);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonAddress entity)
         {
@@ -177,19 +196,23 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonBusinessEntityAddressReader(), entity.Id
-				, PersonBusinessEntityAddressColumnNames.AddressID.ToString()
+						WithChildForParentValues(GetPersonBusinessEntityAddressReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "AddressID",  }
 				, SetChildrenPersonBusinessEntityAddresses);
 
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), entity.Id
-				, SalesSalesOrderHeaderColumnNames.BillToAddressID.ToString()
-				, SetChildrenSalesSalesOrderHeaders);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BillToAddressID",  }
+				, SetChildrenSalesSalesOrderHeaders1);
 
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), entity.Id
-				, SalesSalesOrderHeaderColumnNames.ShipToAddressID.ToString()
-				, SetChildrenSalesSalesOrderHeaders);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ShipToAddressID",  }
+				, SetChildrenSalesSalesOrderHeaders2);
 
-			QueryResultForChildrenOnly(new List<PersonAddress>() { entity });
+			
+QueryResultForChildrenOnly(new List<PersonAddress>() { entity });
 			entity.Loaded = false;
 			GetPersonBusinessEntityAddressReader().SetAllChildrenForExisting(entity.PersonBusinessEntityAddresses);
 			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaders);
@@ -202,35 +225,35 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonBusinessEntityAddressReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonBusinessEntityAddressColumnNames.AddressID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPersonBusinessEntityAddressReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "AddressID",  }
 				, SetChildrenPersonBusinessEntityAddresses);
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderColumnNames.BillToAddressID.ToString()
-				, SetChildrenSalesSalesOrderHeaders);
+			WithChildForParentsValues(GetSalesSalesOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BillToAddressID",  }
+				, SetChildrenSalesSalesOrderHeaders1);
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderColumnNames.ShipToAddressID.ToString()
-				, SetChildrenSalesSalesOrderHeaders);
+			WithChildForParentsValues(GetSalesSalesOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ShipToAddressID",  }
+				, SetChildrenSalesSalesOrderHeaders2);
 
 					
 			QueryResultForChildrenOnly(entities);
 
 			GetPersonBusinessEntityAddressReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PersonBusinessEntityAddresses).ToList());
-			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesOrderHeaders).ToList());
-			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesOrderHeaders).ToList());
+			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesOrderHeaders1).ToList());
+			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesOrderHeaders2).ToList());
 					
 		}
     }

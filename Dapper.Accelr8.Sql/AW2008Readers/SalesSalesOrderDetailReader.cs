@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class SalesSalesOrderDetailReader : EntityReader<int, SalesSalesOrderDetail>
+    public class SalesSalesOrderDetailReader : EntityReader<CompoundKey, SalesSalesOrderDetail>
     {
         public SalesSalesOrderDetailReader(
             SalesSalesOrderDetailTableInfo tableInfo
@@ -27,10 +27,15 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
-		//Parent Count 3
+		//Parent Count 2
 		
 			/// <summary>
 		/// Loads the table Sales.SalesOrderDetail into class SalesSalesOrderDetail
@@ -43,8 +48,9 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesSalesOrderDetail();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.CarrierTrackingNumber = GetRowData<string>(dataRow, "CarrierTrackingNumber"); 
+			domain.SalesOrderID = GetRowData<int>(dataRow, "SalesOrderID"); 
+      		domain.SalesOrderDetailID = GetRowData<int>(dataRow, "SalesOrderDetailID"); 
+      		domain.CarrierTrackingNumber = GetRowData<string>(dataRow, "CarrierTrackingNumber"); 
       		domain.OrderQty = GetRowData<short>(dataRow, "OrderQty"); 
       		domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
       		domain.SpecialOfferID = GetRowData<int>(dataRow, "SpecialOfferID"); 
@@ -53,24 +59,23 @@ namespace Dapper.Accelr8.AW2008Readers
       		domain.LineTotal = GetRowData<decimal>(dataRow, "LineTotal"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+      				domain.Id = SalesSalesOrderDetail.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, SalesSalesOrderDetail></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesSalesOrderDetail> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, SalesSalesOrderDetail></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, SalesSalesOrderDetail> WithAllChildrenForExisting(SalesSalesOrderDetail existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesSalesOrderDetail entity)
         {

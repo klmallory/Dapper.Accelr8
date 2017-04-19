@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonPassword();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.PasswordHash = GetRowData<string>(dataRow, "PasswordHash"); 
+			domain.Id = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.PasswordHash = GetRowData<string>(dataRow, "PasswordHash"); 
       		domain.PasswordSalt = GetRowData<string>(dataRow, "PasswordSalt"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
@@ -59,13 +64,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonPassword></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonPassword> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonPassword> WithAllChildrenForExisting(PersonPassword existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonPassword entity)
         {

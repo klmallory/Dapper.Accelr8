@@ -10,13 +10,13 @@ namespace Dapper.Accelr8.Repo.Contracts
 {
     public interface IEntityReader : IDisposable
     {
-        bool UniqueId { get; }
-        string IdColumn { get; }
-        string TableName { get; }
-        string SchemaName { get; }
-        object TableInfo { get; }
-        IList<KeyValuePair<int, string>> ColumnNames { get; }
-        string TableAlias { get; }
+        //bool UniqueId { get; }
+        //string IdColumn { get; }
+        //string TableName { get; }
+        //string SchemaName { get; }
+        ITableInfo TableInfo { get; }
+        //IList<KeyValuePair<int, string>> ColumnNames { get; }
+        //string TableAlias { get; }
         object LoadEntityObject(dynamic row);
         IList<object> LoadEntityObjects(IEnumerable<dynamic> rows);
         IList<object> LoadMultiple(object reader);
@@ -41,7 +41,7 @@ namespace Dapper.Accelr8.Repo.Contracts
 
     public interface IEntityReader<IdType, EntityType> : IEntityReader
     {
-        IEntityReader<IdType, EntityType> WithAllChildrenForId(IdType id);
+        IEntityReader<IdType, EntityType> WithAllChildrenForExisting(EntityType existing);
         void SetAllChildrenForExisting(EntityType entity);
         void SetAllChildrenForExisting(IList<EntityType> entities);
         EntityType LoadEntity(object row);
@@ -57,9 +57,9 @@ namespace Dapper.Accelr8.Repo.Contracts
         IEntityReader<IdType, EntityType> WithColumn(string name);
         IEntityReader<IdType, EntityType> WithoutColumn(string name);
         IEntityReader<IdType, EntityType> WithoutColumns(string[] name);
-        IEntityReader<IdType, EntityType> WithChildForParentId(IEntityReader childReader, IdType id, string childJoinFieldName, Action<IList<EntityType>, IList<object>> setOnParentVisitor, bool withJoins = false);
-        IEntityReader<IdType, EntityType> WithChildForParentIds(IEntityReader childReader, IdType[] ids, string childJoinFieldName, Action<IList<EntityType>, IList<object>> setOnParentVisitor, bool withJoins = false);
-        IEntityReader<IdType, EntityType> WithChild(IEntityReader childReader, string childJoinFieldName, Action<IList<EntityType>, IList<object>> setOnParentVisitor);
+        IEntityReader<IdType, EntityType> WithChildForParentFields(IEntityReader childReader, object[] parentFields, string[] childJoinFieldNames, Action<IList<EntityType>, IList<object>> setOnParentVisitor, bool withJoins = false);
+        IEntityReader<IdType, EntityType> WithChildForParentsFields(IEntityReader childReader, List<object[]> parentFields, string[] childJoinFieldNames, Action<IList<EntityType>, IList<object>> setOnParentVisitor, bool withJoins = false);
+        IEntityReader<IdType, EntityType> WithChildForParameters(IEntityReader childReader, string[] paramNames, string[] childJoinFieldNames, Action<IList<EntityType>, IList<object>> setOnParentVisitor);
         IEntityReader<IdType, EntityType> WithJoin(string joinTable, string joinAlias, string[] joinColumnNames, JoinQueryElement[] joinQueries, Func<object, dynamic, object> load);
     }
 }

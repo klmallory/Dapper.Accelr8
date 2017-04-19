@@ -5,9 +5,8 @@ using System.Text;
 
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo;
-using Dapper.Accelr8.Repo.Contracts.Readers;
 using Dapper.Accelr8.Domain;
-
+using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.Repo
 {

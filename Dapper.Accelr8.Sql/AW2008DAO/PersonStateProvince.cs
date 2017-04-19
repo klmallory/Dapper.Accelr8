@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PersonStateProvince : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PersonStateProvince : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public PersonStateProvince()
-		{			
+		{
+							
 			IsDirty = false; 
 			_personAddresses = new List<PersonAddress>();
 		_salesSalesTaxRates = new List<SalesSalesTaxRate>();
@@ -24,6 +26,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected string _stateProvinceCode;
 		public string StateProvinceCode 

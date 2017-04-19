@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PersonPersonPhone> GetPersonPersonPhoneWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPersonPhone>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPersonPhone>(); }
 		
 		
 		/// <summary>
@@ -46,13 +49,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonPhoneNumberTypeColumnNames)f.Key)
+                switch ((PersonPhoneNumberTypeFieldNames)f.Key)
                 {
                     
-					case PersonPhoneNumberTypeColumnNames.Name:
+					case PersonPhoneNumberTypeFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case PersonPhoneNumberTypeColumnNames.ModifiedDate:
+					case PersonPhoneNumberTypeFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -69,7 +72,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID
 			var personPersonPhone177 = GetPersonPersonPhoneWriter();
-			if (_cascades.Contains(PersonPhoneNumberTypeCascadeNames.person.personphone.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonPhoneNumberTypeCascadeNames.personpersonphones.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonPersonPhones)
 					Cascade(personPersonPhone177, item, context);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID
 			if (entity.PersonPersonPhones != null && entity.PersonPersonPhones.Count > 0)
 				foreach (var rel in entity.PersonPersonPhones)
-					rel.PersonPersonPhone = entity.Id;
+					rel.PhoneNumberTypeID = entity.Id;
 
 				
 		}
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID
 			var personPersonPhone179 = GetPersonPersonPhoneWriter();
-			if (_cascades.Contains(PersonPhoneNumberTypeCascadeNames.person.personphone.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonPhoneNumberTypeCascadeNames.personpersonphone.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonPersonPhones)
 					CascadeDelete(personPersonPhone179, item, context);
 

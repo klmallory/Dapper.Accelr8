@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PurchasingShipMethod : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PurchasingShipMethod : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public PurchasingShipMethod()
-		{			
+		{
+							
 			IsDirty = false; 
 			_purchasingPurchaseOrderHeaders = new List<PurchasingPurchaseOrderHeader>();
 		_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
@@ -24,6 +26,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 

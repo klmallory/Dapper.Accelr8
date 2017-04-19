@@ -28,15 +28,18 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, ProductionProductModelIllustration> GetProductionProductModelIllustrationWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductModelIllustration>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductModelIllustration>(); }
 		static IEntityWriter<int, ProductionProductModelProductDescriptionCulture> GetProductionProductModelProductDescriptionCultureWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductModelProductDescriptionCulture>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductModelProductDescriptionCulture>(); }
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		
 		/// <summary>
@@ -50,22 +53,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductModelColumnNames)f.Key)
+                switch ((ProductionProductModelFieldNames)f.Key)
                 {
                     
-					case ProductionProductModelColumnNames.Name:
+					case ProductionProductModelFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case ProductionProductModelColumnNames.CatalogDescription:
+					case ProductionProductModelFieldNames.CatalogDescription:
 						parms.Add(GetParamName("CatalogDescription", actionType, taskIndex, ref count), entity.CatalogDescription);
 						break;
-					case ProductionProductModelColumnNames.Instructions:
+					case ProductionProductModelFieldNames.Instructions:
 						parms.Add(GetParamName("Instructions", actionType, taskIndex, ref count), entity.Instructions);
 						break;
-					case ProductionProductModelColumnNames.rowguid:
+					case ProductionProductModelFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case ProductionProductModelColumnNames.ModifiedDate:
+					case ProductionProductModelFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -82,7 +85,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductModelIllustration_ProductModel_ProductModelID
 			var productionProductModelIllustration240 = GetProductionProductModelIllustrationWriter();
-			if (_cascades.Contains(ProductionProductModelCascadeNames.production.productmodelillustration.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductModelCascadeNames.productionproductmodelillustrations.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductModelIllustrations)
 					Cascade(productionProductModelIllustration240, item, context);
 
@@ -91,7 +94,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
 			var productionProductModelProductDescriptionCulture241 = GetProductionProductModelProductDescriptionCultureWriter();
-			if (_cascades.Contains(ProductionProductModelCascadeNames.production.productmodelproductdescriptionculture.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductModelCascadeNames.productionproductmodelproductdescriptioncultures.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductModelProductDescriptionCultures)
 					Cascade(productionProductModelProductDescriptionCulture241, item, context);
 
@@ -100,7 +103,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Product_ProductModel_ProductModelID
 			var productionProduct242 = GetProductionProductWriter();
-			if (_cascades.Contains(ProductionProductModelCascadeNames.production.product.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductModelCascadeNames.productionproducts.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProducts)
 					Cascade(productionProduct242, item, context);
 
@@ -119,17 +122,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_ProductModelIllustration_ProductModel_ProductModelID
 			if (entity.ProductionProductModelIllustrations != null && entity.ProductionProductModelIllustrations.Count > 0)
 				foreach (var rel in entity.ProductionProductModelIllustrations)
-					rel.ProductionProductModelIllustration = entity.Id;
+					rel.ProductModelID = entity.Id;
 
 			//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
 			if (entity.ProductionProductModelProductDescriptionCultures != null && entity.ProductionProductModelProductDescriptionCultures.Count > 0)
 				foreach (var rel in entity.ProductionProductModelProductDescriptionCultures)
-					rel.ProductionProductModelProductDescriptionCulture = entity.Id;
+					rel.ProductModelID = entity.Id;
 
 			//From Foreign Key FK_Product_ProductModel_ProductModelID
 			if (entity.ProductionProducts != null && entity.ProductionProducts.Count > 0)
 				foreach (var rel in entity.ProductionProducts)
-					rel.ProductionProduct = entity.Id;
+					rel.ProductModelID = entity.Id;
 
 				
 		}
@@ -138,7 +141,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_ProductModelIllustration_ProductModel_ProductModelID
 			var productionProductModelIllustration246 = GetProductionProductModelIllustrationWriter();
-			if (_cascades.Contains(ProductionProductModelCascadeNames.production.productmodelillustration.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductModelCascadeNames.productionproductmodelillustration.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductModelIllustrations)
 					CascadeDelete(productionProductModelIllustration246, item, context);
 
@@ -147,7 +150,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
 			var productionProductModelProductDescriptionCulture247 = GetProductionProductModelProductDescriptionCultureWriter();
-			if (_cascades.Contains(ProductionProductModelCascadeNames.production.productmodelproductdescriptionculture.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductModelCascadeNames.productionproductmodelproductdescriptionculture.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductModelProductDescriptionCultures)
 					CascadeDelete(productionProductModelProductDescriptionCulture247, item, context);
 
@@ -156,7 +159,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_Product_ProductModel_ProductModelID
 			var productionProduct248 = GetProductionProductWriter();
-			if (_cascades.Contains(ProductionProductModelCascadeNames.production.product.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductModelCascadeNames.productionproduct.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProducts)
 					CascadeDelete(productionProduct248, item, context);
 

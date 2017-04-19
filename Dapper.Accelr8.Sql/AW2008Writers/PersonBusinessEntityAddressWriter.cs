@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class PersonBusinessEntityAddressWriter : EntityWriter<int, PersonBusinessEntityAddress>
+    public class PersonBusinessEntityAddressWriter : EntityWriter<CompoundKey, PersonBusinessEntityAddress>
     {
         public PersonBusinessEntityAddressWriter
 			(PersonBusinessEntityAddressTableInfo tableInfo
@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, PersonAddress> GetPersonAddressWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonAddress>>(); }
+		{ return s_loc8r.GetWriter<int, PersonAddress>(); }
 		static IEntityWriter<int, PersonAddressType> GetPersonAddressTypeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonAddressType>>(); }
+		{ return s_loc8r.GetWriter<int, PersonAddressType>(); }
 		static IEntityWriter<int, PersonBusinessEntity> GetPersonBusinessEntityWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonBusinessEntity>>(); }
+		{ return s_loc8r.GetWriter<int, PersonBusinessEntity>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,13 +53,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonBusinessEntityAddressColumnNames)f.Key)
+                switch ((PersonBusinessEntityAddressFieldNames)f.Key)
                 {
                     
-					case PersonBusinessEntityAddressColumnNames.rowguid:
+					case PersonBusinessEntityAddressFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case PersonBusinessEntityAddressColumnNames.ModifiedDate:
+					case PersonBusinessEntityAddressFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -75,19 +78,19 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_BusinessEntityAddress_Address_AddressID
 			var personAddress36 = GetPersonAddressWriter();
-		if ((_cascades.Contains(PersonBusinessEntityAddressCascadeNames.personaddress.ToString()) || _cascades.Contains("all")) && entity.PersonAddress != null)
+		if ((_cascades.Contains(PersonBusinessEntityAddressCascadeNames.personaddress_p.ToString()) || _cascades.Contains("all")) && entity.PersonAddress != null)
 			if (Cascade(personAddress36, entity.PersonAddress, context))
 				WithParent(personAddress36, entity);
 
 			//From Foreign Key FK_BusinessEntityAddress_AddressType_AddressTypeID
 			var personAddressType37 = GetPersonAddressTypeWriter();
-		if ((_cascades.Contains(PersonBusinessEntityAddressCascadeNames.personaddresstype.ToString()) || _cascades.Contains("all")) && entity.PersonAddressType != null)
+		if ((_cascades.Contains(PersonBusinessEntityAddressCascadeNames.personaddresstype_p.ToString()) || _cascades.Contains("all")) && entity.PersonAddressType != null)
 			if (Cascade(personAddressType37, entity.PersonAddressType, context))
 				WithParent(personAddressType37, entity);
 
 			//From Foreign Key FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID
 			var personBusinessEntity38 = GetPersonBusinessEntityWriter();
-		if ((_cascades.Contains(PersonBusinessEntityAddressCascadeNames.personbusinessentity.ToString()) || _cascades.Contains("all")) && entity.PersonBusinessEntity != null)
+		if ((_cascades.Contains(PersonBusinessEntityAddressCascadeNames.personbusinessentity_p.ToString()) || _cascades.Contains("all")) && entity.PersonBusinessEntity != null)
 			if (Cascade(personBusinessEntity38, entity.PersonBusinessEntity, context))
 				WithParent(personBusinessEntity38, entity);
 
@@ -101,15 +104,15 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_BusinessEntityAddress_Address_AddressID
 			if (entity.PersonAddress != null)
-				entity.PersonBusinessEntityAddress = entity.PersonAddress.Id;
+				entity.AddressID = entity.PersonAddress.Id;
 
 			//From Foreign Key FK_BusinessEntityAddress_AddressType_AddressTypeID
 			if (entity.PersonAddressType != null)
-				entity.PersonBusinessEntityAddress = entity.PersonAddressType.Id;
+				entity.AddressTypeID = entity.PersonAddressType.Id;
 
 			//From Foreign Key FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID
 			if (entity.PersonBusinessEntity != null)
-				entity.PersonBusinessEntityAddress = entity.PersonBusinessEntity.Id;
+				entity.BusinessEntityID = entity.PersonBusinessEntity.Id;
 
 		}
 

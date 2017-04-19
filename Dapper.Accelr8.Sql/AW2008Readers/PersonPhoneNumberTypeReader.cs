@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , PersonPersonPhone> _personPersonPhoneReader;
-		protected static IEntityReader<int , PersonPersonPhone> GetPersonPersonPhoneReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonPersonPhone> GetPersonPersonPhoneReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonPersonPhone>>();
+			return s_loc8r.GetReader<CompoundKey , PersonPersonPhone>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonPersonPhones(IList<PersonPhoneNumberType> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonPersonPhone
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonPersonPhones = typedChildren.Where(b => b.PersonPersonPhone == r.Id).ToList();
+				
+
+				r.PersonPersonPhones = typedChildren.Where(b =>  b.PhoneNumberTypeID == r.Id ).ToList();
 				r.PersonPersonPhones.ToList().ForEach(b => { b.Loaded = false; b.PersonPhoneNumberType = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonPhoneNumberType();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "PhoneNumberTypeID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -90,15 +98,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonPhoneNumberType></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonPhoneNumberType> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonPhoneNumberType> WithAllChildrenForExisting(PersonPhoneNumberType existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonPersonPhoneReader(), id, IdColumn, SetChildrenPersonPersonPhones);
+						WithChildForParentValues(GetPersonPersonPhoneReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "PhoneNumberTypeID",  }
+				, SetChildrenPersonPersonPhones);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonPhoneNumberType entity)
         {
@@ -107,11 +116,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonPersonPhoneReader(), entity.Id
-				, PersonPersonPhoneColumnNames.PhoneNumberTypeID.ToString()
+						WithChildForParentValues(GetPersonPersonPhoneReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "PhoneNumberTypeID",  }
 				, SetChildrenPersonPersonPhones);
 
-			QueryResultForChildrenOnly(new List<PersonPhoneNumberType>() { entity });
+			
+QueryResultForChildrenOnly(new List<PersonPhoneNumberType>() { entity });
 			entity.Loaded = false;
 			GetPersonPersonPhoneReader().SetAllChildrenForExisting(entity.PersonPersonPhones);
 				
@@ -122,15 +133,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonPersonPhoneReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonPersonPhoneColumnNames.PhoneNumberTypeID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPersonPersonPhoneReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "PhoneNumberTypeID",  }
 				, SetChildrenPersonPersonPhones);
 
 					

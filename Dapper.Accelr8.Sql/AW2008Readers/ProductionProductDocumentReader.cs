@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class ProductionProductDocumentReader : EntityReader<int, ProductionProductDocument>
+    public class ProductionProductDocumentReader : EntityReader<CompoundKey, ProductionProductDocument>
     {
         public ProductionProductDocumentReader(
             ProductionProductDocumentTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,26 +48,26 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProductDocument();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+			domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
+      		domain.DocumentNode = GetRowData<Microsoft.SqlServer.Types.SqlHierarchyId>(dataRow, "DocumentNode"); 
+      		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
+      				domain.Id = ProductionProductDocument.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, ProductionProductDocument></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProductDocument> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, ProductionProductDocument></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, ProductionProductDocument> WithAllChildrenForExisting(ProductionProductDocument existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProductDocument entity)
         {

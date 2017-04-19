@@ -8,19 +8,22 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class HumanResourcesvEmployee : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class HumanResourcesvEmployee : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public HumanResourcesvEmployee()
-		{			
+		{
+							
 			IsDirty = false; 
 			}
 
 
+	
 		
 		protected int _businessEntityID;
 		public int BusinessEntityID 

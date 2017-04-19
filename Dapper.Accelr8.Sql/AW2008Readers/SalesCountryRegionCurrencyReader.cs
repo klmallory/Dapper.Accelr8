@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class SalesCountryRegionCurrencyReader : EntityReader<string, SalesCountryRegionCurrency>
+    public class SalesCountryRegionCurrencyReader : EntityReader<CompoundKey, SalesCountryRegionCurrency>
     {
         public SalesCountryRegionCurrencyReader(
             SalesCountryRegionCurrencyTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 2
@@ -43,26 +48,26 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesCountryRegionCurrency();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<string>(dataRow, IdColumn);
-				domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+			domain.CountryRegionCode = GetRowData<string>(dataRow, "CountryRegionCode"); 
+      		domain.CurrencyCode = GetRowData<string>(dataRow, "CurrencyCode"); 
+      		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
+      				domain.Id = SalesCountryRegionCurrency.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified string Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<string, SalesCountryRegionCurrency></param>
-		/// <param name="id">string</param>
-        public override IEntityReader<string, SalesCountryRegionCurrency> WithAllChildrenForId(string id)
+		/// <param name="results">IEntityReader<CompoundKey, SalesCountryRegionCurrency></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, SalesCountryRegionCurrency> WithAllChildrenForExisting(SalesCountryRegionCurrency existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesCountryRegionCurrency entity)
         {

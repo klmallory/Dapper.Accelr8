@@ -11,7 +11,12 @@
 		public static string BaseDomainEntity = "Dapper.Accelr8.Repo.Domain.BaseEntity";
 		public static string DAOProject = "Dapper.Accelr8.Sql";
 		public static string DAONamespace = @"Dapper.Accelr8.Sql.AW2008DAO";
-		public static string DAODirectory = @"..\AW2008DAO";
+		public static string DAODirectory = @"AW2008DAO";
+		public static string DynamicAssembly = "SampleAssembly, Version=1.0.2004.0, Culture=neutral, PublicKeyToken=8744b20f8da049e3";
+		public static string DynamicProject = "Dapper.Accelr8.Sql";
+		public static string DynamicNamespaceTarget = @"Dapper.Accelr8.Sql.AW2008Domain";
+		public static string DynamicNamespaceDestination = @"Dapper.Accelr8.Sql.AW2008Mappers";
+		public static string DynamicDirectory = @"AW2008Mappers";
 		public static string WritersProject = "Dapper.Accelr8.Sql";
 		public static string WritersNamespace = @"Dapper.Accelr8.AW2008Writers";
 		public static string WritersDirectory = @"AW2008Writers";
@@ -24,7 +29,7 @@
 
 		static string _connectionString = @"Data Source=.\sqlexpress;Initial Catalog=AdventureWorks2008R2;Integrated Security=SSPI;";
 		public static string Database = @"AdventureWorks2008R2";
-		
+
 
 		// Change Names Here =>
 		static Dictionary<string, string> tableNames = new Dictionary<string, string>()
@@ -35,6 +40,16 @@
 		static Dictionary<string, string> tableAliases = new Dictionary<string, string>()
 		{
 
+		};
+
+		static List<string> columnsToIgnore = new List<string>()
+		{
+			
+		};
+
+		static List<string> columnsToSkipMapping = new List<string>()
+		{
+			"%.GenericId"
 		};
 
 		static Dictionary<string, string> columnNames = new Dictionary<string, string>()
@@ -55,6 +70,10 @@
 			var path = Accelr8or.GetProjectPath(project);
 			DAODirectory = Path.Combine(path, DAODirectory);
 
+			project = Accelr8or.GetLibraryProject(DynamicProject);
+			path = Accelr8or.GetProjectPath(project);
+			DynamicDirectory = Path.Combine(path, DynamicDirectory);
+
 			project = Accelr8or.GetLibraryProject(WritersProject);
 			path = Accelr8or.GetProjectPath(project);
 			WritersDirectory = Path.Combine(path, WritersDirectory);
@@ -67,7 +86,7 @@
 			path = Accelr8or.GetProjectPath(project);
 			TableInfoDirectory = Path.Combine(path, TableInfoDirectory);
 		}
-
+		
 		public static bool Equals(string s1, string s2)
 		{
 			return String.Equals(s1, s2, StringComparison.InvariantCultureIgnoreCase);
@@ -90,8 +109,59 @@
 				t.Value.Children = helper.GetChildren(_connectionString, Database, t.Value.OriginalTableName, t.Value.SchemaName);
 				t.Value.Parents = helper.GetParents(_connectionString, Database, t.Value.OriginalTableName, t.Value.SchemaName);
 
+			}
+
+			foreach (var t in tables)
+			{
+				if (t.Value.Ignore)
+					continue;
+
 				if (t.Value.UseCompoundKey)
+				{
 					t.Value.Columns.ForEach(c => c.UseCompoundKey = true);
+				}
+
+				foreach (var c in t.Value.Children)
+				{
+					if (!tables.ContainsKey(c.Key))
+						throw new Exception("Related Key is Missing: " + c.Key);
+
+					var relatedTable = tables[c.Key];
+					c.CSharpIdType = relatedTable.CSharpIdType;
+				}
+
+				foreach (var p in t.Value.Parents)
+				{
+					if (!tables.ContainsKey(p.Key))
+						throw new Exception("Related Key is Missing: " + p.Key);
+
+					var relatedTable = tables[p.Key];
+					p.CSharpIdType = relatedTable.CSharpIdType;
+				}
+			}
+
+			var tcps = tables.Where(t2 => t2.Value.UseCompoundKey).Select(t2 => t2.Value.OriginalTableName);
+
+			foreach (var c in tables.SelectMany(t => t.Value.Children.Where(c2 => tcps.Contains(c2.OriginalTableName))))
+			{
+				c.UseCompoundKey = true;
+				c.Columns.ForEach(c3 => c3.ChildUsesCompoundKey = true);
+			}
+
+			foreach (var c in tables.SelectMany(t => t.Value.Children.Where(c2 => tcps.Contains(c2.OriginalParentName))))
+			{
+				c.Columns.ForEach(c3 => c3.ParentUsesCompoundKey = true);
+			}
+
+			foreach (var p in tables.SelectMany(t => t.Value.Parents.Where(p2 => tcps.Contains(p2.OriginalParentName))))
+			{
+				p.UseCompoundKey = true;
+				p.Columns.ForEach(p3 => p3.ParentUsesCompoundKey = true);
+			}
+
+			foreach (var p in tables.SelectMany(t => t.Value.Parents.Where(p2 => tcps.Contains(p2.OriginalTableName))))
+			{
+				p.Columns.ForEach(p3 => p3.ChildUsesCompoundKey = true);
 			}
 
 			foreach (var a in tableAliases)
@@ -119,14 +189,14 @@
 				
 				foreach (var pc in pcs)
 				{
-					pc.TableAlias = tableAliases[a.Key];
+					pc.ChildAlias = tableAliases[a.Key];
 				}
 
 				var cs = tables.Values.SelectMany<DbTable, DbChild>(tb => tb.Children.Where(c => c.Key == a.Key)).ToList();
 
 				foreach (var c in cs)
 				{
-					c.TableAlias = tableAliases[a.Key];
+					c.ChildAlias = tableAliases[a.Key];
 				}
 
 				var cps = tables.Values.SelectMany<DbTable, DbChild>(tb => tb.Children.Where(c => c.ParentKey == a.Key)).ToList();
@@ -141,27 +211,44 @@
 			{
 				foreach (var tb in tables)
 				{
-					foreach (var cl in tb.Value.Columns.Where(c => string.Compare(tb.Key + "." + c.ColumnName, cn.Value, true) == 0))
+					foreach (var cl in tb.Value.Columns.Where(c => string.Compare(tb.Key + "." + c.ColumnName, cn.Key, true) == 0))
 					{
 						cl.ColumnFieldName = cn.Value;
 					}
 
 					foreach (var c in tb.Value.Children)
 					{
-						if (string.Compare(c.Key + "." + c.OriginalColumnName, cn.Key) == 0)
-							c.ChildColumn = cn.Value;
+						foreach (var kc in c.Columns)
+						{
+							if (string.Compare(c.Key + "." + kc.OriginalChildColumn, cn.Key) == 0)
+								kc.ChildColumnFieldName = cn.Value;
 
-						if (string.Compare(c.ParentKey + "." + c.OriginalParentColumn, cn.Key)== 0)
-							c.ParentColumn = cn.Value;
+							if (string.Compare(c.ParentKey + "." + kc.OriginalParentColumn, cn.Key)== 0)
+								kc.ParentColumnFieldName = cn.Value;
+						}
 					}
 
 					foreach (var p in tb.Value.Parents)
 					{
-						if (string.Compare(p.ChildKey + "." + p.OriginalColumnName, cn.Key) == 0)
-							p.Table = cn.Value;
+						foreach (var kc in p.Columns)
+						{
+							if (string.Compare(p.ChildKey + "." + kc.OriginalChildColumn, cn.Key) == 0)
+								kc.ChildColumnFieldName = cn.Value;
 
-						if (string.Compare(p.Key + "." + p.OriginalParentColumn, cn.Key)== 0)
-							p.Parent = cn.Value;
+							if (string.Compare(p.Key + "." + kc.OriginalParentColumn, cn.Key)== 0)
+								kc.ParentColumnFieldName = cn.Value;
+						}
+					}
+				}
+			}
+
+			foreach (var cn in columnsToIgnore)
+			{
+				foreach (var tb in tables)
+				{
+					foreach (var cl in tb.Value.Columns.Where(c => string.Compare(tb.Key + "." + c.ColumnName, cn, true) == 0))
+					{
+						cl.Ignore = true;
 					}
 				}
 			}
@@ -172,7 +259,7 @@
 				{
 					foreach (var c in tb.Value.Columns.Where(c => string.Compare(tb.Value.TableName + "." + c.ColumnName, ct.Key, true) == 0))
 					{
-						c.ColumnFieldName = ct.Value;
+						c.CSharpType = ct.Value;
 					}
 				}
 			}
@@ -195,7 +282,7 @@
 						foreach (var c in tb.Children)
 						{
 							if (string.Compare(c.Key, n.Key) == 0)
-								c.Table = tname;
+								c.ChildTable = tname;
 
 							if (string.Compare(c.ParentKey, n.Key)== 0)
 								c.Parent = tname;
@@ -204,7 +291,7 @@
 						foreach (var p in tb.Parents)
 						{
 							if (string.Compare(p.ChildKey, n.Key) == 0)
-								p.Table = tname;
+								p.ChildTable = tname;
 
 							if (string.Compare(p.Key, n.Key)== 0)
 								p.Parent = tname;
@@ -213,13 +300,53 @@
 				}
 			}
 
+			foreach (var t in tables)
+			{
+				foreach (var c in t.Value.Children.Select(c => c.ChildClassFieldName).Distinct())
+				{
+					if (t.Value.Children.Count(n => n.ChildClassFieldName == c) < 2)
+						continue;
+
+					var cnt = 1;
+					foreach (var child in t.Value.Children.Where(n => n.ChildClassFieldName == c))
+					{
+						child.ChildClassFieldName = child.ChildClassFieldName + cnt;
+						cnt++;
+					}
+				}
+			}
+
+			foreach (var t in tables)
+			{
+				foreach (var p in t.Value.Parents.Select(c => c.ParentClassFieldName).Distinct())
+				{
+					if (t.Value.Parents.Count(n => n.ParentClassFieldName == p) < 2)
+						continue;
+
+					var cnt = 1;
+					foreach (var parent in t.Value.Parents.Where(n => n.ParentClassFieldName == p))
+					{
+						parent.ParentClassFieldName = parent.ParentClassFieldName + cnt;
+
+						var child = tables.SelectMany(m => m.Value.Children).FirstOrDefault(ch => ch.Name == parent.Name);
+						
+						if (child != null)
+						{
+							parent.ChildClassFieldName = child.ChildClassFieldName;
+							child.ParentClassFieldName = parent.ParentClassFieldName;
+						}
+
+						cnt++;
+					}
+				}
+			}
 
 			//Tweak Columns / Relationships Here.
 			if (Database == "Northwnd")
 			{
-				tables["Employees"].Children.First(c => c.Name == "FK_EmployeeTerritories_Employees").ChildClassFieldName  = "EmployeeTerritories2";
-				tables["Employees"].Children.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
-				tables["Employees"].Parents.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+				//tables["Employees"].Children.First(c => c.Name == "FK_EmployeeTerritories_Employees").ChildClassFieldName  = "EmployeeTerritories2";
+				//tables["Employees"].Children.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
+				//tables["Employees"].Parents.First(c => c.Name == "FK_Employees_Employees").ParentClassFieldName = "ReportsToEmployee";
 			}
 			else if (Database == "AdventureWorks2008R2")
 			{

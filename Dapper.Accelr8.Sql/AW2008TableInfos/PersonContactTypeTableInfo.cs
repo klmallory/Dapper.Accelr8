@@ -18,28 +18,44 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonContactTypeColumnNames
+	public enum PersonContactTypeFieldNames
 	{	
-		ContactTypeID, 	
+		Id, 	
 		Name, 	
 		ModifiedDate, 	
 	}
 
 	public enum PersonContactTypeCascadeNames
 	{	
-		personbusinessentitycontact, 	
+		personbusinessentitycontacts, 	
 		}
 
 	public class PersonContactTypeTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonContactTypeColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonContactTypeFieldNames.Id, "ContactTypeID" }, 
+						{ (int)PersonContactTypeFieldNames.Name, "Name" }, 
+						{ (int)PersonContactTypeFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonContactTypeIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonContactTypeFieldNames.Id, "ContactTypeID" }, 
+				};
+
 		public PersonContactTypeTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonContactTypeColumnNames.ContactTypeID.ToString();
-			//Schema = "Person.ContactType";
+			Schema = "Person";
 			TableName = "Person.ContactType";
 			TableAlias = "personcontacttype";
-			ColumnNames = typeof(PersonContactTypeColumnNames).ToDataList<Type, int>();
+			Columns = PersonContactTypeColumnNames;
+			IdColumns = PersonContactTypeIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

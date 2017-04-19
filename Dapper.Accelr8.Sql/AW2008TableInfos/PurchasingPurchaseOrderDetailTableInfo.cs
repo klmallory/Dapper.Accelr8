@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PurchasingPurchaseOrderDetailColumnNames
+	public enum PurchasingPurchaseOrderDetailFieldNames
 	{	
 		PurchaseOrderID, 	
 		PurchaseOrderDetailID, 	
@@ -40,15 +40,40 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class PurchasingPurchaseOrderDetailTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PurchasingPurchaseOrderDetailColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingPurchaseOrderDetailFieldNames.PurchaseOrderID, "PurchaseOrderID" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.PurchaseOrderDetailID, "PurchaseOrderDetailID" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.DueDate, "DueDate" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.OrderQty, "OrderQty" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.ProductID, "ProductID" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.UnitPrice, "UnitPrice" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.LineTotal, "LineTotal" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.ReceivedQty, "ReceivedQty" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.RejectedQty, "RejectedQty" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.StockedQty, "StockedQty" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PurchasingPurchaseOrderDetailIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingPurchaseOrderDetailFieldNames.PurchaseOrderID, "PurchaseOrderID" }, 
+						{ (int)PurchasingPurchaseOrderDetailFieldNames.PurchaseOrderDetailID, "PurchaseOrderDetailID" }, 
+				};
+
 		public PurchasingPurchaseOrderDetailTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PurchasingPurchaseOrderDetailColumnNames.PurchaseOrderID.ToString();
-			//Schema = "Purchasing.PurchaseOrderDetail";
+			Schema = "Purchasing";
 			TableName = "Purchasing.PurchaseOrderDetail";
 			TableAlias = "purchasingpurchaseorderdetail";
-			ColumnNames = typeof(PurchasingPurchaseOrderDetailColumnNames).ToDataList<Type, int>();
+			Columns = PurchasingPurchaseOrderDetailColumnNames;
+			IdColumns = PurchasingPurchaseOrderDetailIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID

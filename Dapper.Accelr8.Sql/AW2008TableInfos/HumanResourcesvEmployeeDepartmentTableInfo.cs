@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesvEmployeeDepartmentColumnNames
+	public enum HumanResourcesvEmployeeDepartmentFieldNames
 	{	
 		BusinessEntityID, 	
 		Title, 	
@@ -37,15 +37,38 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class HumanResourcesvEmployeeDepartmentTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesvEmployeeDepartmentColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesvEmployeeDepartmentFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.Title, "Title" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.FirstName, "FirstName" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.MiddleName, "MiddleName" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.LastName, "LastName" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.Suffix, "Suffix" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.JobTitle, "JobTitle" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.Department, "Department" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.GroupName, "GroupName" }, 
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.StartDate, "StartDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesvEmployeeDepartmentIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)HumanResourcesvEmployeeDepartmentFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public HumanResourcesvEmployeeDepartmentTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = HumanResourcesvEmployeeDepartmentColumnNames.BusinessEntityID.ToString();
-			//Schema = "HumanResources.vEmployeeDepartment";
+			Schema = "HumanResources";
 			TableName = "HumanResources.vEmployeeDepartment";
 			TableAlias = "humanresourcesvemployeedepartment";
-			ColumnNames = typeof(HumanResourcesvEmployeeDepartmentColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesvEmployeeDepartmentColumnNames;
+			IdColumns = HumanResourcesvEmployeeDepartmentIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

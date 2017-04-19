@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , SalesSalesOrderHeaderSalesReason> _salesSalesOrderHeaderSalesReasonReader;
-		protected static IEntityReader<int , SalesSalesOrderHeaderSalesReason> GetSalesSalesOrderHeaderSalesReasonReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesSalesOrderHeaderSalesReason> GetSalesSalesOrderHeaderSalesReasonReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesOrderHeaderSalesReason>>();
+			return s_loc8r.GetReader<CompoundKey , SalesSalesOrderHeaderSalesReason>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenSalesSalesOrderHeaderSalesReasons(IList<SalesSalesReason> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: SalesSalesOrderHeaderSalesReason
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaderSalesReasons = typedChildren.Where(b => b.SalesSalesOrderHeaderSalesReason == r.Id).ToList();
+				
+
+				r.SalesSalesOrderHeaderSalesReasons = typedChildren.Where(b =>  b.SalesReasonID == r.Id ).ToList();
 				r.SalesSalesOrderHeaderSalesReasons.ToList().ForEach(b => { b.Loaded = false; b.SalesSalesReason = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesSalesReason();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "SalesReasonID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ReasonType = GetRowData<object>(dataRow, "ReasonType"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
@@ -91,15 +99,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesSalesReason></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesSalesReason> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesSalesReason> WithAllChildrenForExisting(SalesSalesReason existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderSalesReasonReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaderSalesReasons);
+						WithChildForParentValues(GetSalesSalesOrderHeaderSalesReasonReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "SalesReasonID",  }
+				, SetChildrenSalesSalesOrderHeaderSalesReasons);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesSalesReason entity)
         {
@@ -108,11 +117,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesSalesOrderHeaderSalesReasonReader(), entity.Id
-				, SalesSalesOrderHeaderSalesReasonColumnNames.SalesReasonID.ToString()
+						WithChildForParentValues(GetSalesSalesOrderHeaderSalesReasonReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "SalesReasonID",  }
 				, SetChildrenSalesSalesOrderHeaderSalesReasons);
 
-			QueryResultForChildrenOnly(new List<SalesSalesReason>() { entity });
+			
+QueryResultForChildrenOnly(new List<SalesSalesReason>() { entity });
 			entity.Loaded = false;
 			GetSalesSalesOrderHeaderSalesReasonReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaderSalesReasons);
 				
@@ -123,15 +134,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderSalesReasonReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderSalesReasonColumnNames.SalesReasonID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesSalesOrderHeaderSalesReasonReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "SalesReasonID",  }
 				, SetChildrenSalesSalesOrderHeaderSalesReasons);
 
 					

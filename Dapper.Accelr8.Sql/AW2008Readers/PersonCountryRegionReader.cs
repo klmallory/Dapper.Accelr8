@@ -27,56 +27,34 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 3
 		//Parent Count 0
-		static IEntityReader<int , PersonStateProvince> _personStateProvinceReader;
-		protected static IEntityReader<int , PersonStateProvince> GetPersonStateProvinceReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesCountryRegionCurrency> GetSalesCountryRegionCurrencyReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonStateProvince>>();
+			return s_loc8r.GetReader<CompoundKey , SalesCountryRegionCurrency>();
 		}
 
-		static IEntityReader<string , SalesCountryRegionCurrency> _salesCountryRegionCurrencyReader;
-		protected static IEntityReader<string , SalesCountryRegionCurrency> GetSalesCountryRegionCurrencyReader()
-		{
-			return _locator.Resolve<IEntityReader<string , SalesCountryRegionCurrency>>();
-		}
-
-		static IEntityReader<int , SalesSalesTerritory> _salesSalesTerritoryReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesSalesTerritory> GetSalesSalesTerritoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesTerritory>>();
+			return s_loc8r.GetReader<int , SalesSalesTerritory>();
+		}
+
+				//Is CompoundKey False
+		protected static IEntityReader<int , PersonStateProvince> GetPersonStateProvinceReader()
+		{
+			return s_loc8r.GetReader<int , PersonStateProvince>();
 		}
 
 		
-		/// <summary>
-		/// Sets the children of type PersonStateProvince on the parent on PersonStateProvinces.
-		/// From foriegn key FK_StateProvince_CountryRegion_CountryRegionCode
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenPersonStateProvinces(IList<PersonCountryRegion> results, IList<object> children)
-		{
-			//Child Id Type: string
-			//Child Type: PersonStateProvince
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<PersonStateProvince>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.PersonStateProvinces = typedChildren.Where(b => b.PersonStateProvince == r.Id).ToList();
-				r.PersonStateProvinces.ToList().ForEach(b => { b.Loaded = false; b.PersonCountryRegion = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
 		/// <summary>
 		/// Sets the children of type SalesCountryRegionCurrency on the parent on SalesCountryRegionCurrencies.
 		/// From foriegn key FK_CountryRegionCurrency_CountryRegion_CountryRegionCode
@@ -85,7 +63,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenSalesCountryRegionCurrencies(IList<PersonCountryRegion> results, IList<object> children)
 		{
-			//Child Id Type: string
+			//Child Id Type: CompoundKey
 			//Child Type: SalesCountryRegionCurrency
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -98,8 +76,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesCountryRegionCurrencies = typedChildren.Where(b => b.SalesCountryRegionCurrency == r.Id).ToList();
+				
+
+				r.SalesCountryRegionCurrencies = typedChildren.Where(b =>  b.CountryRegionCode == r.Id ).ToList();
 				r.SalesCountryRegionCurrencies.ToList().ForEach(b => { b.Loaded = false; b.PersonCountryRegion = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -112,7 +93,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenSalesSalesTerritories(IList<PersonCountryRegion> results, IList<object> children)
 		{
-			//Child Id Type: string
+			//Child Id Type: int
 			//Child Type: SalesSalesTerritory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -125,8 +106,41 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesTerritories = typedChildren.Where(b => b.SalesSalesTerritory == r.Id).ToList();
+				
+
+				r.SalesSalesTerritories = typedChildren.Where(b =>  b.CountryRegionCode == r.Id ).ToList();
 				r.SalesSalesTerritories.ToList().ForEach(b => { b.Loaded = false; b.PersonCountryRegion = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type PersonStateProvince on the parent on PersonStateProvinces.
+		/// From foriegn key FK_StateProvince_CountryRegion_CountryRegionCode
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenPersonStateProvinces(IList<PersonCountryRegion> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: PersonStateProvince
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<PersonStateProvince>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.PersonStateProvinces = typedChildren.Where(b =>  b.CountryRegionCode == r.Id ).ToList();
+				r.PersonStateProvinces.ToList().ForEach(b => { b.Loaded = false; b.PersonCountryRegion = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -142,8 +156,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonCountryRegion();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<string>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<string>(dataRow, "CountryRegionCode"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -156,19 +170,24 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<string, PersonCountryRegion></param>
 		/// <param name="id">string</param>
-        public override IEntityReader<string, PersonCountryRegion> WithAllChildrenForId(string id)
+        public override IEntityReader<string, PersonCountryRegion> WithAllChildrenForExisting(PersonCountryRegion existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonStateProvinceReader(), id, IdColumn, SetChildrenPersonStateProvinces);
-			
-			WithChildForParentId(GetSalesCountryRegionCurrencyReader(), id, IdColumn, SetChildrenSalesCountryRegionCurrencies);
-			
-			WithChildForParentId(GetSalesSalesTerritoryReader(), id, IdColumn, SetChildrenSalesSalesTerritories);
+						WithChildForParentValues(GetSalesCountryRegionCurrencyReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CountryRegionCode",  }
+				, SetChildrenSalesCountryRegionCurrencies);
+						WithChildForParentValues(GetSalesSalesTerritoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CountryRegionCode",  }
+				, SetChildrenSalesSalesTerritories);
+						WithChildForParentValues(GetPersonStateProvinceReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CountryRegionCode",  }
+				, SetChildrenPersonStateProvinces);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonCountryRegion entity)
         {
@@ -177,23 +196,27 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonStateProvinceReader(), entity.Id
-				, PersonStateProvinceColumnNames.CountryRegionCode.ToString()
-				, SetChildrenPersonStateProvinces);
-
-			WithChildForParentId(GetSalesCountryRegionCurrencyReader(), entity.Id
-				, SalesCountryRegionCurrencyColumnNames.CountryRegionCode.ToString()
+						WithChildForParentValues(GetSalesCountryRegionCurrencyReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CountryRegionCode",  }
 				, SetChildrenSalesCountryRegionCurrencies);
 
-			WithChildForParentId(GetSalesSalesTerritoryReader(), entity.Id
-				, SalesSalesTerritoryColumnNames.CountryRegionCode.ToString()
+						WithChildForParentValues(GetSalesSalesTerritoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CountryRegionCode",  }
 				, SetChildrenSalesSalesTerritories);
 
-			QueryResultForChildrenOnly(new List<PersonCountryRegion>() { entity });
+						WithChildForParentValues(GetPersonStateProvinceReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CountryRegionCode",  }
+				, SetChildrenPersonStateProvinces);
+
+			
+QueryResultForChildrenOnly(new List<PersonCountryRegion>() { entity });
 			entity.Loaded = false;
-			GetPersonStateProvinceReader().SetAllChildrenForExisting(entity.PersonStateProvinces);
 			GetSalesCountryRegionCurrencyReader().SetAllChildrenForExisting(entity.SalesCountryRegionCurrencies);
 			GetSalesSalesTerritoryReader().SetAllChildrenForExisting(entity.SalesSalesTerritories);
+			GetPersonStateProvinceReader().SetAllChildrenForExisting(entity.PersonStateProvinces);
 				
 			entity.Loaded = true;
 		}
@@ -202,35 +225,35 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonStateProvinceReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonStateProvinceColumnNames.CountryRegionCode.ToString()
-				, SetChildrenPersonStateProvinces);
+			entities = entities.Where(e => e != null).ToList();
 
-			WithChildForParentIds(GetSalesCountryRegionCurrencyReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesCountryRegionCurrencyColumnNames.CountryRegionCode.ToString()
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesCountryRegionCurrencyReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CountryRegionCode",  }
 				, SetChildrenSalesCountryRegionCurrencies);
 
-			WithChildForParentIds(GetSalesSalesTerritoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesTerritoryColumnNames.CountryRegionCode.ToString()
+			WithChildForParentsValues(GetSalesSalesTerritoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CountryRegionCode",  }
 				, SetChildrenSalesSalesTerritories);
+
+			WithChildForParentsValues(GetPersonStateProvinceReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CountryRegionCode",  }
+				, SetChildrenPersonStateProvinces);
 
 					
 			QueryResultForChildrenOnly(entities);
 
-			GetPersonStateProvinceReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PersonStateProvinces).ToList());
 			GetSalesCountryRegionCurrencyReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesCountryRegionCurrencies).ToList());
 			GetSalesSalesTerritoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesTerritories).ToList());
+			GetPersonStateProvinceReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PersonStateProvinces).ToList());
 					
 		}
     }

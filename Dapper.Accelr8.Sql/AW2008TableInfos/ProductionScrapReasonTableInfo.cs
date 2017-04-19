@@ -18,28 +18,44 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionScrapReasonColumnNames
+	public enum ProductionScrapReasonFieldNames
 	{	
-		ScrapReasonID, 	
+		Id, 	
 		Name, 	
 		ModifiedDate, 	
 	}
 
 	public enum ProductionScrapReasonCascadeNames
 	{	
-		productionworkorder, 	
+		productionworkorders, 	
 		}
 
 	public class ProductionScrapReasonTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionScrapReasonColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionScrapReasonFieldNames.Id, "ScrapReasonID" }, 
+						{ (int)ProductionScrapReasonFieldNames.Name, "Name" }, 
+						{ (int)ProductionScrapReasonFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionScrapReasonIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionScrapReasonFieldNames.Id, "ScrapReasonID" }, 
+				};
+
 		public ProductionScrapReasonTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionScrapReasonColumnNames.ScrapReasonID.ToString();
-			//Schema = "Production.ScrapReason";
+			Schema = "Production";
 			TableName = "Production.ScrapReason";
 			TableAlias = "productionscrapreason";
-			ColumnNames = typeof(ProductionScrapReasonColumnNames).ToDataList<Type, int>();
+			Columns = ProductionScrapReasonColumnNames;
+			IdColumns = ProductionScrapReasonIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

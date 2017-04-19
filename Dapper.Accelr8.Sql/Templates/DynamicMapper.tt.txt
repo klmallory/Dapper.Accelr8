@@ -1,0 +1,180 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data" #>
+<#@ assembly name="System.Data.DataSetExtensions" #>
+<#@ import namespace="EnvDTE" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#@ import namespace="System.Runtime.InteropServices" #>
+<#@ output extension=".txt" #>
+<#@ include file="Includes\\Accelr8or.tt.txt" #>
+<#@ include file="Includes\\DbHelper.tt.txt" #>
+<#@ include file="Includes\\Manager.tt.txt" #>
+<#@ include file="Schema.tt.txt" #>
+
+<#@ assembly name="Dapper.Accelr8.Sql.dll" #>
+
+<#
+	var className = @"";
+	var idType = @"";
+	var entityType = @"";
+	var idField = @"";
+
+	var tables = SchemaHelper.GetTables();
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	var ignoreProperties = new string[] { "MergeCollection", "IsDirty", "GenericId", "Merged" };
+
+	var manager = Manager.Create(Host, GenerationEnvironment);
+
+	var assembly = Assembly.Load("");
+
+	Debug.WriteLine(assembly.DefinedTypes.Where(d => d.Namespace.Contains("Entities") && d.BaseType.Name.Contains("BaseEntity")).Count());
+
+    foreach (var type in assembly.DefinedTypes.Where(d => d.Namespace.Contains("Entities") && d.BaseType.Name.Contains("BaseEntity")))
+    {
+		manager.StartNewFile(Path.Combine(SchemaHelper.DynamicDirectory, name + "Mapper.cs")); 
+
+		#>using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Text;
+
+using <#= SchemaHelper.DAONamespace #>;
+using <#= SchemaHelper.TableInfoNamespace #>;
+using Dapper;
+using Dapper.Accelr8.Sql;
+using Dapper.Accelr8.Domain;
+using Dapper.Accelr8.Repo;
+using Dapper.Accelr8.Repo.Extensions;
+using Dapper.Accelr8.Repo.Parameters;
+using Dapper.Accelr8.Repo.Contracts;
+
+//This code is auto-generated using the MapperTemplate.tt.
+//Please use a partial class or child class to change or override the funtionality in this class.
+namespace <#= SchemaHelper.DynamicNamespace #>
+{
+	public partial class <#=type.Name#>Mapper : DomainMapper<<#=type.FullName#>>
+	{
+		public <#=type.Name#>Mapper(IServiceLocator locator) : base(locator)
+		{
+			<# var ch = type.Name.ToLower().ToArray()[0].ToString().Replace("v", "V"); #>
+lock (_syncRoot)
+			{
+				<# foreach (var prop in type.GetProperties().Where(p => !p.CustomAttributes.Any(c => c.AttributeType.Name == "SkipMapper") && !ignoreProperties.Contains(p.Name)))
+				{
+					var get = prop.GetGetMethod();
+					var set = prop.GetSetMethod(); 
+
+					if (get == null && set == null)
+						continue;#>
+_mappings.Add("<#=prop.Name#>", new DomainMap<<#=type.Name#>>()
+				{ <#
+					if (get != null && get.IsPublic)
+					{ #>
+
+					Getter = <#=ch#> => <#=ch#>.<#=prop.Name#>,<#}
+					if (prop.PropertyType.GetInterfaces().Any(i => i == typeof(IComparable) || i == typeof(IComparable<>)))
+					{ #>
+
+					Comparer = (<#=ch#>1, <#=ch#>2) => <#=ch#>1.<#=prop.Name#>.CompareTo(<#=ch#>2.<#=prop.Name#>),
+					<#}
+					else if (prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>) && Nullable.GetUnderlyingType(prop.PropertyType).GetInterfaces().Any(i => i == typeof(IComparable) || i == typeof(IComparable<>)))
+					{ #>
+
+					Comparer = (<#=ch#>1, <#=ch#>2) => <#=ch#>1.<#=prop.Name#>.SafeCompare(<#=ch#>2.<#=prop.Name#>),
+					<#}
+					else if (prop.PropertyType == typeof(DateTime))
+					{#>
+
+					Comparer = (<#=ch#>1, <#=ch#>2) => <#=ch#>1.<#=prop.Name#>.TimeStamp.CompareTo(<#=ch#>2.<#=prop.Name#>.TimeStamp),<#}
+
+					if (set != null && set.IsPublic)
+					{
+						if (prop.PropertyType.Name.Contains("IDictionary`2") || prop.PropertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
+						{
+						var dKey = prop.PropertyType.GetGenericArguments().Count() > 0
+						? prop.PropertyType.GetGenericArguments()[0]
+						: prop.PropertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)).GetGenericArguments()[0];
+						var dValue = prop.PropertyType.GetGenericArguments().Count() > 0
+						? prop.PropertyType.GetGenericArguments()[1]
+						: prop.PropertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>)).GetGenericArguments()[1];
+						#>
+
+					//IDictionary
+					Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v as IDictionary<<#=dKey#>,<#=dValue#>>,
+						<#}
+						else if (prop.PropertyType != typeof(string) && prop.PropertyType.IsArray) 
+						{#>
+
+					//array
+					Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToArray<<#=prop.PropertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)).GetGenericArguments()[0]#>>(),
+						<#}
+
+						else if (prop.PropertyType != typeof(string) && (prop.PropertyType.Name.Contains("IList`1") || prop.PropertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>))))
+						{
+						var inner = prop.PropertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)).GetGenericArguments()[0];
+						#>
+
+					//IList
+					Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToList<<#=inner#>>(),
+					Add = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#>.Add((<#=inner#>)v),
+					Remove = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#>.Remove((<#=inner#>)v)
+						<#}
+						else if (prop.PropertyType != typeof(string) && prop.PropertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+						{#>
+						//<#= prop.PropertyType #>
+						<# foreach (var i in prop.PropertyType.GetInterfaces()) {#>
+						//<#=i.ToString()#> <#}#>
+
+					//IEnumerable
+					Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToList<<#=prop.PropertyType.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)).GetGenericArguments()[0]#>>(),
+						<#}
+
+						else
+						{
+							if (prop.PropertyType.IsEnum && prop.PropertyType.IsGenericType && prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>)) 
+							{#>Setter = (<#=ch#>, v) => { <#=prop.PropertyType.FullName#>? val = null);
+							<#=ch#>.<#=prop.Name#> = Enum.TryParse(v.SafeToString(), true, out val) ? val : null;},<#}
+							else if (prop.PropertyType.IsEnum) {#>Setter = (<#=ch#>, v) => { <#=prop.PropertyType.FullName#> val = default(<#=prop.PropertyType#>);
+							<#=ch#>.<#=prop.Name#> = Enum.TryParse(v.SafeToString(), true, out val) ? val : val;},<#}
+							else if (prop.PropertyType == typeof(int)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = Convert.ToInt32(v),<#}
+							else if (prop.PropertyType == typeof(long)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = Convert.ToInt64(v),<#}
+							else if (prop.PropertyType == typeof(long?)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToInt64(),<#}
+							else if (prop.PropertyType == typeof(string)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToString(),<#}
+							else if (prop.PropertyType == typeof(bool)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = Convert.ToBoolean(v),<#}
+							else if (prop.PropertyType == typeof(bool?)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToBoolean(),<#}
+							else if (prop.PropertyType == typeof(byte[])) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToBytes(),<#}
+							else if (prop.PropertyType == typeof(int?)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToInt32(),<#}
+							else if (prop.PropertyType == typeof(Guid)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = (Guid)v,<#}
+							else if (prop.PropertyType == typeof(Guid?)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToGuid(v),<#}
+							else if (prop.PropertyType == typeof(DateTime)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> =  Convert.ToDateTime(v),<#}
+							else if (prop.PropertyType == typeof(DateTime?)) {#>Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v.SafeToDateTime(),<#}
+							else {#>
+
+					Setter = (<#=ch#>, v) => <#=ch#>.<#=prop.Name#> = v as <#=prop.PropertyType#>,<#}
+						} } #>
+									
+				});		
+				<#}#>
+}	
+		}
+	}
+}
+<# manager.EndBlock();
+}
+manager.Process(true);
+#>

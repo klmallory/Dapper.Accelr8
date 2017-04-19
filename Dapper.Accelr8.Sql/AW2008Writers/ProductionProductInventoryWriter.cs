@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class ProductionProductInventoryWriter : EntityWriter<int, ProductionProductInventory>
+    public class ProductionProductInventoryWriter : EntityWriter<CompoundKey, ProductionProductInventory>
     {
         public ProductionProductInventoryWriter
 			(ProductionProductInventoryTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<short, ProductionLocation> GetProductionLocationWriter()
-		{ return _locator.Resolve<IEntityWriter<short, ProductionLocation>>(); }
+		{ return s_loc8r.GetWriter<short, ProductionLocation>(); }
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,22 +51,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductInventoryColumnNames)f.Key)
+                switch ((ProductionProductInventoryFieldNames)f.Key)
                 {
                     
-					case ProductionProductInventoryColumnNames.Shelf:
+					case ProductionProductInventoryFieldNames.Shelf:
 						parms.Add(GetParamName("Shelf", actionType, taskIndex, ref count), entity.Shelf);
 						break;
-					case ProductionProductInventoryColumnNames.Bin:
+					case ProductionProductInventoryFieldNames.Bin:
 						parms.Add(GetParamName("Bin", actionType, taskIndex, ref count), entity.Bin);
 						break;
-					case ProductionProductInventoryColumnNames.Quantity:
+					case ProductionProductInventoryFieldNames.Quantity:
 						parms.Add(GetParamName("Quantity", actionType, taskIndex, ref count), entity.Quantity);
 						break;
-					case ProductionProductInventoryColumnNames.rowguid:
+					case ProductionProductInventoryFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case ProductionProductInventoryColumnNames.ModifiedDate:
+					case ProductionProductInventoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -82,13 +85,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ProductInventory_Location_LocationID
 			var productionLocation234 = GetProductionLocationWriter();
-		if ((_cascades.Contains(ProductionProductInventoryCascadeNames.productionlocation.ToString()) || _cascades.Contains("all")) && entity.ProductionLocation != null)
+		if ((_cascades.Contains(ProductionProductInventoryCascadeNames.productionlocation_p.ToString()) || _cascades.Contains("all")) && entity.ProductionLocation != null)
 			if (Cascade(productionLocation234, entity.ProductionLocation, context))
 				WithParent(productionLocation234, entity);
 
 			//From Foreign Key FK_ProductInventory_Product_ProductID
 			var productionProduct235 = GetProductionProductWriter();
-		if ((_cascades.Contains(ProductionProductInventoryCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(ProductionProductInventoryCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct235, entity.ProductionProduct, context))
 				WithParent(productionProduct235, entity);
 
@@ -102,11 +105,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ProductInventory_Location_LocationID
 			if (entity.ProductionLocation != null)
-				entity.ProductionProductInventory = entity.ProductionLocation.Id;
+				entity.LocationID = entity.ProductionLocation.Id;
 
 			//From Foreign Key FK_ProductInventory_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.ProductionProductInventory = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

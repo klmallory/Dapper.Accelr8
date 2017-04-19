@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionvProductModelCatalogDescriptionColumnNames
+	public enum ProductionvProductModelCatalogDescriptionFieldNames
 	{	
 		ProductModelID, 	
 		Name, 	
@@ -52,15 +52,53 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class ProductionvProductModelCatalogDescriptionTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionvProductModelCatalogDescriptionColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionvProductModelCatalogDescriptionFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Name, "Name" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Summary, "Summary" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Manufacturer, "Manufacturer" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Copyright, "Copyright" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.ProductURL, "ProductURL" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.WarrantyPeriod, "WarrantyPeriod" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.WarrantyDescription, "WarrantyDescription" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.NoOfYears, "NoOfYears" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.MaintenanceDescription, "MaintenanceDescription" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Wheel, "Wheel" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Saddle, "Saddle" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Pedal, "Pedal" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.BikeFrame, "BikeFrame" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Crankset, "Crankset" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.PictureAngle, "PictureAngle" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.PictureSize, "PictureSize" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.ProductPhotoID, "ProductPhotoID" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Material, "Material" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Color, "Color" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.ProductLine, "ProductLine" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.Style, "Style" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.RiderExperience, "RiderExperience" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionvProductModelCatalogDescriptionIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)ProductionvProductModelCatalogDescriptionFieldNames.ProductModelID, "ProductModelID" }, 
+				};
+
 		public ProductionvProductModelCatalogDescriptionTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = ProductionvProductModelCatalogDescriptionColumnNames.ProductModelID.ToString();
-			//Schema = "Production.vProductModelCatalogDescription";
+			Schema = "Production";
 			TableName = "Production.vProductModelCatalogDescription";
 			TableAlias = "productionvproductmodelcatalogdescription";
-			ColumnNames = typeof(ProductionvProductModelCatalogDescriptionColumnNames).ToDataList<Type, int>();
+			Columns = ProductionvProductModelCatalogDescriptionColumnNames;
+			IdColumns = ProductionvProductModelCatalogDescriptionIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

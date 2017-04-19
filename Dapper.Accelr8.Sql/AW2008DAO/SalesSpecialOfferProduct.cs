@@ -8,22 +8,64 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSpecialOfferProduct : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSpecialOfferProduct : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public SalesSpecialOfferProduct()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_salesSalesOrderDetails = new List<SalesSalesOrderDetail>();
-		_salesSalesOrderDetails = new List<SalesSalesOrderDetail>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(SalesSpecialOfferProduct dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.SpecialOfferID,
+							dao.ProductID,
+						
+				}
+			};
+		}
+
+			
+			protected int _specialOfferID;
+		public int SpecialOfferID 
+		{ 
+			get { return _specialOfferID; }
+			set 
+			{ 
+				_specialOfferID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _productID;
+		public int ProductID 
+		{ 
+			get { return _productID; }
+			set 
+			{ 
+				_productID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected Guid _rowguid;
 		public Guid rowguid 
@@ -71,18 +113,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
-	//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID	
-		protected IList<SalesSalesOrderDetail> _salesSalesOrderDetails;
-		public virtual IList<SalesSalesOrderDetail> SalesSalesOrderDetails 
-		{ 
-			get { return _salesSalesOrderDetails; }
-			set 
-			{ 
-				_salesSalesOrderDetails = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID	
 		protected IList<SalesSalesOrderDetail> _salesSalesOrderDetails;
 		public virtual IList<SalesSalesOrderDetail> SalesSalesOrderDetails 

@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, HumanResourcesEmployee> GetHumanResourcesEmployeeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployee>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployee>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,16 +49,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((HumanResourcesJobCandidateColumnNames)f.Key)
+                switch ((HumanResourcesJobCandidateFieldNames)f.Key)
                 {
                     
-					case HumanResourcesJobCandidateColumnNames.BusinessEntityID:
+					case HumanResourcesJobCandidateFieldNames.BusinessEntityID:
 						parms.Add(GetParamName("BusinessEntityID", actionType, taskIndex, ref count), entity.BusinessEntityID);
 						break;
-					case HumanResourcesJobCandidateColumnNames.Resume:
+					case HumanResourcesJobCandidateFieldNames.Resume:
 						parms.Add(GetParamName("Resume", actionType, taskIndex, ref count), entity.Resume);
 						break;
-					case HumanResourcesJobCandidateColumnNames.ModifiedDate:
+					case HumanResourcesJobCandidateFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -74,7 +77,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_JobCandidate_Employee_BusinessEntityID
 			var humanResourcesEmployee136 = GetHumanResourcesEmployeeWriter();
-		if ((_cascades.Contains(HumanResourcesJobCandidateCascadeNames.humanresourcesemployee.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
+		if ((_cascades.Contains(HumanResourcesJobCandidateCascadeNames.humanresourcesemployee_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
 			if (Cascade(humanResourcesEmployee136, entity.HumanResourcesEmployee, context))
 				WithParent(humanResourcesEmployee136, entity);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_JobCandidate_Employee_BusinessEntityID
 			if (entity.HumanResourcesEmployee != null)
-				entity.HumanResourcesJobCandidate = entity.HumanResourcesEmployee.Id;
+				entity.BusinessEntityID = entity.HumanResourcesEmployee.Id;
 
 		}
 

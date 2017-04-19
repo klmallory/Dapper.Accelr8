@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductModelIllustrationColumnNames
+	public enum ProductionProductModelIllustrationFieldNames
 	{	
 		ProductModelID, 	
 		IllustrationID, 	
@@ -32,15 +32,32 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionillustration_p, 	}
 
 	public class ProductionProductModelIllustrationTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductModelIllustrationColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductModelIllustrationFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionProductModelIllustrationFieldNames.IllustrationID, "IllustrationID" }, 
+						{ (int)ProductionProductModelIllustrationFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductModelIllustrationIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductModelIllustrationFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionProductModelIllustrationFieldNames.IllustrationID, "IllustrationID" }, 
+				};
+
 		public ProductionProductModelIllustrationTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductModelIllustrationColumnNames.ProductModelID.ToString();
-			//Schema = "Production.ProductModelIllustration";
+			Schema = "Production";
 			TableName = "Production.ProductModelIllustration";
 			TableAlias = "productionproductmodelillustration";
-			ColumnNames = typeof(ProductionProductModelIllustrationColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductModelIllustrationColumnNames;
+			IdColumns = ProductionProductModelIllustrationIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductModelIllustration_ProductModel_ProductModelID

@@ -8,20 +8,63 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesPersonCreditCard : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesPersonCreditCard : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public SalesPersonCreditCard()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(SalesPersonCreditCard dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.BusinessEntityID,
+							dao.CreditCardID,
+						
+				}
+			};
+		}
+
+			
+			protected int _businessEntityID;
+		public int BusinessEntityID 
+		{ 
+			get { return _businessEntityID; }
+			set 
+			{ 
+				_businessEntityID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _creditCardID;
+		public int CreditCardID 
+		{ 
+			get { return _creditCardID; }
+			set 
+			{ 
+				_creditCardID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected DateTime _modifiedDate;
 		public DateTime ModifiedDate 

@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , SalesSpecialOfferProduct> _salesSpecialOfferProductReader;
-		protected static IEntityReader<int , SalesSpecialOfferProduct> GetSalesSpecialOfferProductReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesSpecialOfferProduct> GetSalesSpecialOfferProductReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSpecialOfferProduct>>();
+			return s_loc8r.GetReader<CompoundKey , SalesSpecialOfferProduct>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenSalesSpecialOfferProducts(IList<SalesSpecialOffer> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: SalesSpecialOfferProduct
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSpecialOfferProducts = typedChildren.Where(b => b.SalesSpecialOfferProduct == r.Id).ToList();
+				
+
+				r.SalesSpecialOfferProducts = typedChildren.Where(b =>  b.SpecialOfferID == r.Id ).ToList();
 				r.SalesSpecialOfferProducts.ToList().ForEach(b => { b.Loaded = false; b.SalesSpecialOffer = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesSpecialOffer();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Description = GetRowData<string>(dataRow, "Description"); 
+			domain.Id = GetRowData<int>(dataRow, "SpecialOfferID"); 
+      		domain.Description = GetRowData<string>(dataRow, "Description"); 
       		domain.DiscountPct = GetRowData<decimal>(dataRow, "DiscountPct"); 
       		domain.Type = GetRowData<string>(dataRow, "Type"); 
       		domain.Category = GetRowData<string>(dataRow, "Category"); 
@@ -98,15 +106,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesSpecialOffer></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesSpecialOffer> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesSpecialOffer> WithAllChildrenForExisting(SalesSpecialOffer existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesSpecialOfferProductReader(), id, IdColumn, SetChildrenSalesSpecialOfferProducts);
+						WithChildForParentValues(GetSalesSpecialOfferProductReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "SpecialOfferID",  }
+				, SetChildrenSalesSpecialOfferProducts);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesSpecialOffer entity)
         {
@@ -115,11 +124,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesSpecialOfferProductReader(), entity.Id
-				, SalesSpecialOfferProductColumnNames.SpecialOfferID.ToString()
+						WithChildForParentValues(GetSalesSpecialOfferProductReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "SpecialOfferID",  }
 				, SetChildrenSalesSpecialOfferProducts);
 
-			QueryResultForChildrenOnly(new List<SalesSpecialOffer>() { entity });
+			
+QueryResultForChildrenOnly(new List<SalesSpecialOffer>() { entity });
 			entity.Loaded = false;
 			GetSalesSpecialOfferProductReader().SetAllChildrenForExisting(entity.SalesSpecialOfferProducts);
 				
@@ -130,15 +141,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesSpecialOfferProductReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSpecialOfferProductColumnNames.SpecialOfferID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesSpecialOfferProductReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "SpecialOfferID",  }
 				, SetChildrenSalesSpecialOfferProducts);
 
 					

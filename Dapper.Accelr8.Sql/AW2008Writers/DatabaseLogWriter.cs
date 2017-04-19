@@ -28,8 +28,11 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		
@@ -44,28 +47,28 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((DatabaseLogColumnNames)f.Key)
+                switch ((DatabaseLogFieldNames)f.Key)
                 {
                     
-					case DatabaseLogColumnNames.PostTime:
+					case DatabaseLogFieldNames.PostTime:
 						parms.Add(GetParamName("PostTime", actionType, taskIndex, ref count), entity.PostTime);
 						break;
-					case DatabaseLogColumnNames.DatabaseUser:
+					case DatabaseLogFieldNames.DatabaseUser:
 						parms.Add(GetParamName("DatabaseUser", actionType, taskIndex, ref count), entity.DatabaseUser);
 						break;
-					case DatabaseLogColumnNames.Event:
+					case DatabaseLogFieldNames.Event:
 						parms.Add(GetParamName("Event", actionType, taskIndex, ref count), entity.Event);
 						break;
-					case DatabaseLogColumnNames.Schema:
+					case DatabaseLogFieldNames.Schema:
 						parms.Add(GetParamName("Schema", actionType, taskIndex, ref count), entity.Schema);
 						break;
-					case DatabaseLogColumnNames.Object:
+					case DatabaseLogFieldNames.Object:
 						parms.Add(GetParamName("Object", actionType, taskIndex, ref count), entity.Object);
 						break;
-					case DatabaseLogColumnNames.TSQL:
+					case DatabaseLogFieldNames.TSQL:
 						parms.Add(GetParamName("TSQL", actionType, taskIndex, ref count), entity.TSQL);
 						break;
-					case DatabaseLogColumnNames.XmlEvent:
+					case DatabaseLogFieldNames.XmlEvent:
 						parms.Add(GetParamName("XmlEvent", actionType, taskIndex, ref count), entity.XmlEvent);
 						break;
 				}

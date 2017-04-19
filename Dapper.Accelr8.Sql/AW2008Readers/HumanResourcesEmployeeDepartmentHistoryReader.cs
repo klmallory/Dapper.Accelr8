@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class HumanResourcesEmployeeDepartmentHistoryReader : EntityReader<int, HumanResourcesEmployeeDepartmentHistory>
+    public class HumanResourcesEmployeeDepartmentHistoryReader : EntityReader<CompoundKey, HumanResourcesEmployeeDepartmentHistory>
     {
         public HumanResourcesEmployeeDepartmentHistoryReader(
             HumanResourcesEmployeeDepartmentHistoryTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 3
@@ -43,27 +48,29 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new HumanResourcesEmployeeDepartmentHistory();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.EndDate = GetRowData<DateTime?>(dataRow, "EndDate"); 
+			domain.BusinessEntityID = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.DepartmentID = GetRowData<short>(dataRow, "DepartmentID"); 
+      		domain.ShiftID = GetRowData<byte>(dataRow, "ShiftID"); 
+      		domain.StartDate = GetRowData<DateTime>(dataRow, "StartDate"); 
+      		domain.EndDate = GetRowData<DateTime?>(dataRow, "EndDate"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+      				domain.Id = HumanResourcesEmployeeDepartmentHistory.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, HumanResourcesEmployeeDepartmentHistory></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, HumanResourcesEmployeeDepartmentHistory> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, HumanResourcesEmployeeDepartmentHistory></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, HumanResourcesEmployeeDepartmentHistory> WithAllChildrenForExisting(HumanResourcesEmployeeDepartmentHistory existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(HumanResourcesEmployeeDepartmentHistory entity)
         {

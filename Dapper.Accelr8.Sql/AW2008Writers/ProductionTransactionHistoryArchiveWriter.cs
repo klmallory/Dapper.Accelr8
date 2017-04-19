@@ -28,8 +28,11 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		
@@ -44,31 +47,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionTransactionHistoryArchiveColumnNames)f.Key)
+                switch ((ProductionTransactionHistoryArchiveFieldNames)f.Key)
                 {
                     
-					case ProductionTransactionHistoryArchiveColumnNames.ProductID:
+					case ProductionTransactionHistoryArchiveFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.ReferenceOrderID:
+					case ProductionTransactionHistoryArchiveFieldNames.ReferenceOrderID:
 						parms.Add(GetParamName("ReferenceOrderID", actionType, taskIndex, ref count), entity.ReferenceOrderID);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.ReferenceOrderLineID:
+					case ProductionTransactionHistoryArchiveFieldNames.ReferenceOrderLineID:
 						parms.Add(GetParamName("ReferenceOrderLineID", actionType, taskIndex, ref count), entity.ReferenceOrderLineID);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.TransactionDate:
+					case ProductionTransactionHistoryArchiveFieldNames.TransactionDate:
 						parms.Add(GetParamName("TransactionDate", actionType, taskIndex, ref count), entity.TransactionDate);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.TransactionType:
+					case ProductionTransactionHistoryArchiveFieldNames.TransactionType:
 						parms.Add(GetParamName("TransactionType", actionType, taskIndex, ref count), entity.TransactionType);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.Quantity:
+					case ProductionTransactionHistoryArchiveFieldNames.Quantity:
 						parms.Add(GetParamName("Quantity", actionType, taskIndex, ref count), entity.Quantity);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.ActualCost:
+					case ProductionTransactionHistoryArchiveFieldNames.ActualCost:
 						parms.Add(GetParamName("ActualCost", actionType, taskIndex, ref count), entity.ActualCost);
 						break;
-					case ProductionTransactionHistoryArchiveColumnNames.ModifiedDate:
+					case ProductionTransactionHistoryArchiveFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}

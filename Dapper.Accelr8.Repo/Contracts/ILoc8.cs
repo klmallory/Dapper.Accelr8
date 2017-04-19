@@ -1,6 +1,5 @@
 ﻿using Dapper.Accelr8.Domain;
-using Dapper.Accelr8.Repo.Contracts.Readers;
-using Dapper.Accelr8.Repo.Contracts.Writers;
+using Dapper.Accelr8.Repo.Dynamic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +15,7 @@ namespace Dapper.Accelr8.Repo.Contracts
 
         IDictionary<Type, Type> ClassesToRegister { get; }
 
-        IUnitOfWork GetUnitOfWork(string type = null);
+        IUnitOfWork GetUnitOfWork(LockType type = LockType.Safe);
 
         IEntityReader<IdType, EntityType> GetReader<IdType, EntityType>()
                     where EntityType : class, IHaveId<IdType>
@@ -33,5 +32,10 @@ namespace Dapper.Accelr8.Repo.Contracts
         IEntityWriter<IdType, EntityType> GetWriter<IdType, EntityType>(string className)
                     where EntityType : class, IHaveId<IdType>
                     where IdType : IComparable;
+
+        IDynamicMapper<EntityType> GetMapper<EntityType>()
+            where EntityType : class, IEntity;
+
+        IDynamicMapper GetMapper(string className);
     }
 }

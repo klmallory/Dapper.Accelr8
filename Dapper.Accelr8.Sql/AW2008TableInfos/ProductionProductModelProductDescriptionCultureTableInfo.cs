@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductModelProductDescriptionCultureColumnNames
+	public enum ProductionProductModelProductDescriptionCultureFieldNames
 	{	
 		ProductModelID, 	
 		ProductDescriptionID, 	
@@ -34,15 +34,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproductdescription_p, 	}
 
 	public class ProductionProductModelProductDescriptionCultureTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductModelProductDescriptionCultureColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductModelProductDescriptionCultureFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionProductModelProductDescriptionCultureFieldNames.ProductDescriptionID, "ProductDescriptionID" }, 
+						{ (int)ProductionProductModelProductDescriptionCultureFieldNames.CultureID, "CultureID" }, 
+						{ (int)ProductionProductModelProductDescriptionCultureFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductModelProductDescriptionCultureIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductModelProductDescriptionCultureFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionProductModelProductDescriptionCultureFieldNames.ProductDescriptionID, "ProductDescriptionID" }, 
+						{ (int)ProductionProductModelProductDescriptionCultureFieldNames.CultureID, "CultureID" }, 
+				};
+
 		public ProductionProductModelProductDescriptionCultureTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductModelProductDescriptionCultureColumnNames.ProductModelID.ToString();
-			//Schema = "Production.ProductModelProductDescriptionCulture";
+			Schema = "Production";
 			TableName = "Production.ProductModelProductDescriptionCulture";
 			TableAlias = "productionproductmodelproductdescriptionculture";
-			ColumnNames = typeof(ProductionProductModelProductDescriptionCultureColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductModelProductDescriptionCultureColumnNames;
+			IdColumns = ProductionProductModelProductDescriptionCultureIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID

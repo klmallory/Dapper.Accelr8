@@ -28,19 +28,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, SalesStore> GetSalesStoreWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesStore>>(); }
+		{ return s_loc8r.GetWriter<int, SalesStore>(); }
 		static IEntityWriter<int, PersonBusinessEntityAddress> GetPersonBusinessEntityAddressWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonBusinessEntityAddress>>(); }
+		{ return s_loc8r.GetWriter<int, PersonBusinessEntityAddress>(); }
 		static IEntityWriter<int, PersonBusinessEntityContact> GetPersonBusinessEntityContactWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonBusinessEntityContact>>(); }
+		{ return s_loc8r.GetWriter<int, PersonBusinessEntityContact>(); }
 		static IEntityWriter<int, PurchasingVendor> GetPurchasingVendorWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingVendor>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingVendor>(); }
 		static IEntityWriter<int, PersonPerson> GetPersonPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPerson>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPerson>(); }
 		
 		
 		/// <summary>
@@ -54,13 +57,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonBusinessEntityColumnNames)f.Key)
+                switch ((PersonBusinessEntityFieldNames)f.Key)
                 {
                     
-					case PersonBusinessEntityColumnNames.rowguid:
+					case PersonBusinessEntityFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case PersonBusinessEntityColumnNames.ModifiedDate:
+					case PersonBusinessEntityFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -77,7 +80,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Store_BusinessEntity_BusinessEntityID
 			var salesStore21 = GetSalesStoreWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.sales.store.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.salesstores.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesStores)
 					Cascade(salesStore21, item, context);
 
@@ -86,7 +89,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID
 			var personBusinessEntityAddress22 = GetPersonBusinessEntityAddressWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.person.businessentityaddress.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.personbusinessentityaddresses.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityAddresses)
 					Cascade(personBusinessEntityAddress22, item, context);
 
@@ -95,7 +98,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_BusinessEntityContact_BusinessEntity_BusinessEntityID
 			var personBusinessEntityContact23 = GetPersonBusinessEntityContactWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.person.businessentitycontact.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.personbusinessentitycontacts.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityContacts)
 					Cascade(personBusinessEntityContact23, item, context);
 
@@ -104,7 +107,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID
 			var purchasingVendor24 = GetPurchasingVendorWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.purchasing.vendor.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.purchasingvendors.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingVendors)
 					Cascade(purchasingVendor24, item, context);
 
@@ -113,8 +116,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Person_BusinessEntity_BusinessEntityID
 			var personPerson25 = GetPersonPersonWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.person.person.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.PersonPeople)
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.personpeople.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.PersonPeoples)
 					Cascade(personPerson25, item, context);
 
 			if (personPerson25.Count > 0)
@@ -132,27 +135,27 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_Store_BusinessEntity_BusinessEntityID
 			if (entity.SalesStores != null && entity.SalesStores.Count > 0)
 				foreach (var rel in entity.SalesStores)
-					rel.SalesStore = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID
 			if (entity.PersonBusinessEntityAddresses != null && entity.PersonBusinessEntityAddresses.Count > 0)
 				foreach (var rel in entity.PersonBusinessEntityAddresses)
-					rel.PersonBusinessEntityAddress = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_BusinessEntityContact_BusinessEntity_BusinessEntityID
 			if (entity.PersonBusinessEntityContacts != null && entity.PersonBusinessEntityContacts.Count > 0)
 				foreach (var rel in entity.PersonBusinessEntityContacts)
-					rel.PersonBusinessEntityContact = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID
 			if (entity.PurchasingVendors != null && entity.PurchasingVendors.Count > 0)
 				foreach (var rel in entity.PurchasingVendors)
-					rel.PurchasingVendor = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_Person_BusinessEntity_BusinessEntityID
 			if (entity.PersonPeople != null && entity.PersonPeople.Count > 0)
 				foreach (var rel in entity.PersonPeople)
-					rel.PersonPerson = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 				
 		}
@@ -161,7 +164,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_Store_BusinessEntity_BusinessEntityID
 			var salesStore31 = GetSalesStoreWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.sales.store.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.salesstore.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesStores)
 					CascadeDelete(salesStore31, item, context);
 
@@ -170,7 +173,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID
 			var personBusinessEntityAddress32 = GetPersonBusinessEntityAddressWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.person.businessentityaddress.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.personbusinessentityaddress.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityAddresses)
 					CascadeDelete(personBusinessEntityAddress32, item, context);
 
@@ -179,7 +182,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_BusinessEntityContact_BusinessEntity_BusinessEntityID
 			var personBusinessEntityContact33 = GetPersonBusinessEntityContactWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.person.businessentitycontact.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.personbusinessentitycontact.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityContacts)
 					CascadeDelete(personBusinessEntityContact33, item, context);
 
@@ -188,7 +191,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID
 			var purchasingVendor34 = GetPurchasingVendorWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.purchasing.vendor.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.purchasingvendor.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingVendors)
 					CascadeDelete(purchasingVendor34, item, context);
 
@@ -197,7 +200,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_Person_BusinessEntity_BusinessEntityID
 			var personPerson35 = GetPersonPersonWriter();
-			if (_cascades.Contains(PersonBusinessEntityCascadeNames.person.person.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonBusinessEntityCascadeNames.personperson.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonPeople)
 					CascadeDelete(personPerson35, item, context);
 

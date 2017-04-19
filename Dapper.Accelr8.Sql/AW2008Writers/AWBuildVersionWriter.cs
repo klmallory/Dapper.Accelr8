@@ -28,8 +28,11 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		
@@ -44,16 +47,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((AWBuildVersionColumnNames)f.Key)
+                switch ((AWBuildVersionFieldNames)f.Key)
                 {
                     
-					case AWBuildVersionColumnNames.Database_spc_Version:
-						parms.Add(GetParamName("Database Version", actionType, taskIndex, ref count), entity.Database_spc_Version);
+					case AWBuildVersionFieldNames.Database_Spc_Version:
+						parms.Add(GetParamName("Database Version", actionType, taskIndex, ref count), entity.Database_Spc_Version);
 						break;
-					case AWBuildVersionColumnNames.VersionDate:
+					case AWBuildVersionFieldNames.VersionDate:
 						parms.Add(GetParamName("VersionDate", actionType, taskIndex, ref count), entity.VersionDate);
 						break;
-					case AWBuildVersionColumnNames.ModifiedDate:
+					case AWBuildVersionFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}

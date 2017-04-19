@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionTransactionHistoryColumnNames
+	public enum ProductionTransactionHistoryFieldNames
 	{	
-		TransactionID, 	
+		Id, 	
 		ProductID, 	
 		ReferenceOrderID, 	
 		ReferenceOrderLineID, 	
@@ -37,15 +37,37 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class ProductionTransactionHistoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionTransactionHistoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionTransactionHistoryFieldNames.Id, "TransactionID" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.ReferenceOrderID, "ReferenceOrderID" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.ReferenceOrderLineID, "ReferenceOrderLineID" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.TransactionDate, "TransactionDate" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.TransactionType, "TransactionType" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.Quantity, "Quantity" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.ActualCost, "ActualCost" }, 
+						{ (int)ProductionTransactionHistoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionTransactionHistoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionTransactionHistoryFieldNames.Id, "TransactionID" }, 
+				};
+
 		public ProductionTransactionHistoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionTransactionHistoryColumnNames.TransactionID.ToString();
-			//Schema = "Production.TransactionHistory";
+			Schema = "Production";
 			TableName = "Production.TransactionHistory";
 			TableAlias = "productiontransactionhistory";
-			ColumnNames = typeof(ProductionTransactionHistoryColumnNames).ToDataList<Type, int>();
+			Columns = ProductionTransactionHistoryColumnNames;
+			IdColumns = ProductionTransactionHistoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_TransactionHistory_Product_ProductID

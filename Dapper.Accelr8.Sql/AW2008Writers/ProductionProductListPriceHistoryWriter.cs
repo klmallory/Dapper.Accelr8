@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class ProductionProductListPriceHistoryWriter : EntityWriter<int, ProductionProductListPriceHistory>
+    public class ProductionProductListPriceHistoryWriter : EntityWriter<CompoundKey, ProductionProductListPriceHistory>
     {
         public ProductionProductListPriceHistoryWriter
 			(ProductionProductListPriceHistoryTableInfo tableInfo
@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,16 +49,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductListPriceHistoryColumnNames)f.Key)
+                switch ((ProductionProductListPriceHistoryFieldNames)f.Key)
                 {
                     
-					case ProductionProductListPriceHistoryColumnNames.EndDate:
+					case ProductionProductListPriceHistoryFieldNames.EndDate:
 						parms.Add(GetParamName("EndDate", actionType, taskIndex, ref count), entity.EndDate);
 						break;
-					case ProductionProductListPriceHistoryColumnNames.ListPrice:
+					case ProductionProductListPriceHistoryFieldNames.ListPrice:
 						parms.Add(GetParamName("ListPrice", actionType, taskIndex, ref count), entity.ListPrice);
 						break;
-					case ProductionProductListPriceHistoryColumnNames.ModifiedDate:
+					case ProductionProductListPriceHistoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -74,7 +77,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ProductListPriceHistory_Product_ProductID
 			var productionProduct238 = GetProductionProductWriter();
-		if ((_cascades.Contains(ProductionProductListPriceHistoryCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(ProductionProductListPriceHistoryCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct238, entity.ProductionProduct, context))
 				WithParent(productionProduct238, entity);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ProductListPriceHistory_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.ProductionProductListPriceHistory = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

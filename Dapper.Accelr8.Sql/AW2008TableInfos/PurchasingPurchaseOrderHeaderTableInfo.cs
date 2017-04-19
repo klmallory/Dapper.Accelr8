@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PurchasingPurchaseOrderHeaderColumnNames
+	public enum PurchasingPurchaseOrderHeaderFieldNames
 	{	
-		PurchaseOrderID, 	
+		Id, 	
 		RevisionNumber, 	
 		Status, 	
 		EmployeeID, 	
@@ -37,22 +37,48 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum PurchasingPurchaseOrderHeaderCascadeNames
 	{	
-		purchasingpurchaseorderdetail, 	
+		purchasingpurchaseorderdetails, 	
 		
 		purchasingvendor_p, 	
 		humanresourcesemployee_p, 	
 		purchasingshipmethod_p, 	}
 
 	public class PurchasingPurchaseOrderHeaderTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PurchasingPurchaseOrderHeaderColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingPurchaseOrderHeaderFieldNames.Id, "PurchaseOrderID" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.RevisionNumber, "RevisionNumber" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.Status, "Status" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.EmployeeID, "EmployeeID" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.VendorID, "VendorID" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.ShipMethodID, "ShipMethodID" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.OrderDate, "OrderDate" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.ShipDate, "ShipDate" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.SubTotal, "SubTotal" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.TaxAmt, "TaxAmt" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.Freight, "Freight" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.TotalDue, "TotalDue" }, 
+						{ (int)PurchasingPurchaseOrderHeaderFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PurchasingPurchaseOrderHeaderIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingPurchaseOrderHeaderFieldNames.Id, "PurchaseOrderID" }, 
+				};
+
 		public PurchasingPurchaseOrderHeaderTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PurchasingPurchaseOrderHeaderColumnNames.PurchaseOrderID.ToString();
-			//Schema = "Purchasing.PurchaseOrderHeader";
+			Schema = "Purchasing";
 			TableName = "Purchasing.PurchaseOrderHeader";
 			TableAlias = "purchasingpurchaseorderheader";
-			ColumnNames = typeof(PurchasingPurchaseOrderHeaderColumnNames).ToDataList<Type, int>();
+			Columns = PurchasingPurchaseOrderHeaderColumnNames;
+			IdColumns = PurchasingPurchaseOrderHeaderIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_PurchaseOrderHeader_Vendor_VendorID

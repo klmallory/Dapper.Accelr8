@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonAddressColumnNames
+	public enum PersonAddressFieldNames
 	{	
-		AddressID, 	
+		Id, 	
 		AddressLine1, 	
 		AddressLine2, 	
 		City, 	
@@ -33,21 +33,43 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum PersonAddressCascadeNames
 	{	
-		personbusinessentityaddress, 	
-		salessalesorderheader, 	
+		personbusinessentityaddresses, 	
+		salessalesorderheaders1, 	
 		
 		personstateprovince_p, 	}
 
 	public class PersonAddressTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonAddressColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonAddressFieldNames.Id, "AddressID" }, 
+						{ (int)PersonAddressFieldNames.AddressLine1, "AddressLine1" }, 
+						{ (int)PersonAddressFieldNames.AddressLine2, "AddressLine2" }, 
+						{ (int)PersonAddressFieldNames.City, "City" }, 
+						{ (int)PersonAddressFieldNames.StateProvinceID, "StateProvinceID" }, 
+						{ (int)PersonAddressFieldNames.PostalCode, "PostalCode" }, 
+						{ (int)PersonAddressFieldNames.SpatialLocation, "SpatialLocation" }, 
+						{ (int)PersonAddressFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonAddressFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonAddressIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonAddressFieldNames.Id, "AddressID" }, 
+				};
+
 		public PersonAddressTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonAddressColumnNames.AddressID.ToString();
-			//Schema = "Person.Address";
+			Schema = "Person";
 			TableName = "Person.Address";
 			TableAlias = "personaddress";
-			ColumnNames = typeof(PersonAddressColumnNames).ToDataList<Type, int>();
+			Columns = PersonAddressColumnNames;
+			IdColumns = PersonAddressIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Address_StateProvince_StateProvinceID

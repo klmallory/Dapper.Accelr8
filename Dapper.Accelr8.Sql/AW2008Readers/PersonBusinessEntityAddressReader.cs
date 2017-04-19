@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class PersonBusinessEntityAddressReader : EntityReader<int, PersonBusinessEntityAddress>
+    public class PersonBusinessEntityAddressReader : EntityReader<CompoundKey, PersonBusinessEntityAddress>
     {
         public PersonBusinessEntityAddressReader(
             PersonBusinessEntityAddressTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 3
@@ -43,27 +48,28 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonBusinessEntityAddress();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
+			domain.BusinessEntityID = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.AddressID = GetRowData<int>(dataRow, "AddressID"); 
+      		domain.AddressTypeID = GetRowData<int>(dataRow, "AddressTypeID"); 
+      		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+      				domain.Id = PersonBusinessEntityAddress.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, PersonBusinessEntityAddress></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonBusinessEntityAddress> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, PersonBusinessEntityAddress></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, PersonBusinessEntityAddress> WithAllChildrenForExisting(PersonBusinessEntityAddress existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonBusinessEntityAddress entity)
         {

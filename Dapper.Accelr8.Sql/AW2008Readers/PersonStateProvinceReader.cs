@@ -27,20 +27,25 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 2
 		//Parent Count 2
-		static IEntityReader<int , PersonAddress> _personAddressReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , PersonAddress> GetPersonAddressReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonAddress>>();
+			return s_loc8r.GetReader<int , PersonAddress>();
 		}
 
-		static IEntityReader<int , SalesSalesTaxRate> _salesSalesTaxRateReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesSalesTaxRate> GetSalesSalesTaxRateReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesTaxRate>>();
+			return s_loc8r.GetReader<int , SalesSalesTaxRate>();
 		}
 
 		
@@ -65,8 +70,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonAddresses = typedChildren.Where(b => b.PersonAddress == r.Id).ToList();
+				
+
+				r.PersonAddresses = typedChildren.Where(b =>  b.StateProvinceID == r.Id ).ToList();
 				r.PersonAddresses.ToList().ForEach(b => { b.Loaded = false; b.PersonStateProvince = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -92,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesTaxRates = typedChildren.Where(b => b.SalesSalesTaxRate == r.Id).ToList();
+				
+
+				r.SalesSalesTaxRates = typedChildren.Where(b =>  b.StateProvinceID == r.Id ).ToList();
 				r.SalesSalesTaxRates.ToList().ForEach(b => { b.Loaded = false; b.PersonStateProvince = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -109,8 +120,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonStateProvince();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.StateProvinceCode = GetRowData<string>(dataRow, "StateProvinceCode"); 
+			domain.Id = GetRowData<int>(dataRow, "StateProvinceID"); 
+      		domain.StateProvinceCode = GetRowData<string>(dataRow, "StateProvinceCode"); 
       		domain.CountryRegionCode = GetRowData<string>(dataRow, "CountryRegionCode"); 
       		domain.IsOnlyStateProvinceFlag = GetRowData<object>(dataRow, "IsOnlyStateProvinceFlag"); 
       		domain.Name = GetRowData<object>(dataRow, "Name"); 
@@ -128,17 +139,20 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonStateProvince></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonStateProvince> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonStateProvince> WithAllChildrenForExisting(PersonStateProvince existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonAddressReader(), id, IdColumn, SetChildrenPersonAddresses);
-			
-			WithChildForParentId(GetSalesSalesTaxRateReader(), id, IdColumn, SetChildrenSalesSalesTaxRates);
+						WithChildForParentValues(GetPersonAddressReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "StateProvinceID",  }
+				, SetChildrenPersonAddresses);
+						WithChildForParentValues(GetSalesSalesTaxRateReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "StateProvinceID",  }
+				, SetChildrenSalesSalesTaxRates);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonStateProvince entity)
         {
@@ -147,15 +161,18 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonAddressReader(), entity.Id
-				, PersonAddressColumnNames.StateProvinceID.ToString()
+						WithChildForParentValues(GetPersonAddressReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "StateProvinceID",  }
 				, SetChildrenPersonAddresses);
 
-			WithChildForParentId(GetSalesSalesTaxRateReader(), entity.Id
-				, SalesSalesTaxRateColumnNames.StateProvinceID.ToString()
+						WithChildForParentValues(GetSalesSalesTaxRateReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "StateProvinceID",  }
 				, SetChildrenSalesSalesTaxRates);
 
-			QueryResultForChildrenOnly(new List<PersonStateProvince>() { entity });
+			
+QueryResultForChildrenOnly(new List<PersonStateProvince>() { entity });
 			entity.Loaded = false;
 			GetPersonAddressReader().SetAllChildrenForExisting(entity.PersonAddresses);
 			GetSalesSalesTaxRateReader().SetAllChildrenForExisting(entity.SalesSalesTaxRates);
@@ -167,21 +184,22 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonAddressReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonAddressColumnNames.StateProvinceID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPersonAddressReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "StateProvinceID",  }
 				, SetChildrenPersonAddresses);
 
-			WithChildForParentIds(GetSalesSalesTaxRateReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesTaxRateColumnNames.StateProvinceID.ToString()
+			WithChildForParentsValues(GetSalesSalesTaxRateReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "StateProvinceID",  }
 				, SetChildrenSalesSalesTaxRates);
 
 					

@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PurchasingShipMethodColumnNames
+	public enum PurchasingShipMethodFieldNames
 	{	
-		ShipMethodID, 	
+		Id, 	
 		Name, 	
 		ShipBase, 	
 		ShipRate, 	
@@ -30,20 +30,39 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum PurchasingShipMethodCascadeNames
 	{	
-		purchasingpurchaseorderheader, 	
-		salessalesorderheader, 	
+		purchasingpurchaseorderheaders, 	
+		salessalesorderheaders, 	
 		}
 
 	public class PurchasingShipMethodTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PurchasingShipMethodColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingShipMethodFieldNames.Id, "ShipMethodID" }, 
+						{ (int)PurchasingShipMethodFieldNames.Name, "Name" }, 
+						{ (int)PurchasingShipMethodFieldNames.ShipBase, "ShipBase" }, 
+						{ (int)PurchasingShipMethodFieldNames.ShipRate, "ShipRate" }, 
+						{ (int)PurchasingShipMethodFieldNames.rowguid, "rowguid" }, 
+						{ (int)PurchasingShipMethodFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PurchasingShipMethodIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingShipMethodFieldNames.Id, "ShipMethodID" }, 
+				};
+
 		public PurchasingShipMethodTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PurchasingShipMethodColumnNames.ShipMethodID.ToString();
-			//Schema = "Purchasing.ShipMethod";
+			Schema = "Purchasing";
 			TableName = "Purchasing.ShipMethod";
 			TableAlias = "purchasingshipmethod";
-			ColumnNames = typeof(PurchasingShipMethodColumnNames).ToDataList<Type, int>();
+			Columns = PurchasingShipMethodColumnNames;
+			IdColumns = PurchasingShipMethodIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

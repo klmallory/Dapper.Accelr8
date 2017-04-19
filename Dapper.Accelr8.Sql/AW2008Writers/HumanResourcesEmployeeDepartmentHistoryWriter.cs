@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class HumanResourcesEmployeeDepartmentHistoryWriter : EntityWriter<int, HumanResourcesEmployeeDepartmentHistory>
+    public class HumanResourcesEmployeeDepartmentHistoryWriter : EntityWriter<CompoundKey, HumanResourcesEmployeeDepartmentHistory>
     {
         public HumanResourcesEmployeeDepartmentHistoryWriter
 			(HumanResourcesEmployeeDepartmentHistoryTableInfo tableInfo
@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<short, HumanResourcesDepartment> GetHumanResourcesDepartmentWriter()
-		{ return _locator.Resolve<IEntityWriter<short, HumanResourcesDepartment>>(); }
+		{ return s_loc8r.GetWriter<short, HumanResourcesDepartment>(); }
 		static IEntityWriter<int, HumanResourcesEmployee> GetHumanResourcesEmployeeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployee>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployee>(); }
 		static IEntityWriter<byte, HumanResourcesShift> GetHumanResourcesShiftWriter()
-		{ return _locator.Resolve<IEntityWriter<byte, HumanResourcesShift>>(); }
+		{ return s_loc8r.GetWriter<byte, HumanResourcesShift>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,13 +53,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((HumanResourcesEmployeeDepartmentHistoryColumnNames)f.Key)
+                switch ((HumanResourcesEmployeeDepartmentHistoryFieldNames)f.Key)
                 {
                     
-					case HumanResourcesEmployeeDepartmentHistoryColumnNames.EndDate:
+					case HumanResourcesEmployeeDepartmentHistoryFieldNames.EndDate:
 						parms.Add(GetParamName("EndDate", actionType, taskIndex, ref count), entity.EndDate);
 						break;
-					case HumanResourcesEmployeeDepartmentHistoryColumnNames.ModifiedDate:
+					case HumanResourcesEmployeeDepartmentHistoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -75,19 +78,19 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_EmployeeDepartmentHistory_Department_DepartmentID
 			var humanResourcesDepartment125 = GetHumanResourcesDepartmentWriter();
-		if ((_cascades.Contains(HumanResourcesEmployeeDepartmentHistoryCascadeNames.humanresourcesdepartment.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesDepartment != null)
+		if ((_cascades.Contains(HumanResourcesEmployeeDepartmentHistoryCascadeNames.humanresourcesdepartment_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesDepartment != null)
 			if (Cascade(humanResourcesDepartment125, entity.HumanResourcesDepartment, context))
 				WithParent(humanResourcesDepartment125, entity);
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Employee_BusinessEntityID
 			var humanResourcesEmployee126 = GetHumanResourcesEmployeeWriter();
-		if ((_cascades.Contains(HumanResourcesEmployeeDepartmentHistoryCascadeNames.humanresourcesemployee.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
+		if ((_cascades.Contains(HumanResourcesEmployeeDepartmentHistoryCascadeNames.humanresourcesemployee_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
 			if (Cascade(humanResourcesEmployee126, entity.HumanResourcesEmployee, context))
 				WithParent(humanResourcesEmployee126, entity);
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Shift_ShiftID
 			var humanResourcesShift127 = GetHumanResourcesShiftWriter();
-		if ((_cascades.Contains(HumanResourcesEmployeeDepartmentHistoryCascadeNames.humanresourcesshift.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesShift != null)
+		if ((_cascades.Contains(HumanResourcesEmployeeDepartmentHistoryCascadeNames.humanresourcesshift_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesShift != null)
 			if (Cascade(humanResourcesShift127, entity.HumanResourcesShift, context))
 				WithParent(humanResourcesShift127, entity);
 
@@ -101,15 +104,15 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_EmployeeDepartmentHistory_Department_DepartmentID
 			if (entity.HumanResourcesDepartment != null)
-				entity.HumanResourcesEmployeeDepartmentHistory = entity.HumanResourcesDepartment.Id;
+				entity.DepartmentID = entity.HumanResourcesDepartment.Id;
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Employee_BusinessEntityID
 			if (entity.HumanResourcesEmployee != null)
-				entity.HumanResourcesEmployeeDepartmentHistory = entity.HumanResourcesEmployee.Id;
+				entity.BusinessEntityID = entity.HumanResourcesEmployee.Id;
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Shift_ShiftID
 			if (entity.HumanResourcesShift != null)
-				entity.HumanResourcesEmployeeDepartmentHistory = entity.HumanResourcesShift.Id;
+				entity.ShiftID = entity.HumanResourcesShift.Id;
 
 		}
 

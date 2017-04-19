@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionWorkOrderColumnNames
+	public enum ProductionWorkOrderFieldNames
 	{	
-		WorkOrderID, 	
+		Id, 	
 		ProductID, 	
 		OrderQty, 	
 		StockedQty, 	
@@ -34,21 +34,44 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum ProductionWorkOrderCascadeNames
 	{	
-		productionworkorderrouting, 	
+		productionworkorderroutings, 	
 		
 		productionproduct_p, 	
 		productionscrapreason_p, 	}
 
 	public class ProductionWorkOrderTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionWorkOrderColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionWorkOrderFieldNames.Id, "WorkOrderID" }, 
+						{ (int)ProductionWorkOrderFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionWorkOrderFieldNames.OrderQty, "OrderQty" }, 
+						{ (int)ProductionWorkOrderFieldNames.StockedQty, "StockedQty" }, 
+						{ (int)ProductionWorkOrderFieldNames.ScrappedQty, "ScrappedQty" }, 
+						{ (int)ProductionWorkOrderFieldNames.StartDate, "StartDate" }, 
+						{ (int)ProductionWorkOrderFieldNames.EndDate, "EndDate" }, 
+						{ (int)ProductionWorkOrderFieldNames.DueDate, "DueDate" }, 
+						{ (int)ProductionWorkOrderFieldNames.ScrapReasonID, "ScrapReasonID" }, 
+						{ (int)ProductionWorkOrderFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionWorkOrderIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionWorkOrderFieldNames.Id, "WorkOrderID" }, 
+				};
+
 		public ProductionWorkOrderTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionWorkOrderColumnNames.WorkOrderID.ToString();
-			//Schema = "Production.WorkOrder";
+			Schema = "Production";
 			TableName = "Production.WorkOrder";
 			TableAlias = "productionworkorder";
-			ColumnNames = typeof(ProductionWorkOrderColumnNames).ToDataList<Type, int>();
+			Columns = ProductionWorkOrderColumnNames;
+			IdColumns = ProductionWorkOrderIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_WorkOrder_Product_ProductID

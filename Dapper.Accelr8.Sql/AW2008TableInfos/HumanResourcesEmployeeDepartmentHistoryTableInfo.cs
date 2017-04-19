@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesEmployeeDepartmentHistoryColumnNames
+	public enum HumanResourcesEmployeeDepartmentHistoryFieldNames
 	{	
 		BusinessEntityID, 	
 		DepartmentID, 	
@@ -36,15 +36,37 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		humanresourcesshift_p, 	}
 
 	public class HumanResourcesEmployeeDepartmentHistoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesEmployeeDepartmentHistoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.DepartmentID, "DepartmentID" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.ShiftID, "ShiftID" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.StartDate, "StartDate" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.EndDate, "EndDate" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesEmployeeDepartmentHistoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.DepartmentID, "DepartmentID" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.ShiftID, "ShiftID" }, 
+						{ (int)HumanResourcesEmployeeDepartmentHistoryFieldNames.StartDate, "StartDate" }, 
+				};
+
 		public HumanResourcesEmployeeDepartmentHistoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = HumanResourcesEmployeeDepartmentHistoryColumnNames.BusinessEntityID.ToString();
-			//Schema = "HumanResources.EmployeeDepartmentHistory";
+			Schema = "HumanResources";
 			TableName = "HumanResources.EmployeeDepartmentHistory";
 			TableAlias = "humanresourcesemployeedepartmenthistory";
-			ColumnNames = typeof(HumanResourcesEmployeeDepartmentHistoryColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesEmployeeDepartmentHistoryColumnNames;
+			IdColumns = HumanResourcesEmployeeDepartmentHistoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_EmployeeDepartmentHistory_Department_DepartmentID

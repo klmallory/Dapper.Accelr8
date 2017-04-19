@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductColumnNames
+	public enum ProductionProductFieldNames
 	{	
-		ProductID, 	
+		Id, 	
 		Name, 	
 		ProductNumber, 	
 		MakeFlag, 	
@@ -49,33 +49,72 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum ProductionProductCascadeNames
 	{	
-		productionproductinventory, 	
-		productionproductlistpricehistory, 	
-		salesspecialofferproduct, 	
-		productionproductproductphoto, 	
-		productiontransactionhistory, 	
-		productionproductreview, 	
-		purchasingproductvendor, 	
-		productionworkorder, 	
-		purchasingpurchaseorderdetail, 	
-		productionproductcosthistory, 	
-		salesshoppingcartitem, 	
-		productionproductdocument, 	
+		productionproductinventories, 	
+		productionproductlistpricehistories, 	
+		salesspecialofferproducts, 	
+		productionproductproductphotos, 	
+		productiontransactionhistories, 	
+		productionproductreviews, 	
+		purchasingproductvendors, 	
+		productionworkorders, 	
+		purchasingpurchaseorderdetails, 	
+		productionproductcosthistories, 	
+		salesshoppingcartitems, 	
+		productionproductdocuments, 	
 		
 		productionproductmodel_p, 	
 		productionproductsubcategory_p, 	
-		productionunitmeasure_p, 	}
+		productionunitmeasure1_p, 	
+		productionunitmeasure2_p, 	}
 
 	public class ProductionProductTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductFieldNames.Id, "ProductID" }, 
+						{ (int)ProductionProductFieldNames.Name, "Name" }, 
+						{ (int)ProductionProductFieldNames.ProductNumber, "ProductNumber" }, 
+						{ (int)ProductionProductFieldNames.MakeFlag, "MakeFlag" }, 
+						{ (int)ProductionProductFieldNames.FinishedGoodsFlag, "FinishedGoodsFlag" }, 
+						{ (int)ProductionProductFieldNames.Color, "Color" }, 
+						{ (int)ProductionProductFieldNames.SafetyStockLevel, "SafetyStockLevel" }, 
+						{ (int)ProductionProductFieldNames.ReorderPoint, "ReorderPoint" }, 
+						{ (int)ProductionProductFieldNames.StandardCost, "StandardCost" }, 
+						{ (int)ProductionProductFieldNames.ListPrice, "ListPrice" }, 
+						{ (int)ProductionProductFieldNames.Size, "Size" }, 
+						{ (int)ProductionProductFieldNames.SizeUnitMeasureCode, "SizeUnitMeasureCode" }, 
+						{ (int)ProductionProductFieldNames.WeightUnitMeasureCode, "WeightUnitMeasureCode" }, 
+						{ (int)ProductionProductFieldNames.Weight, "Weight" }, 
+						{ (int)ProductionProductFieldNames.DaysToManufacture, "DaysToManufacture" }, 
+						{ (int)ProductionProductFieldNames.ProductLine, "ProductLine" }, 
+						{ (int)ProductionProductFieldNames.Class, "Class" }, 
+						{ (int)ProductionProductFieldNames.Style, "Style" }, 
+						{ (int)ProductionProductFieldNames.ProductSubcategoryID, "ProductSubcategoryID" }, 
+						{ (int)ProductionProductFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionProductFieldNames.SellStartDate, "SellStartDate" }, 
+						{ (int)ProductionProductFieldNames.SellEndDate, "SellEndDate" }, 
+						{ (int)ProductionProductFieldNames.DiscontinuedDate, "DiscontinuedDate" }, 
+						{ (int)ProductionProductFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionProductFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductFieldNames.Id, "ProductID" }, 
+				};
+
 		public ProductionProductTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductColumnNames.ProductID.ToString();
-			//Schema = "Production.Product";
+			Schema = "Production";
 			TableName = "Production.Product";
 			TableAlias = "productionproduct";
-			ColumnNames = typeof(ProductionProductColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductColumnNames;
+			IdColumns = ProductionProductIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Product_ProductModel_ProductModelID
@@ -148,7 +187,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<string, ProductionUnitMeasure>("ProductionUnitMeasure")),
 			TableName = "Production.UnitMeasure",
-			Alias = TableAlias + "_" + "ProductionUnitMeasure",
+			Alias = TableAlias + "_" + "ProductionUnitMeasure1",
 			Outer = true,
 			Load = (entity, row) =>
 				{ 
@@ -161,7 +200,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.UnitMeasureCode == null || row.UnitMeasureCode == default(string))
 						return st;
 
-					st.ProductionUnitMeasure = reader.LoadEntityObject(row);
+					st.ProductionUnitMeasure1 = reader.LoadEntityObject(row);
 
 					return st;
 				},
@@ -181,7 +220,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<string, ProductionUnitMeasure>("ProductionUnitMeasure")),
 			TableName = "Production.UnitMeasure",
-			Alias = TableAlias + "_" + "ProductionUnitMeasure",
+			Alias = TableAlias + "_" + "ProductionUnitMeasure2",
 			Outer = true,
 			Load = (entity, row) =>
 				{ 
@@ -194,7 +233,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.UnitMeasureCode == null || row.UnitMeasureCode == default(string))
 						return st;
 
-					st.ProductionUnitMeasure = reader.LoadEntityObject(row);
+					st.ProductionUnitMeasure2 = reader.LoadEntityObject(row);
 
 					return st;
 				},

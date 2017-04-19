@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class HumanResourcesEmployeePayHistoryWriter : EntityWriter<int, HumanResourcesEmployeePayHistory>
+    public class HumanResourcesEmployeePayHistoryWriter : EntityWriter<CompoundKey, HumanResourcesEmployeePayHistory>
     {
         public HumanResourcesEmployeePayHistoryWriter
 			(HumanResourcesEmployeePayHistoryTableInfo tableInfo
@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, HumanResourcesEmployee> GetHumanResourcesEmployeeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployee>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployee>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,16 +49,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((HumanResourcesEmployeePayHistoryColumnNames)f.Key)
+                switch ((HumanResourcesEmployeePayHistoryFieldNames)f.Key)
                 {
                     
-					case HumanResourcesEmployeePayHistoryColumnNames.Rate:
+					case HumanResourcesEmployeePayHistoryFieldNames.Rate:
 						parms.Add(GetParamName("Rate", actionType, taskIndex, ref count), entity.Rate);
 						break;
-					case HumanResourcesEmployeePayHistoryColumnNames.PayFrequency:
+					case HumanResourcesEmployeePayHistoryFieldNames.PayFrequency:
 						parms.Add(GetParamName("PayFrequency", actionType, taskIndex, ref count), entity.PayFrequency);
 						break;
-					case HumanResourcesEmployeePayHistoryColumnNames.ModifiedDate:
+					case HumanResourcesEmployeePayHistoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -74,7 +77,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_EmployeePayHistory_Employee_BusinessEntityID
 			var humanResourcesEmployee131 = GetHumanResourcesEmployeeWriter();
-		if ((_cascades.Contains(HumanResourcesEmployeePayHistoryCascadeNames.humanresourcesemployee.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
+		if ((_cascades.Contains(HumanResourcesEmployeePayHistoryCascadeNames.humanresourcesemployee_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
 			if (Cascade(humanResourcesEmployee131, entity.HumanResourcesEmployee, context))
 				WithParent(humanResourcesEmployee131, entity);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_EmployeePayHistory_Employee_BusinessEntityID
 			if (entity.HumanResourcesEmployee != null)
-				entity.HumanResourcesEmployeePayHistory = entity.HumanResourcesEmployee.Id;
+				entity.BusinessEntityID = entity.HumanResourcesEmployee.Id;
 
 		}
 

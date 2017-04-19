@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 3
-		static IEntityReader<int , SalesSalesOrderHeader> _salesSalesOrderHeaderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesSalesOrderHeader> GetSalesSalesOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesOrderHeader>>();
+			return s_loc8r.GetReader<int , SalesSalesOrderHeader>();
 		}
 
 		
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaders = typedChildren.Where(b => b.SalesSalesOrderHeader == r.Id).ToList();
+				
+
+				r.SalesSalesOrderHeaders = typedChildren.Where(b =>  b.CustomerID == r.Id ).ToList();
 				r.SalesSalesOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.SalesCustomer = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesCustomer();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.PersonID = GetRowData<int?>(dataRow, "PersonID"); 
+			domain.Id = GetRowData<int>(dataRow, "CustomerID"); 
+      		domain.PersonID = GetRowData<int?>(dataRow, "PersonID"); 
       		domain.StoreID = GetRowData<int?>(dataRow, "StoreID"); 
       		domain.TerritoryID = GetRowData<int?>(dataRow, "TerritoryID"); 
       		domain.AccountNumber = GetRowData<string>(dataRow, "AccountNumber"); 
@@ -94,15 +102,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesCustomer></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesCustomer> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesCustomer> WithAllChildrenForExisting(SalesCustomer existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaders);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CustomerID",  }
+				, SetChildrenSalesSalesOrderHeaders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesCustomer entity)
         {
@@ -111,11 +120,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), entity.Id
-				, SalesSalesOrderHeaderColumnNames.CustomerID.ToString()
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CustomerID",  }
 				, SetChildrenSalesSalesOrderHeaders);
 
-			QueryResultForChildrenOnly(new List<SalesCustomer>() { entity });
+			
+QueryResultForChildrenOnly(new List<SalesCustomer>() { entity });
 			entity.Loaded = false;
 			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaders);
 				
@@ -126,15 +137,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderColumnNames.CustomerID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesSalesOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CustomerID",  }
 				, SetChildrenSalesSalesOrderHeaders);
 
 					

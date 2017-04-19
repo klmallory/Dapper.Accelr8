@@ -28,28 +28,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, SalesSalesOrderDetail> GetSalesSalesOrderDetailWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderDetail>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderDetail>(); }
 		static IEntityWriter<int, SalesSalesOrderHeaderSalesReason> GetSalesSalesOrderHeaderSalesReasonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderHeaderSalesReason>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderHeaderSalesReason>(); }
 		
 		static IEntityWriter<int, PersonAddress> GetPersonAddressWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonAddress>>(); }
+		{ return s_loc8r.GetWriter<int, PersonAddress>(); }
 		static IEntityWriter<int, SalesCreditCard> GetSalesCreditCardWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesCreditCard>>(); }
+		{ return s_loc8r.GetWriter<int, SalesCreditCard>(); }
 		static IEntityWriter<int, SalesCurrencyRate> GetSalesCurrencyRateWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesCurrencyRate>>(); }
+		{ return s_loc8r.GetWriter<int, SalesCurrencyRate>(); }
 		static IEntityWriter<int, SalesCustomer> GetSalesCustomerWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesCustomer>>(); }
+		{ return s_loc8r.GetWriter<int, SalesCustomer>(); }
 		static IEntityWriter<int, SalesSalesPerson> GetSalesSalesPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesPerson>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesPerson>(); }
 		static IEntityWriter<int, SalesSalesTerritory> GetSalesSalesTerritoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesTerritory>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesTerritory>(); }
 		static IEntityWriter<int, PurchasingShipMethod> GetPurchasingShipMethodWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingShipMethod>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingShipMethod>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -62,82 +65,82 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSalesOrderHeaderColumnNames)f.Key)
+                switch ((SalesSalesOrderHeaderFieldNames)f.Key)
                 {
                     
-					case SalesSalesOrderHeaderColumnNames.RevisionNumber:
+					case SalesSalesOrderHeaderFieldNames.RevisionNumber:
 						parms.Add(GetParamName("RevisionNumber", actionType, taskIndex, ref count), entity.RevisionNumber);
 						break;
-					case SalesSalesOrderHeaderColumnNames.OrderDate:
+					case SalesSalesOrderHeaderFieldNames.OrderDate:
 						parms.Add(GetParamName("OrderDate", actionType, taskIndex, ref count), entity.OrderDate);
 						break;
-					case SalesSalesOrderHeaderColumnNames.DueDate:
+					case SalesSalesOrderHeaderFieldNames.DueDate:
 						parms.Add(GetParamName("DueDate", actionType, taskIndex, ref count), entity.DueDate);
 						break;
-					case SalesSalesOrderHeaderColumnNames.ShipDate:
+					case SalesSalesOrderHeaderFieldNames.ShipDate:
 						parms.Add(GetParamName("ShipDate", actionType, taskIndex, ref count), entity.ShipDate);
 						break;
-					case SalesSalesOrderHeaderColumnNames.Status:
+					case SalesSalesOrderHeaderFieldNames.Status:
 						parms.Add(GetParamName("Status", actionType, taskIndex, ref count), entity.Status);
 						break;
-					case SalesSalesOrderHeaderColumnNames.OnlineOrderFlag:
+					case SalesSalesOrderHeaderFieldNames.OnlineOrderFlag:
 						parms.Add(GetParamName("OnlineOrderFlag", actionType, taskIndex, ref count), entity.OnlineOrderFlag);
 						break;
-					case SalesSalesOrderHeaderColumnNames.SalesOrderNumber:
+					case SalesSalesOrderHeaderFieldNames.SalesOrderNumber:
 						parms.Add(GetParamName("SalesOrderNumber", actionType, taskIndex, ref count), entity.SalesOrderNumber);
 						break;
-					case SalesSalesOrderHeaderColumnNames.PurchaseOrderNumber:
+					case SalesSalesOrderHeaderFieldNames.PurchaseOrderNumber:
 						parms.Add(GetParamName("PurchaseOrderNumber", actionType, taskIndex, ref count), entity.PurchaseOrderNumber);
 						break;
-					case SalesSalesOrderHeaderColumnNames.AccountNumber:
+					case SalesSalesOrderHeaderFieldNames.AccountNumber:
 						parms.Add(GetParamName("AccountNumber", actionType, taskIndex, ref count), entity.AccountNumber);
 						break;
-					case SalesSalesOrderHeaderColumnNames.CustomerID:
+					case SalesSalesOrderHeaderFieldNames.CustomerID:
 						parms.Add(GetParamName("CustomerID", actionType, taskIndex, ref count), entity.CustomerID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.SalesPersonID:
+					case SalesSalesOrderHeaderFieldNames.SalesPersonID:
 						parms.Add(GetParamName("SalesPersonID", actionType, taskIndex, ref count), entity.SalesPersonID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.TerritoryID:
+					case SalesSalesOrderHeaderFieldNames.TerritoryID:
 						parms.Add(GetParamName("TerritoryID", actionType, taskIndex, ref count), entity.TerritoryID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.BillToAddressID:
+					case SalesSalesOrderHeaderFieldNames.BillToAddressID:
 						parms.Add(GetParamName("BillToAddressID", actionType, taskIndex, ref count), entity.BillToAddressID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.ShipToAddressID:
+					case SalesSalesOrderHeaderFieldNames.ShipToAddressID:
 						parms.Add(GetParamName("ShipToAddressID", actionType, taskIndex, ref count), entity.ShipToAddressID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.ShipMethodID:
+					case SalesSalesOrderHeaderFieldNames.ShipMethodID:
 						parms.Add(GetParamName("ShipMethodID", actionType, taskIndex, ref count), entity.ShipMethodID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.CreditCardID:
+					case SalesSalesOrderHeaderFieldNames.CreditCardID:
 						parms.Add(GetParamName("CreditCardID", actionType, taskIndex, ref count), entity.CreditCardID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.CreditCardApprovalCode:
+					case SalesSalesOrderHeaderFieldNames.CreditCardApprovalCode:
 						parms.Add(GetParamName("CreditCardApprovalCode", actionType, taskIndex, ref count), entity.CreditCardApprovalCode);
 						break;
-					case SalesSalesOrderHeaderColumnNames.CurrencyRateID:
+					case SalesSalesOrderHeaderFieldNames.CurrencyRateID:
 						parms.Add(GetParamName("CurrencyRateID", actionType, taskIndex, ref count), entity.CurrencyRateID);
 						break;
-					case SalesSalesOrderHeaderColumnNames.SubTotal:
+					case SalesSalesOrderHeaderFieldNames.SubTotal:
 						parms.Add(GetParamName("SubTotal", actionType, taskIndex, ref count), entity.SubTotal);
 						break;
-					case SalesSalesOrderHeaderColumnNames.TaxAmt:
+					case SalesSalesOrderHeaderFieldNames.TaxAmt:
 						parms.Add(GetParamName("TaxAmt", actionType, taskIndex, ref count), entity.TaxAmt);
 						break;
-					case SalesSalesOrderHeaderColumnNames.Freight:
+					case SalesSalesOrderHeaderFieldNames.Freight:
 						parms.Add(GetParamName("Freight", actionType, taskIndex, ref count), entity.Freight);
 						break;
-					case SalesSalesOrderHeaderColumnNames.TotalDue:
+					case SalesSalesOrderHeaderFieldNames.TotalDue:
 						parms.Add(GetParamName("TotalDue", actionType, taskIndex, ref count), entity.TotalDue);
 						break;
-					case SalesSalesOrderHeaderColumnNames.Comment:
+					case SalesSalesOrderHeaderFieldNames.Comment:
 						parms.Add(GetParamName("Comment", actionType, taskIndex, ref count), entity.Comment);
 						break;
-					case SalesSalesOrderHeaderColumnNames.rowguid:
+					case SalesSalesOrderHeaderFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSalesOrderHeaderColumnNames.ModifiedDate:
+					case SalesSalesOrderHeaderFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -154,7 +157,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID
 			var salesSalesOrderDetail298 = GetSalesSalesOrderDetailWriter();
-			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.sales.salesorderdetail.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesorderdetails.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderDetails)
 					Cascade(salesSalesOrderDetail298, item, context);
 
@@ -163,7 +166,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID
 			var salesSalesOrderHeaderSalesReason299 = GetSalesSalesOrderHeaderSalesReasonWriter();
-			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.sales.salesorderheadersalesreason.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesorderheadersalesreasons.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaderSalesReasons)
 					Cascade(salesSalesOrderHeaderSalesReason299, item, context);
 
@@ -174,49 +177,49 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID
 			var personAddress300 = GetPersonAddressWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.personaddress.ToString()) || _cascades.Contains("all")) && entity.PersonAddress != null)
-			if (Cascade(personAddress300, entity.PersonAddress, context))
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.personaddress1_p.ToString()) || _cascades.Contains("all")) && entity.PersonAddress1 != null)
+			if (Cascade(personAddress300, entity.PersonAddress1, context))
 				WithParent(personAddress300, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID
 			var personAddress301 = GetPersonAddressWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.personaddress.ToString()) || _cascades.Contains("all")) && entity.PersonAddress != null)
-			if (Cascade(personAddress301, entity.PersonAddress, context))
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.personaddress2_p.ToString()) || _cascades.Contains("all")) && entity.PersonAddress2 != null)
+			if (Cascade(personAddress301, entity.PersonAddress2, context))
 				WithParent(personAddress301, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID
 			var salesCreditCard302 = GetSalesCreditCardWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salescreditcard.ToString()) || _cascades.Contains("all")) && entity.SalesCreditCard != null)
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salescreditcard_p.ToString()) || _cascades.Contains("all")) && entity.SalesCreditCard != null)
 			if (Cascade(salesCreditCard302, entity.SalesCreditCard, context))
 				WithParent(salesCreditCard302, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_CurrencyRate_CurrencyRateID
 			var salesCurrencyRate303 = GetSalesCurrencyRateWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salescurrencyrate.ToString()) || _cascades.Contains("all")) && entity.SalesCurrencyRate != null)
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salescurrencyrate_p.ToString()) || _cascades.Contains("all")) && entity.SalesCurrencyRate != null)
 			if (Cascade(salesCurrencyRate303, entity.SalesCurrencyRate, context))
 				WithParent(salesCurrencyRate303, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_Customer_CustomerID
 			var salesCustomer304 = GetSalesCustomerWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salescustomer.ToString()) || _cascades.Contains("all")) && entity.SalesCustomer != null)
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salescustomer_p.ToString()) || _cascades.Contains("all")) && entity.SalesCustomer != null)
 			if (Cascade(salesCustomer304, entity.SalesCustomer, context))
 				WithParent(salesCustomer304, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_SalesPerson_SalesPersonID
 			var salesSalesPerson305 = GetSalesSalesPersonWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesperson.ToString()) || _cascades.Contains("all")) && entity.SalesSalesPerson != null)
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesperson_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesPerson != null)
 			if (Cascade(salesSalesPerson305, entity.SalesSalesPerson, context))
 				WithParent(salesSalesPerson305, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_SalesTerritory_TerritoryID
 			var salesSalesTerritory306 = GetSalesSalesTerritoryWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesterritory.ToString()) || _cascades.Contains("all")) && entity.SalesSalesTerritory != null)
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesterritory_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesTerritory != null)
 			if (Cascade(salesSalesTerritory306, entity.SalesSalesTerritory, context))
 				WithParent(salesSalesTerritory306, entity);
 
 			//From Foreign Key FK_SalesOrderHeader_ShipMethod_ShipMethodID
 			var purchasingShipMethod307 = GetPurchasingShipMethodWriter();
-		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.purchasingshipmethod.ToString()) || _cascades.Contains("all")) && entity.PurchasingShipMethod != null)
+		if ((_cascades.Contains(SalesSalesOrderHeaderCascadeNames.purchasingshipmethod_p.ToString()) || _cascades.Contains("all")) && entity.PurchasingShipMethod != null)
 			if (Cascade(purchasingShipMethod307, entity.PurchasingShipMethod, context))
 				WithParent(purchasingShipMethod307, entity);
 
@@ -230,45 +233,45 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID
 			if (entity.SalesSalesOrderDetails != null && entity.SalesSalesOrderDetails.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderDetails)
-					rel.SalesSalesOrderDetail = entity.Id;
+					rel.SalesOrderID = entity.Id;
 
 			//From Foreign Key FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID
 			if (entity.SalesSalesOrderHeaderSalesReasons != null && entity.SalesSalesOrderHeaderSalesReasons.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderHeaderSalesReasons)
-					rel.SalesSalesOrderHeaderSalesReason = entity.Id;
+					rel.SalesOrderID = entity.Id;
 
 				
 			//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID
-			if (entity.PersonAddress != null)
-				entity.SalesSalesOrderHeader = entity.PersonAddress.Id;
+			if (entity.PersonAddress1 != null)
+				entity.BillToAddressID = entity.PersonAddress1.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID
-			if (entity.PersonAddress != null)
-				entity.SalesSalesOrderHeader = entity.PersonAddress.Id;
+			if (entity.PersonAddress2 != null)
+				entity.ShipToAddressID = entity.PersonAddress2.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID
 			if (entity.SalesCreditCard != null)
-				entity.SalesSalesOrderHeader = entity.SalesCreditCard.Id;
+				entity.CreditCardID = entity.SalesCreditCard.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_CurrencyRate_CurrencyRateID
 			if (entity.SalesCurrencyRate != null)
-				entity.SalesSalesOrderHeader = entity.SalesCurrencyRate.Id;
+				entity.CurrencyRateID = entity.SalesCurrencyRate.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_Customer_CustomerID
 			if (entity.SalesCustomer != null)
-				entity.SalesSalesOrderHeader = entity.SalesCustomer.Id;
+				entity.CustomerID = entity.SalesCustomer.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_SalesPerson_SalesPersonID
 			if (entity.SalesSalesPerson != null)
-				entity.SalesSalesOrderHeader = entity.SalesSalesPerson.Id;
+				entity.SalesPersonID = entity.SalesSalesPerson.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_SalesTerritory_TerritoryID
 			if (entity.SalesSalesTerritory != null)
-				entity.SalesSalesOrderHeader = entity.SalesSalesTerritory.Id;
+				entity.TerritoryID = entity.SalesSalesTerritory.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_ShipMethod_ShipMethodID
 			if (entity.PurchasingShipMethod != null)
-				entity.SalesSalesOrderHeader = entity.PurchasingShipMethod.Id;
+				entity.ShipMethodID = entity.PurchasingShipMethod.Id;
 
 		}
 
@@ -276,7 +279,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID
 			var salesSalesOrderDetail318 = GetSalesSalesOrderDetailWriter();
-			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.sales.salesorderdetail.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesorderdetail.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderDetails)
 					CascadeDelete(salesSalesOrderDetail318, item, context);
 
@@ -285,7 +288,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID
 			var salesSalesOrderHeaderSalesReason319 = GetSalesSalesOrderHeaderSalesReasonWriter();
-			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.sales.salesorderheadersalesreason.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesOrderHeaderCascadeNames.salessalesorderheadersalesreason.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaderSalesReasons)
 					CascadeDelete(salesSalesOrderHeaderSalesReason319, item, context);
 

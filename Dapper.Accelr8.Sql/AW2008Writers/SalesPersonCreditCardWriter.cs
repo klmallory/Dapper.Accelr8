@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class SalesPersonCreditCardWriter : EntityWriter<int, SalesPersonCreditCard>
+    public class SalesPersonCreditCardWriter : EntityWriter<CompoundKey, SalesPersonCreditCard>
     {
         public SalesPersonCreditCardWriter
 			(SalesPersonCreditCardTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, SalesCreditCard> GetSalesCreditCardWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesCreditCard>>(); }
+		{ return s_loc8r.GetWriter<int, SalesCreditCard>(); }
 		static IEntityWriter<int, PersonPerson> GetPersonPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPerson>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPerson>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,10 +51,10 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesPersonCreditCardColumnNames)f.Key)
+                switch ((SalesPersonCreditCardFieldNames)f.Key)
                 {
                     
-					case SalesPersonCreditCardColumnNames.ModifiedDate:
+					case SalesPersonCreditCardFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -70,13 +73,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_PersonCreditCard_CreditCard_CreditCardID
 			var salesCreditCard169 = GetSalesCreditCardWriter();
-		if ((_cascades.Contains(SalesPersonCreditCardCascadeNames.salescreditcard.ToString()) || _cascades.Contains("all")) && entity.SalesCreditCard != null)
+		if ((_cascades.Contains(SalesPersonCreditCardCascadeNames.salescreditcard_p.ToString()) || _cascades.Contains("all")) && entity.SalesCreditCard != null)
 			if (Cascade(salesCreditCard169, entity.SalesCreditCard, context))
 				WithParent(salesCreditCard169, entity);
 
 			//From Foreign Key FK_PersonCreditCard_Person_BusinessEntityID
 			var personPerson170 = GetPersonPersonWriter();
-		if ((_cascades.Contains(SalesPersonCreditCardCascadeNames.personperson.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
+		if ((_cascades.Contains(SalesPersonCreditCardCascadeNames.personperson_p.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
 			if (Cascade(personPerson170, entity.PersonPerson, context))
 				WithParent(personPerson170, entity);
 
@@ -90,11 +93,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_PersonCreditCard_CreditCard_CreditCardID
 			if (entity.SalesCreditCard != null)
-				entity.SalesPersonCreditCard = entity.SalesCreditCard.Id;
+				entity.CreditCardID = entity.SalesCreditCard.Id;
 
 			//From Foreign Key FK_PersonCreditCard_Person_BusinessEntityID
 			if (entity.PersonPerson != null)
-				entity.SalesPersonCreditCard = entity.PersonPerson.Id;
+				entity.BusinessEntityID = entity.PersonPerson.Id;
 
 		}
 

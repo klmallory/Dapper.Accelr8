@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,7 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new HumanResourcesvJobCandidateEducation();
 			domain.Loaded = false;
 
-				domain.Edu__Level = GetRowData<string>(dataRow, "Edu.Level"); 
+			domain.JobCandidateID = GetRowData<int>(dataRow, "JobCandidateID"); 
+      		domain.Edu__Level = GetRowData<string>(dataRow, "Edu.Level"); 
       		domain.Edu__StartDate = GetRowData<DateTime?>(dataRow, "Edu.StartDate"); 
       		domain.Edu__EndDate = GetRowData<DateTime?>(dataRow, "Edu.EndDate"); 
       		domain.Edu__Degree = GetRowData<string>(dataRow, "Edu.Degree"); 
@@ -66,13 +72,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, HumanResourcesvJobCandidateEducation></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, HumanResourcesvJobCandidateEducation> WithAllChildrenForId(int id)
+        public override IEntityReader<int, HumanResourcesvJobCandidateEducation> WithAllChildrenForExisting(HumanResourcesvJobCandidateEducation existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(HumanResourcesvJobCandidateEducation entity)
         {

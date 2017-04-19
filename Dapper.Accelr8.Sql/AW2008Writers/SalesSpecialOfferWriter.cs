@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, SalesSpecialOfferProduct> GetSalesSpecialOfferProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSpecialOfferProduct>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSpecialOfferProduct>(); }
 		
 		
 		/// <summary>
@@ -46,37 +49,37 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSpecialOfferColumnNames)f.Key)
+                switch ((SalesSpecialOfferFieldNames)f.Key)
                 {
                     
-					case SalesSpecialOfferColumnNames.Description:
+					case SalesSpecialOfferFieldNames.Description:
 						parms.Add(GetParamName("Description", actionType, taskIndex, ref count), entity.Description);
 						break;
-					case SalesSpecialOfferColumnNames.DiscountPct:
+					case SalesSpecialOfferFieldNames.DiscountPct:
 						parms.Add(GetParamName("DiscountPct", actionType, taskIndex, ref count), entity.DiscountPct);
 						break;
-					case SalesSpecialOfferColumnNames.Type:
+					case SalesSpecialOfferFieldNames.Type:
 						parms.Add(GetParamName("Type", actionType, taskIndex, ref count), entity.Type);
 						break;
-					case SalesSpecialOfferColumnNames.Category:
+					case SalesSpecialOfferFieldNames.Category:
 						parms.Add(GetParamName("Category", actionType, taskIndex, ref count), entity.Category);
 						break;
-					case SalesSpecialOfferColumnNames.StartDate:
+					case SalesSpecialOfferFieldNames.StartDate:
 						parms.Add(GetParamName("StartDate", actionType, taskIndex, ref count), entity.StartDate);
 						break;
-					case SalesSpecialOfferColumnNames.EndDate:
+					case SalesSpecialOfferFieldNames.EndDate:
 						parms.Add(GetParamName("EndDate", actionType, taskIndex, ref count), entity.EndDate);
 						break;
-					case SalesSpecialOfferColumnNames.MinQty:
+					case SalesSpecialOfferFieldNames.MinQty:
 						parms.Add(GetParamName("MinQty", actionType, taskIndex, ref count), entity.MinQty);
 						break;
-					case SalesSpecialOfferColumnNames.MaxQty:
+					case SalesSpecialOfferFieldNames.MaxQty:
 						parms.Add(GetParamName("MaxQty", actionType, taskIndex, ref count), entity.MaxQty);
 						break;
-					case SalesSpecialOfferColumnNames.rowguid:
+					case SalesSpecialOfferFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSpecialOfferColumnNames.ModifiedDate:
+					case SalesSpecialOfferFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -93,7 +96,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID
 			var salesSpecialOfferProduct382 = GetSalesSpecialOfferProductWriter();
-			if (_cascades.Contains(SalesSpecialOfferCascadeNames.sales.specialofferproduct.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSpecialOfferCascadeNames.salesspecialofferproducts.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSpecialOfferProducts)
 					Cascade(salesSpecialOfferProduct382, item, context);
 
@@ -112,7 +115,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID
 			if (entity.SalesSpecialOfferProducts != null && entity.SalesSpecialOfferProducts.Count > 0)
 				foreach (var rel in entity.SalesSpecialOfferProducts)
-					rel.SalesSpecialOfferProduct = entity.Id;
+					rel.SpecialOfferID = entity.Id;
 
 				
 		}
@@ -121,7 +124,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID
 			var salesSpecialOfferProduct384 = GetSalesSpecialOfferProductWriter();
-			if (_cascades.Contains(SalesSpecialOfferCascadeNames.sales.specialofferproduct.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSpecialOfferCascadeNames.salesspecialofferproduct.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSpecialOfferProducts)
 					CascadeDelete(salesSpecialOfferProduct384, item, context);
 

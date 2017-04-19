@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesStoreColumnNames
+	public enum SalesStoreFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		Name, 	
 		SalesPersonID, 	
 		Demographics, 	
@@ -30,21 +30,40 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesStoreCascadeNames
 	{	
-		salescustomer, 	
+		salescustomers, 	
 		
 		personbusinessentity_p, 	
 		salessalesperson_p, 	}
 
 	public class SalesStoreTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesStoreColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesStoreFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)SalesStoreFieldNames.Name, "Name" }, 
+						{ (int)SalesStoreFieldNames.SalesPersonID, "SalesPersonID" }, 
+						{ (int)SalesStoreFieldNames.Demographics, "Demographics" }, 
+						{ (int)SalesStoreFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesStoreFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesStoreIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesStoreFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public SalesStoreTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesStoreColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.Store";
+			Schema = "Sales";
 			TableName = "Sales.Store";
 			TableAlias = "salesstore";
-			ColumnNames = typeof(SalesStoreColumnNames).ToDataList<Type, int>();
+			Columns = SalesStoreColumnNames;
+			IdColumns = SalesStoreIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Store_BusinessEntity_BusinessEntityID

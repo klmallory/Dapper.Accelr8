@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PurchasingProductVendor> GetPurchasingProductVendorWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingProductVendor>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingProductVendor>(); }
 		static IEntityWriter<int, PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingPurchaseOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingPurchaseOrderHeader>(); }
 		
 		static IEntityWriter<int, PersonBusinessEntity> GetPersonBusinessEntityWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonBusinessEntity>>(); }
+		{ return s_loc8r.GetWriter<int, PersonBusinessEntity>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,28 +53,28 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PurchasingVendorColumnNames)f.Key)
+                switch ((PurchasingVendorFieldNames)f.Key)
                 {
                     
-					case PurchasingVendorColumnNames.AccountNumber:
+					case PurchasingVendorFieldNames.AccountNumber:
 						parms.Add(GetParamName("AccountNumber", actionType, taskIndex, ref count), entity.AccountNumber);
 						break;
-					case PurchasingVendorColumnNames.Name:
+					case PurchasingVendorFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case PurchasingVendorColumnNames.CreditRating:
+					case PurchasingVendorFieldNames.CreditRating:
 						parms.Add(GetParamName("CreditRating", actionType, taskIndex, ref count), entity.CreditRating);
 						break;
-					case PurchasingVendorColumnNames.PreferredVendorStatus:
+					case PurchasingVendorFieldNames.PreferredVendorStatus:
 						parms.Add(GetParamName("PreferredVendorStatus", actionType, taskIndex, ref count), entity.PreferredVendorStatus);
 						break;
-					case PurchasingVendorColumnNames.ActiveFlag:
+					case PurchasingVendorFieldNames.ActiveFlag:
 						parms.Add(GetParamName("ActiveFlag", actionType, taskIndex, ref count), entity.ActiveFlag);
 						break;
-					case PurchasingVendorColumnNames.PurchasingWebServiceURL:
+					case PurchasingVendorFieldNames.PurchasingWebServiceURL:
 						parms.Add(GetParamName("PurchasingWebServiceURL", actionType, taskIndex, ref count), entity.PurchasingWebServiceURL);
 						break;
-					case PurchasingVendorColumnNames.ModifiedDate:
+					case PurchasingVendorFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductVendor_Vendor_BusinessEntityID
 			var purchasingProductVendor423 = GetPurchasingProductVendorWriter();
-			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasing.productvendor.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasingproductvendors.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingProductVendors)
 					Cascade(purchasingProductVendor423, item, context);
 
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_PurchaseOrderHeader_Vendor_VendorID
 			var purchasingPurchaseOrderHeader424 = GetPurchasingPurchaseOrderHeaderWriter();
-			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasing.purchaseorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasingpurchaseorderheaders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingPurchaseOrderHeaders)
 					Cascade(purchasingPurchaseOrderHeader424, item, context);
 
@@ -108,7 +111,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID
 			var personBusinessEntity425 = GetPersonBusinessEntityWriter();
-		if ((_cascades.Contains(PurchasingVendorCascadeNames.personbusinessentity.ToString()) || _cascades.Contains("all")) && entity.PersonBusinessEntity != null)
+		if ((_cascades.Contains(PurchasingVendorCascadeNames.personbusinessentity_p.ToString()) || _cascades.Contains("all")) && entity.PersonBusinessEntity != null)
 			if (Cascade(personBusinessEntity425, entity.PersonBusinessEntity, context))
 				WithParent(personBusinessEntity425, entity);
 
@@ -122,17 +125,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_ProductVendor_Vendor_BusinessEntityID
 			if (entity.PurchasingProductVendors != null && entity.PurchasingProductVendors.Count > 0)
 				foreach (var rel in entity.PurchasingProductVendors)
-					rel.PurchasingProductVendor = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_PurchaseOrderHeader_Vendor_VendorID
 			if (entity.PurchasingPurchaseOrderHeaders != null && entity.PurchasingPurchaseOrderHeaders.Count > 0)
 				foreach (var rel in entity.PurchasingPurchaseOrderHeaders)
-					rel.PurchasingPurchaseOrderHeader = entity.Id;
+					rel.VendorID = entity.Id;
 
 				
 			//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID
 			if (entity.PersonBusinessEntity != null)
-				entity.PurchasingVendor = entity.PersonBusinessEntity.Id;
+				entity.BusinessEntityID = entity.PersonBusinessEntity.Id;
 
 		}
 
@@ -140,7 +143,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_ProductVendor_Vendor_BusinessEntityID
 			var purchasingProductVendor429 = GetPurchasingProductVendorWriter();
-			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasing.productvendor.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasingproductvendor.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingProductVendors)
 					CascadeDelete(purchasingProductVendor429, item, context);
 
@@ -149,7 +152,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_PurchaseOrderHeader_Vendor_VendorID
 			var purchasingPurchaseOrderHeader430 = GetPurchasingPurchaseOrderHeaderWriter();
-			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasing.purchaseorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingVendorCascadeNames.purchasingpurchaseorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingPurchaseOrderHeaders)
 					CascadeDelete(purchasingPurchaseOrderHeader430, item, context);
 

@@ -27,20 +27,25 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 2
 		//Parent Count 1
-		static IEntityReader<int , PurchasingProductVendor> _purchasingProductVendorReader;
-		protected static IEntityReader<int , PurchasingProductVendor> GetPurchasingProductVendorReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PurchasingProductVendor> GetPurchasingProductVendorReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PurchasingProductVendor>>();
+			return s_loc8r.GetReader<CompoundKey , PurchasingProductVendor>();
 		}
 
-		static IEntityReader<int , PurchasingPurchaseOrderHeader> _purchasingPurchaseOrderHeaderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PurchasingPurchaseOrderHeader>>();
+			return s_loc8r.GetReader<int , PurchasingPurchaseOrderHeader>();
 		}
 
 		
@@ -52,7 +57,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPurchasingProductVendors(IList<PurchasingVendor> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PurchasingProductVendor
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -65,8 +70,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PurchasingProductVendors = typedChildren.Where(b => b.PurchasingProductVendor == r.Id).ToList();
+				
+
+				r.PurchasingProductVendors = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.PurchasingProductVendors.ToList().ForEach(b => { b.Loaded = false; b.PurchasingVendor = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -92,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PurchasingPurchaseOrderHeaders = typedChildren.Where(b => b.PurchasingPurchaseOrderHeader == r.Id).ToList();
+				
+
+				r.PurchasingPurchaseOrderHeaders = typedChildren.Where(b =>  b.VendorID == r.Id ).ToList();
 				r.PurchasingPurchaseOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.PurchasingVendor = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -109,8 +120,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PurchasingVendor();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.AccountNumber = GetRowData<object>(dataRow, "AccountNumber"); 
+			domain.Id = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.AccountNumber = GetRowData<object>(dataRow, "AccountNumber"); 
       		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.CreditRating = GetRowData<byte>(dataRow, "CreditRating"); 
       		domain.PreferredVendorStatus = GetRowData<object>(dataRow, "PreferredVendorStatus"); 
@@ -128,17 +139,20 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PurchasingVendor></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PurchasingVendor> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PurchasingVendor> WithAllChildrenForExisting(PurchasingVendor existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPurchasingProductVendorReader(), id, IdColumn, SetChildrenPurchasingProductVendors);
-			
-			WithChildForParentId(GetPurchasingPurchaseOrderHeaderReader(), id, IdColumn, SetChildrenPurchasingPurchaseOrderHeaders);
+						WithChildForParentValues(GetPurchasingProductVendorReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenPurchasingProductVendors);
+						WithChildForParentValues(GetPurchasingPurchaseOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "VendorID",  }
+				, SetChildrenPurchasingPurchaseOrderHeaders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PurchasingVendor entity)
         {
@@ -147,15 +161,18 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPurchasingProductVendorReader(), entity.Id
-				, PurchasingProductVendorColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetPurchasingProductVendorReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenPurchasingProductVendors);
 
-			WithChildForParentId(GetPurchasingPurchaseOrderHeaderReader(), entity.Id
-				, PurchasingPurchaseOrderHeaderColumnNames.VendorID.ToString()
+						WithChildForParentValues(GetPurchasingPurchaseOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "VendorID",  }
 				, SetChildrenPurchasingPurchaseOrderHeaders);
 
-			QueryResultForChildrenOnly(new List<PurchasingVendor>() { entity });
+			
+QueryResultForChildrenOnly(new List<PurchasingVendor>() { entity });
 			entity.Loaded = false;
 			GetPurchasingProductVendorReader().SetAllChildrenForExisting(entity.PurchasingProductVendors);
 			GetPurchasingPurchaseOrderHeaderReader().SetAllChildrenForExisting(entity.PurchasingPurchaseOrderHeaders);
@@ -167,21 +184,22 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPurchasingProductVendorReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingProductVendorColumnNames.BusinessEntityID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPurchasingProductVendorReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenPurchasingProductVendors);
 
-			WithChildForParentIds(GetPurchasingPurchaseOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingPurchaseOrderHeaderColumnNames.VendorID.ToString()
+			WithChildForParentsValues(GetPurchasingPurchaseOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "VendorID",  }
 				, SetChildrenPurchasingPurchaseOrderHeaders);
 
 					

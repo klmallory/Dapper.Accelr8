@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesvStoreWithAddressColumnNames
+	public enum SalesvStoreWithAddressFieldNames
 	{	
 		BusinessEntityID, 	
 		Name, 	
@@ -36,15 +36,37 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class SalesvStoreWithAddressTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesvStoreWithAddressColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesvStoreWithAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.Name, "Name" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.AddressType, "AddressType" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.AddressLine1, "AddressLine1" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.AddressLine2, "AddressLine2" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.City, "City" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.StateProvinceName, "StateProvinceName" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.PostalCode, "PostalCode" }, 
+						{ (int)SalesvStoreWithAddressFieldNames.CountryRegionName, "CountryRegionName" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesvStoreWithAddressIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)SalesvStoreWithAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public SalesvStoreWithAddressTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = SalesvStoreWithAddressColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.vStoreWithAddresses";
+			Schema = "Sales";
 			TableName = "Sales.vStoreWithAddresses";
 			TableAlias = "salesvstorewithaddress";
-			ColumnNames = typeof(SalesvStoreWithAddressColumnNames).ToDataList<Type, int>();
+			Columns = SalesvStoreWithAddressColumnNames;
+			IdColumns = SalesvStoreWithAddressIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

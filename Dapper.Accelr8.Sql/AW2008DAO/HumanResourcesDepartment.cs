@@ -8,21 +8,24 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class HumanResourcesDepartment : Dapper.Accelr8.Repo.Domain.BaseEntity<short>
+	public class HumanResourcesDepartment : Dapper.Accelr8.Repo.Domain.BaseEntity<short>
 	{
 			public HumanResourcesDepartment()
-		{			
+		{
+							
 			IsDirty = false; 
 			_humanResourcesEmployeeDepartmentHistories = new List<HumanResourcesEmployeeDepartmentHistory>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 

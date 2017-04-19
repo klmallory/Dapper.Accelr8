@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class SalesCountryRegionCurrencyWriter : EntityWriter<string, SalesCountryRegionCurrency>
+    public class SalesCountryRegionCurrencyWriter : EntityWriter<CompoundKey, SalesCountryRegionCurrency>
     {
         public SalesCountryRegionCurrencyWriter
 			(SalesCountryRegionCurrencyTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<string, PersonCountryRegion> GetPersonCountryRegionWriter()
-		{ return _locator.Resolve<IEntityWriter<string, PersonCountryRegion>>(); }
+		{ return s_loc8r.GetWriter<string, PersonCountryRegion>(); }
 		static IEntityWriter<string, SalesCurrency> GetSalesCurrencyWriter()
-		{ return _locator.Resolve<IEntityWriter<string, SalesCurrency>>(); }
+		{ return s_loc8r.GetWriter<string, SalesCurrency>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,10 +51,10 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesCountryRegionCurrencyColumnNames)f.Key)
+                switch ((SalesCountryRegionCurrencyFieldNames)f.Key)
                 {
                     
-					case SalesCountryRegionCurrencyColumnNames.ModifiedDate:
+					case SalesCountryRegionCurrencyFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -70,13 +73,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_CountryRegionCurrency_CountryRegion_CountryRegionCode
 			var personCountryRegion60 = GetPersonCountryRegionWriter();
-		if ((_cascades.Contains(SalesCountryRegionCurrencyCascadeNames.personcountryregion.ToString()) || _cascades.Contains("all")) && entity.PersonCountryRegion != null)
+		if ((_cascades.Contains(SalesCountryRegionCurrencyCascadeNames.personcountryregion_p.ToString()) || _cascades.Contains("all")) && entity.PersonCountryRegion != null)
 			if (Cascade(personCountryRegion60, entity.PersonCountryRegion, context))
 				WithParent(personCountryRegion60, entity);
 
 			//From Foreign Key FK_CountryRegionCurrency_Currency_CurrencyCode
 			var salesCurrency61 = GetSalesCurrencyWriter();
-		if ((_cascades.Contains(SalesCountryRegionCurrencyCascadeNames.salescurrency.ToString()) || _cascades.Contains("all")) && entity.SalesCurrency != null)
+		if ((_cascades.Contains(SalesCountryRegionCurrencyCascadeNames.salescurrency_p.ToString()) || _cascades.Contains("all")) && entity.SalesCurrency != null)
 			if (Cascade(salesCurrency61, entity.SalesCurrency, context))
 				WithParent(salesCurrency61, entity);
 
@@ -90,11 +93,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_CountryRegionCurrency_CountryRegion_CountryRegionCode
 			if (entity.PersonCountryRegion != null)
-				entity.SalesCountryRegionCurrency = entity.PersonCountryRegion.Id;
+				entity.CountryRegionCode = entity.PersonCountryRegion.Id;
 
 			//From Foreign Key FK_CountryRegionCurrency_Currency_CurrencyCode
 			if (entity.SalesCurrency != null)
-				entity.SalesCountryRegionCurrency = entity.SalesCurrency.Id;
+				entity.CurrencyCode = entity.SalesCurrency.Id;
 
 		}
 

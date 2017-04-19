@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesCurrencyRate : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesCurrencyRate : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesCurrencyRate()
-		{			
+		{
+							
 			IsDirty = false; 
 			_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
 		_currencyRateDate = (DateTime)SqlDateTime.MinValue;
@@ -24,6 +26,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected DateTime _currencyRateDate;
 		public DateTime CurrencyRateDate 
@@ -92,25 +95,25 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		} 
 		 
 	//From Foreign Key FK_CurrencyRate_Currency_FromCurrencyCode	
-		protected SalesCurrency _salesCurrency;
-		public virtual SalesCurrency SalesCurrency 
+		protected SalesCurrency _salesCurrency1;
+		public virtual SalesCurrency SalesCurrency1 
 		{ 
-			get { return _salesCurrency; }
+			get { return _salesCurrency1; }
 			set 
 			{ 
-				_salesCurrency = value;  
+				_salesCurrency1 = value;  
 				IsDirty = true;
 			}
 		} 
 		 
 	//From Foreign Key FK_CurrencyRate_Currency_ToCurrencyCode	
-		protected SalesCurrency _salesCurrency;
-		public virtual SalesCurrency SalesCurrency 
+		protected SalesCurrency _salesCurrency2;
+		public virtual SalesCurrency SalesCurrency2 
 		{ 
-			get { return _salesCurrency; }
+			get { return _salesCurrency2; }
 			set 
 			{ 
-				_salesCurrency = value;  
+				_salesCurrency2 = value;  
 				IsDirty = true;
 			}
 		} 

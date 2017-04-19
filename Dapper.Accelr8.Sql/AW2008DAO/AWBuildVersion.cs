@@ -8,29 +8,32 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class AWBuildVersion : Dapper.Accelr8.Repo.Domain.BaseEntity<byte>
+	public class AWBuildVersion : Dapper.Accelr8.Repo.Domain.BaseEntity<byte>
 	{
 			public AWBuildVersion()
-		{			
+		{
+							
 			IsDirty = false; 
 			_versionDate = (DateTime)SqlDateTime.MinValue;
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
-		protected string _database_spc_Version;
-		public string Database_spc_Version 
+		protected string _database_Spc_Version;
+		public string Database_Spc_Version 
 		{ 
-			get { return _database_spc_Version; }
+			get { return _database_Spc_Version; }
 			set 
 			{ 
-				_database_spc_Version = value;  
+				_database_Spc_Version = value;  
 				IsDirty = true;
 			}
 		} 

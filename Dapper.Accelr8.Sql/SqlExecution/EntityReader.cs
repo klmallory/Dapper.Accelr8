@@ -8,7 +8,6 @@ using System.Text;
 using Dapper;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Parameters;
-using Dapper.Accelr8.Repo.Contracts.Readers;
 using EnvDTE;
 using System.Runtime.InteropServices;
 using System.Globalization;
@@ -77,8 +76,8 @@ namespace Dapper.Accelr8.Sql
         protected List<OrderBy> _orderBys = new List<OrderBy>();
         protected List<GroupBy> _groups = new List<GroupBy>();
 
-        protected List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>> _children
-            = new List<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>>();
+        protected List<Tuple<IEntityReader, Action<IList<EntityType>, IList<object>>>> _children
+            = new List<Tuple<IEntityReader, Action<IList<EntityType>, IList<object>>>>();
 
         protected ILoc8 _loc8r;
 
@@ -108,12 +107,12 @@ namespace Dapper.Accelr8.Sql
             if (_loc8r == null)
                 _loc8r = loc8r;
 
-            UniqueId = tableInfo.UniqueId;
-            IdColumn = tableInfo.IdColumn;
-            TableName = tableInfo.TableName;
-            TableAlias = tableInfo.TableAlias;
-            ColumnNames = tableInfo.ColumnNames.OrderBy(c => c.Value).ToList();
-            Joins = (JoinInfo[])tableInfo.Joins.Clone();
+            //UniqueId = tableInfo.UniqueId;
+            //IdColumn = tableInfo.IdColumn;
+            //TableName = tableInfo.TableName;
+            //TableAlias = tableInfo.TableAlias;
+            //ColumnNames = tableInfo.Columns.OrderBy(c => c.Value).ToList();
+            //Joins = (JoinInfo[])tableInfo.Joins.Clone();
             TableInfo = tableInfo;
         }
 
@@ -131,18 +130,18 @@ namespace Dapper.Accelr8.Sql
         }
 
 
-        protected virtual string BuildChildren(IList<Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>> children)
+        protected virtual string BuildChildren(IList<Tuple<IEntityReader, Action<IList<EntityType>, IList<object>>>> children)
         {
             var sb = new StringBuilder();
 
             var count = 1;
             foreach (var e in children)
-                sb.Append(BuildChild(e.Item1, e.Item2, count++));
+                sb.Append(BuildChild(e.Item1, count++));
 
             return sb.ToString();
         }
 
-        protected virtual string BuildChild(string childFieldName, IEntityReader reader, int count)
+        protected virtual string BuildChild(IEntityReader reader, int count)
         {
             return reader.GetSqlForQueries(count);
         }
@@ -192,14 +191,14 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual string BuildFields()
         {
-            return BuildFields(ColumnNames, _aggregates);
+            return BuildFields(TableInfo.Columns, _aggregates);
         }
 
-        protected virtual string BuildFields(IList<KeyValuePair<int, string>> fields, IList<Aggregate> aggregates)
+        protected virtual string BuildFields(IDictionary<int, string> fields, IList<Aggregate> aggregates)
         {
             var cols = fields.Select(f => f.Value).ToArray();
 
-            var fieldNames = "[" + TableAlias + "].[" + string.Join("], [" + TableAlias + "].[", cols) + "]";
+            var fieldNames = "[" + TableInfo.TableAlias + "].[" + string.Join("], [" + TableInfo.TableAlias + "].[", cols) + "]";
 
             var agg = BuildAggregates(aggregates);
 
@@ -335,7 +334,7 @@ namespace Dapper.Accelr8.Sql
 
         protected virtual EntityType LoadJoinRow<IType, EType>(object entity, dynamic row, Action<EntityType, EType> setter)
             where EType : class, IHaveId<IType>
-            where IType : IComparable<IType>, IEquatable<IType>
+            where IType : IComparable
         {
             var reader = _loc8r.GetReader<IType, EType>();
 
@@ -509,57 +508,56 @@ namespace Dapper.Accelr8.Sql
             return entity;
         }
 
-        public virtual bool UniqueId { get; protected set; }
-        public virtual string IdColumn { get; protected set; }
-        public virtual string TableName { get; protected set; }
-        public virtual string SchemaName { get; protected set; }
-        public virtual string TableAlias { get; protected set; }
-        public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
-        public virtual JoinInfo[] Joins { get; protected set; }
+        //public virtual bool UniqueId { get; protected set; }
+        //public virtual string TableName { get; protected set; }
+        //public virtual string SchemaName { get; protected set; }
+        //public virtual string TableAlias { get; protected set; }
+        //public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
+        //public virtual JoinInfo[] Joins { get; protected set; }
         public virtual TableInfo TableInfo { get; protected set; }
-        object IEntityReader.TableInfo
+        ITableInfo IEntityReader.TableInfo
         { get { return this.TableInfo; } }
 
         public void ClearJoins()
         {
             _joins.Clear();
-            Joins = new JoinInfo[0];
+            TableInfo.Joins = new JoinInfo[0];
         }
 
         public IEntityReader<IdType, EntityType> WithColumn(string column)
         {
-            var matchingColumn = this.TableInfo.ColumnNames.FirstOrDefault(c => string.Equals(c.Value, column, StringComparison.CurrentCultureIgnoreCase));
+            var matchingColumn = this.TableInfo.Columns.FirstOrDefault(c => string.Equals(c.Value, column, StringComparison.CurrentCultureIgnoreCase));
 
             if (matchingColumn.Value == null)
                 throw new KeyNotFoundException(string.Format("column {0} not found.", column));
 
-            ColumnNames.Add(matchingColumn);
+            TableInfo.Columns.Add(matchingColumn);
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WithoutColumn(string column)
         {
-            var matchingColumn = ColumnNames
+            var matchingColumn = TableInfo.Columns
                 .FirstOrDefault(c => string.Equals(c.Value, column
                     , StringComparison.CurrentCultureIgnoreCase));
 
             if (matchingColumn.Value == null)
                 return this;
 
-            ColumnNames.Remove(matchingColumn);
+            TableInfo.Columns.Remove(matchingColumn);
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WithoutColumns(string[] columns)
         {
-            var matchingColumns = ColumnNames
+            var matchingColumns = TableInfo.Columns
                 .Where(c => columns.Any(m => string.Equals(c.Value, m
                     , StringComparison.CurrentCultureIgnoreCase))).ToList();
 
             foreach (var c in matchingColumns)
-                ColumnNames.Remove(c);
+                TableInfo.Columns.Remove(c);
 
             return this;
         }
@@ -652,11 +650,11 @@ namespace Dapper.Accelr8.Sql
                 var index = count - 1;
 
                 if (_children.Count <= index)
-                    throw new InvalidOperationException(string.Format("Too many results from reader {0}: only {1} children specified in table {2}.", count, _children.Count, TableName));
+                    throw new InvalidOperationException(string.Format("Too many results from reader {0}: only {1} children specified in table {2}.", count, _children.Count, TableInfo.TableName));
 
-                var children = _children[index].Item2.LoadMultiple(reader);
+                var children = _children[index].Item1.LoadMultiple(reader);
 
-                _children[index].Item3(results, children);
+                _children[index].Item2(results, children);
             }
 
             return results;
@@ -703,7 +701,7 @@ namespace Dapper.Accelr8.Sql
 
         public IList<object> LoadResults(IEnumerable<dynamic> rows)
         {
-            if (UniqueId)
+            if (TableInfo.UniqueId)
                 return LoadEntities(rows).GroupBy(e => e.Id).Select(s => s.First()).Cast<object>().ToList();
             else
                 return LoadEntities(rows).Cast<object>().ToList();
@@ -711,7 +709,7 @@ namespace Dapper.Accelr8.Sql
 
         public virtual IList<object> LoadMultiple(object reader)
         {
-            if (UniqueId)
+            if (TableInfo.UniqueId)
                 return LoadMultipleEntities(reader).GroupBy(e => e.Id).Select(s => s.First()).Cast<object>().ToList();
             else
                 return LoadMultipleEntities(reader).Cast<object>().ToList();
@@ -720,17 +718,17 @@ namespace Dapper.Accelr8.Sql
         public abstract EntityType LoadEntity(dynamic row);
         public abstract void SetAllChildrenForExisting(EntityType entity);
         public abstract void SetAllChildrenForExisting(IList<EntityType> entities);
+        public abstract IEntityReader<IdType, EntityType> WithAllChildrenForExisting(EntityType existing);
+        //public virtual IEntityReader<IdType, EntityType> WithAllChildrenForExisting(IdType id)
+        //{
+        //    ClearAllQueries();
 
-        public virtual IEntityReader<IdType, EntityType> WithAllChildrenForId(IdType id)
-        {
-            ClearAllQueries();
+        //    WhereId(id);
 
-            WhereId(id);
+        //    WithAllJoins();
 
-            WithAllJoins();
-
-            return this;
-        }
+        //    return this;
+        //}
 
         /// <summary>
         /// Sets the Reader to execute all joins from the table info.
@@ -738,11 +736,14 @@ namespace Dapper.Accelr8.Sql
         /// <returns>this entity reader instance</returns>
         public virtual IEntityReader WithAllJoins()
         {
-            foreach (var j in Joins)
+            foreach (var j in TableInfo.Joins)
             {
                 WithManyToOneJoin(j);
             }
-
+            //var g = this.TableInfo.Joins.GroupBy(j => j.TableName);
+            //foreach (var i in g)
+            //    foreach (var j in i)
+            //        j.
             return this;
         }
 
@@ -862,7 +863,7 @@ namespace Dapper.Accelr8.Sql
 
             var cCount = 1;
             foreach (var c in _children)
-                foreach (var p in c.Item2.GetParameters(cCount++))
+                foreach (var p in c.Item1.GetParameters(cCount++))
                 {
                     var f = (KeyValuePair<string, object>)p;
                     expand.Add(f.Key, f.Value);
@@ -888,8 +889,12 @@ namespace Dapper.Accelr8.Sql
 
             string fields = null;
 
-            fields = BuildSkipRowsClause(_orderBys.Count > 0 ? _orderBys : new List<OrderBy>() { new OrderBy() { FieldName = IdColumn, TableAlias = TableAlias } }) + ", ";
-            fields += "[" + TableAlias + "].[" + IdColumn + "]";
+            fields = BuildSkipRowsClause
+                (_orderBys.Count > 0 ? _orderBys
+                : TableInfo.IdColumns.Select(i => new OrderBy() { FieldName = i.Value, TableAlias = TableInfo.TableAlias }).ToList())
+                + ", ";
+
+            fields += TableInfo.IdColumns.Select(i => "[" + TableInfo.TableAlias + "].[" + i.Value + "], ");
 
             var distinct = _distinct ? "distinct " : "";
             var nolock = _noLock ? " with (nolock)" : string.Empty;
@@ -898,8 +903,8 @@ namespace Dapper.Accelr8.Sql
                , distinct
                , ""
                , fields
-               , (SchemaName != null ? SchemaName + "." : "") + TableName
-               , TableAlias
+               , (TableInfo.Schema != null ? TableInfo.Schema + "." : "") + TableInfo.TableName
+               , TableInfo.TableAlias
                , nolock));
 
             query.Append(Environment.NewLine);
@@ -970,8 +975,8 @@ namespace Dapper.Accelr8.Sql
                , distinct
                , top
                , fields
-               , (SchemaName != null ? SchemaName + "." : "") + TableName
-               , TableAlias
+               , (TableInfo.Schema != null ? TableInfo.Schema + "." : "") + TableInfo.TableName
+               , TableInfo.TableAlias
                , nolock));
 
             query.Append(Environment.NewLine);
@@ -981,7 +986,20 @@ namespace Dapper.Accelr8.Sql
                 if (_skip > 0)
                 {
                     query.Append(Environment.NewLine);
-                    query.Append(" join pagingCTE on pagingCTE.[" + IdColumn + "] = " + "[" + TableAlias + "].[" + IdColumn + "] and pagingCTE.[_rowsByNumber] > @skip ");
+                    if (TableInfo.IdColumns.Count == 1)
+                        query.Append(" join pagingCTE on pagingCTE.[" + TableInfo.IdColumns.First() + "] = " + "[" + TableInfo.TableAlias + "].[" + TableInfo.IdColumns.First() + "] and pagingCTE.[_rowsByNumber] > @skip ");
+                    else
+                    {
+                        query.Append(" join pagingCTE on"); 
+                        
+                        foreach (var c in TableInfo.Columns)
+                        {
+                            query.Append(" pagingCTE.[" + c.Value + "] = " + "[" + TableInfo.TableAlias + "].[" + c.Value + "] and");
+                        }    
+                            
+                        query.Append(" pagingCTE.[_rowsByNumber] > @skip ");
+                    }
+
                     query.Append(Environment.NewLine);
                 }
 
@@ -1044,7 +1062,7 @@ namespace Dapper.Accelr8.Sql
 
             foreach (var c in _children)
             {
-                foreach (var parm in ((IDictionary<string, object>)c.Item2.BuildParameters(count++)))
+                foreach (var parm in ((IDictionary<string, object>)c.Item1.BuildParameters(count++)))
                 {
                     parameters.Add(parm.Key, parm.Value);
                 }
@@ -1070,7 +1088,7 @@ namespace Dapper.Accelr8.Sql
 
         public IEntityReader WithAlias(string alias)
         {
-            TableAlias = alias;
+            TableInfo.TableAlias = alias;
 
             return this;
         }
@@ -1112,34 +1130,46 @@ namespace Dapper.Accelr8.Sql
 
         public IEntityReader WhereId(object id)
         {
-            _queries.Add(new QueryElement()
+            if (id is CompoundKey)
             {
-                FieldName = IdColumn,
-                TableAlias = TableAlias,
-                Operator = Operator.Equals,
-                Value = id
-            });
+                var keys = ((CompoundKey)id).Keys;
+                 
+                for (var i = 0; i < keys.Length; i++)
+                {
+                    _queries.Add(new QueryElement()
+                    {
+                        FieldName = TableInfo.IdColumns[i],
+                        TableAlias = TableInfo.TableAlias,
+                        Operator = Operator.Equals,
+                        Value = keys[i]
+                    });
+                }
+            }
+            else
+            {
+                _queries.Add(new QueryElement()
+                {
+                    FieldName = TableInfo.IdColumns.First().Value,
+                    TableAlias = TableInfo.TableAlias,
+                    Operator = Operator.Equals,
+                    Value = id
+                });
+            }
 
             return this;
         }
 
         public IEntityReader<IdType, EntityType> WhereId(IdType id)
         {
-            _queries.Add(new QueryElement()
-            {
-                FieldName = IdColumn,
-                TableAlias = TableAlias,
-                Operator = Operator.Equals,
-                Value = id
-            });
+            return this.WhereId(id as object) as IEntityReader<IdType, EntityType>;
 
-            return this;
+            //return this;
         }
 
         public IEntityReader Where(QueryElement query)
         {
             if (string.IsNullOrWhiteSpace(query.TableAlias))
-                query.TableAlias = TableAlias;
+                query.TableAlias = TableInfo.TableAlias;
 
             _queries.Add(query);
 
@@ -1150,7 +1180,7 @@ namespace Dapper.Accelr8.Sql
         {
             return Where(new QueryElement()
             {
-                TableAlias = TableAlias,
+                TableAlias = TableInfo.TableAlias,
                 FieldName = fieldName,
                 Operator = op,
                 Value = value
@@ -1160,7 +1190,7 @@ namespace Dapper.Accelr8.Sql
         public IEntityReader GroupBy(GroupBy group)
         {
             if (string.IsNullOrWhiteSpace(group.TableAlias))
-                group.TableAlias = TableAlias;
+                group.TableAlias = TableInfo.TableAlias;
 
             _groups.Add(group);
 
@@ -1177,7 +1207,7 @@ namespace Dapper.Accelr8.Sql
         public IEntityReader OrderBy(OrderBy ordering)
         {
             if (string.IsNullOrWhiteSpace(ordering.TableAlias))
-                ordering.TableAlias = TableAlias;
+                ordering.TableAlias = TableInfo.TableAlias;
 
             _orderBys.Add(ordering);
 
@@ -1189,15 +1219,17 @@ namespace Dapper.Accelr8.Sql
         {
             for (var i = 0; i < join.JoinQuery.Length; i++)
             {
-                join.JoinQuery[i].ParentTableAlias = TableAlias;
+                join.JoinQuery[i].ParentTableAlias = TableInfo.TableAlias;
             }
+
+            var jti = join.Reader().TableInfo as TableInfo;
 
             var j = new Join()
             {
                 Load = join.Load,
                 SplitOnColumnName = "SplitMe",
                 JoinAlias = join.Alias,
-                JoinColumnNames = join.Reader().ColumnNames.Select(d => d.Value).ToArray(),
+                JoinColumnNames = jti.Columns.Select(d => d.Value).ToArray(),
                 JoinTable = join.TableName,
                 Outer = join.Outer,
                 JoinOnQueries = join.JoinQuery
@@ -1210,38 +1242,47 @@ namespace Dapper.Accelr8.Sql
 
         public virtual IEntityReader<IdType, EntityType> WithManyToOneJoin<IType, EType>
             (IEntityReader<IType, EType> joinReader
-            , string joinField
-            , string parentField
+            , string[] joinFields
+            , string[] parentFields
             , Func<object, dynamic, object> loadVisitor)
         {
-            return this.WithManyToOneJoin(joinReader, joinField, parentField, "", false, loadVisitor);
+            return this.WithManyToOneJoin(joinReader, joinFields, parentFields, "", false, loadVisitor);
         }
 
         public virtual IEntityReader<IdType, EntityType> WithManyToOneJoin<IType, EType>
             (IEntityReader<IType, EType> joinReader
-            , string joinField
-            , string parentField
+            , string[] joinFields
+            , string[] parentFields
             , string alias
             , bool outer
             , Func<object, dynamic, object> loadVisitor)
         {
+            var jti = joinReader.TableInfo as TableInfo;
+
             var j = new Join()
             {
                 Load = loadVisitor,
                 SplitOnColumnName = "SplitMe",
-                JoinAlias = TableAlias + "_" + joinReader.TableAlias + alias,
-                JoinColumnNames = joinReader.ColumnNames.Select(c => c.Value).ToArray(),
-                JoinTable = joinReader.TableName,
-                Outer = outer,
-                JoinOnQueries = new JoinQueryElement[] 
-                        { new JoinQueryElement() 
-                        {
-                            JoinField =  joinField
-                            , Operator = Operator.Equals
-                            , ParentField = parentField
-                            , ParentTableAlias = TableAlias
-                        }}
+                JoinAlias = TableInfo.TableAlias + "_" + jti.TableAlias + alias,
+                JoinColumnNames = jti.Columns.Select(c => c.Value).ToArray(),
+                JoinTable = jti.TableName,
+                Outer = outer
             };
+
+            var joins = new List<JoinQueryElement>();
+
+            for (var i = 0; i < joinFields.Length; i++)
+            {
+                joins.Add(new JoinQueryElement()
+                {
+                    JoinField = joinFields[i],
+                    Operator = Operator.Equals,
+                    ParentField = parentFields[i],
+                    ParentTableAlias = TableInfo.TableAlias
+                });
+            }
+
+            j.JoinOnQueries = joins.ToArray();
 
             return WithJoin(j);
         }
@@ -1274,86 +1315,159 @@ namespace Dapper.Accelr8.Sql
             return this;
         }
 
-        public virtual IEntityReader<IdType, EntityType> WithChildForParentIds
-            (IEntityReader childReader
-            , IdType[] ids
-            , string childJoinFieldName
-            , Action<IList<EntityType>, IList<object>> setOnParentVisitor
-            , bool withJoins = true)
+        public virtual IEntityReader<IdType, EntityType> WithChildForParentValues
+        (IEntityReader childReader
+        , object[] values
+        , string[] childJoinFieldNames
+        , Action<IList<EntityType>, IList<object>> setOnParentVisitor
+        , bool withJoins = true)
         {
             childReader.ClearAllQueries();
+            var cri = childReader.TableInfo as TableInfo;
 
-            childReader.WithAlias(TableAlias + "_" + childReader.TableAlias)
-                .Where(new QueryElement()
+            childReader.WithAlias(TableInfo.TableAlias + "_" + cri.TableAlias);
+
+            for (var i = 0; i < childJoinFieldNames.Length; i++)
+            {
+                childReader.Where(new QueryElement()
                 {
-                    TableAlias = childReader.TableAlias,
-                    FieldName = childJoinFieldName,
-                    Operator = Operator.In,
-                    ValueArray = ids.Cast<object>().ToArray()
+                    TableAlias = cri.TableAlias,
+                    FieldName = childJoinFieldNames[i],
+                    Operator = Operator.Equals,
+                    Value = values[i]
                 });
+            }
 
             if (withJoins)
                 childReader.WithAllJoins();
 
-            return WithChild(childReader, childJoinFieldName, setOnParentVisitor);
+            return WithChild(childReader, setOnParentVisitor);
         }
 
-        public virtual IEntityReader<IdType, EntityType> WithChildForParentId
+        public virtual IEntityReader<IdType, EntityType> WithChildForParentsValues
+        (IEntityReader childReader
+        , List<object[]> parentsValues
+        , string[] childJoinFieldNames
+        , Action<IList<EntityType>, IList<object>> setOnParentVisitor
+        , bool withJoins = true)
+        {
+            childReader.ClearAllQueries();
+            var cri = childReader.TableInfo as TableInfo;
+
+            childReader.WithAlias(TableInfo.TableAlias + "_" + cri.TableAlias);
+
+            for (var i = 0; i < childJoinFieldNames.Length; i++)
+            {
+                childReader.Where(new QueryElement()
+                {
+                    TableAlias = cri.TableAlias,
+                    FieldName = childJoinFieldNames[i],
+                    Operator = Operator.In,
+                    ValueArray = parentsValues.Select(p => p[i]).ToArray()  //ids.Cast<object>().ToArray()
+                });
+            }
+
+            if (withJoins)
+                childReader.WithAllJoins();
+
+            return WithChild(childReader, setOnParentVisitor);
+        }
+
+        public virtual IEntityReader<IdType, EntityType> WithChildForParentsFields
             (IEntityReader childReader
-            , IdType id
-            , string childJoinFieldName
+            , List<object[]> parentsFields
+            , string[] childJoinFieldNames
             , Action<IList<EntityType>, IList<object>> setOnParentVisitor
             , bool withJoins = true)
         {
+            childReader.ClearAllQueries();
+            var cri = childReader.TableInfo as TableInfo;
+
+            childReader.WithAlias(TableInfo.TableAlias + "_" + cri.TableAlias);
+
+            for (var i = 0; i < childJoinFieldNames.Length; i++)
+            {
+                childReader.Where(new QueryElement()
+                {
+                    TableAlias = cri.TableAlias,
+                    FieldName = childJoinFieldNames[i],
+                    Operator = Operator.In,
+                    ValueArray = parentsFields.Select(p => p[i]).ToArray()  //ids.Cast<object>().ToArray()
+                });
+            }
+
+            if (withJoins)
+                childReader.WithAllJoins();
+
+            return WithChild(childReader, setOnParentVisitor);
+        }
+
+        public virtual IEntityReader<IdType, EntityType> WithChildForParentFields
+            (IEntityReader childReader
+            , object[] parentFields
+            , string[] childJoinFieldNames
+            , Action<IList<EntityType>, IList<object>> setOnParentVisitor
+            , bool withJoins = true)
+        {
+            var cri = childReader.TableInfo as TableInfo;
             childReader.ClearAllQueries();
 
             childReader
-                .WithAlias(TableAlias + "_" + childReader.TableAlias)
-                .Where(new QueryElement()
+                .WithAlias(TableInfo.TableAlias + "_" + cri.TableAlias);
+
+            for (var i = 0; i < parentFields.Length; i++)
+            {
+                childReader.Where(new QueryElement()
                 {
-                    TableAlias = childReader.TableAlias,
-                    FieldName = childJoinFieldName,
+                    TableAlias = cri.TableAlias,
+                    FieldName = childJoinFieldNames[i],
                     Operator = Operator.Equals,
-                    Value = id
+                    Value = parentFields[i]
                 });
+            }
 
             if (withJoins)
                 childReader.WithAllJoins();
 
-            return WithChild(childReader, childJoinFieldName, setOnParentVisitor);
+            return WithChild(childReader, setOnParentVisitor);
         }
 
-        public virtual IEntityReader<IdType, EntityType> WithChildForExistingId
+        public virtual IEntityReader<IdType, EntityType> WithChildForParameters
             (IEntityReader childReader
-            , string paramName
-            , string childJoinFieldName
+            , string[] paramNames
+            , string[] childJoinFieldNames
             , Action<IList<EntityType>, IList<object>> setOnParentVisitor)
         {
+            var cri = childReader.TableInfo as TableInfo;
             childReader.ClearAllQueries();
 
             childReader
-                .WithAlias(TableAlias + "_" + childReader.TableAlias)
-                .Where(new QueryElement()
-                {
-                    TableAlias = childReader.TableAlias,
-                    FieldName = childJoinFieldName,
-                    Operator = Operator.Equals,
-                    ParamNames = new string[] { paramName }
-                });
+                .WithAlias(TableInfo.TableAlias + "_" + cri.TableAlias);
+
+            for (var i = 0; i < childJoinFieldNames.Length; i++)
+            { 
+                childReader.Where(new QueryElement()
+                 {
+                     TableAlias = cri.TableAlias,
+                     FieldName = childJoinFieldNames[i],
+                     Operator = Operator.Equals,
+                     ParamNames = new string[] { paramNames[i] }
+                 });
+            }
 
             childReader.WithAllJoins();
 
-            return WithChild(childReader, childJoinFieldName, setOnParentVisitor);
+            return WithChild(childReader, setOnParentVisitor);
         }
 
         public virtual IEntityReader<IdType, EntityType> WithChild
             (IEntityReader childReader
-            , string childJoinFieldName
-            , Action<IList<EntityType>, IList<object>> setOnParentVisitor)
+            , Action<IList<EntityType>
+                , IList<object>> setOnParentVisitor)
         {
             _children.Add
-                (new Tuple<string, IEntityReader, Action<IList<EntityType>, IList<object>>>
-                (childJoinFieldName, childReader, setOnParentVisitor));
+                (new Tuple<IEntityReader, Action<IList<EntityType>, IList<object>>>
+                (childReader, setOnParentVisitor));
 
             return this;
         }
@@ -1365,8 +1479,8 @@ namespace Dapper.Accelr8.Sql
 
             if (_children != null)
                 foreach (var c in _children)
-                    if (c.Item2 != null)
-                        c.Item2.Dispose();
+                    if (c.Item1 != null)
+                        c.Item1.Dispose();
         }
     }
 }

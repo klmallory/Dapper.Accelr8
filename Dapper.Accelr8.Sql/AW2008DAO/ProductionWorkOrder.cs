@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionWorkOrder : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionWorkOrder : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public ProductionWorkOrder()
-		{			
+		{
+							
 			IsDirty = false; 
 			_productionWorkOrderRoutings = new List<ProductionWorkOrderRouting>();
 		_startDate = (DateTime)SqlDateTime.MinValue;
@@ -25,6 +27,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected int _productID;
 		public int ProductID 

@@ -8,23 +8,26 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionProductModel : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionProductModel : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public ProductionProductModel()
-		{			
+		{
+							
 			IsDirty = false; 
-			_productionProductModelIllustrations = new List<ProductionProductModelIllustration>();
+			_productionProducts = new List<ProductionProduct>();
+		_productionProductModelIllustrations = new List<ProductionProductModelIllustration>();
 		_productionProductModelProductDescriptionCultures = new List<ProductionProductModelProductDescriptionCulture>();
-		_productionProducts = new List<ProductionProduct>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 
@@ -81,6 +84,18 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
+	//From Foreign Key FK_Product_ProductModel_ProductModelID	
+		protected IList<ProductionProduct> _productionProducts;
+		public virtual IList<ProductionProduct> ProductionProducts 
+		{ 
+			get { return _productionProducts; }
+			set 
+			{ 
+				_productionProducts = value;  
+				IsDirty = true;
+			}
+		} 
+			 
 	//From Foreign Key FK_ProductModelIllustration_ProductModel_ProductModelID	
 		protected IList<ProductionProductModelIllustration> _productionProductModelIllustrations;
 		public virtual IList<ProductionProductModelIllustration> ProductionProductModelIllustrations 
@@ -101,18 +116,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_productionProductModelProductDescriptionCultures = value;  
-				IsDirty = true;
-			}
-		} 
-			 
-	//From Foreign Key FK_Product_ProductModel_ProductModelID	
-		protected IList<ProductionProduct> _productionProducts;
-		public virtual IList<ProductionProduct> ProductionProducts 
-		{ 
-			get { return _productionProducts; }
-			set 
-			{ 
-				_productionProducts = value;  
 				IsDirty = true;
 			}
 		} 

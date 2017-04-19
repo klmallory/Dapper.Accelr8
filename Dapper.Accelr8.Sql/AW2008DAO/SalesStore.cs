@@ -8,21 +8,24 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesStore : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesStore : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesStore()
-		{			
+		{
+							
 			IsDirty = false; 
 			_salesCustomers = new List<SalesCustomer>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 

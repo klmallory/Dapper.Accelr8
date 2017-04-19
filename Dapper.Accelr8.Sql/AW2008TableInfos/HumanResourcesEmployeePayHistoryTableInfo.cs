@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesEmployeePayHistoryColumnNames
+	public enum HumanResourcesEmployeePayHistoryFieldNames
 	{	
 		BusinessEntityID, 	
 		RateChangeDate, 	
@@ -33,15 +33,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		humanresourcesemployee_p, 	}
 
 	public class HumanResourcesEmployeePayHistoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesEmployeePayHistoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesEmployeePayHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)HumanResourcesEmployeePayHistoryFieldNames.RateChangeDate, "RateChangeDate" }, 
+						{ (int)HumanResourcesEmployeePayHistoryFieldNames.Rate, "Rate" }, 
+						{ (int)HumanResourcesEmployeePayHistoryFieldNames.PayFrequency, "PayFrequency" }, 
+						{ (int)HumanResourcesEmployeePayHistoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesEmployeePayHistoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesEmployeePayHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)HumanResourcesEmployeePayHistoryFieldNames.RateChangeDate, "RateChangeDate" }, 
+				};
+
 		public HumanResourcesEmployeePayHistoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = HumanResourcesEmployeePayHistoryColumnNames.BusinessEntityID.ToString();
-			//Schema = "HumanResources.EmployeePayHistory";
+			Schema = "HumanResources";
 			TableName = "HumanResources.EmployeePayHistory";
 			TableAlias = "humanresourcesemployeepayhistory";
-			ColumnNames = typeof(HumanResourcesEmployeePayHistoryColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesEmployeePayHistoryColumnNames;
+			IdColumns = HumanResourcesEmployeePayHistoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_EmployeePayHistory_Employee_BusinessEntityID

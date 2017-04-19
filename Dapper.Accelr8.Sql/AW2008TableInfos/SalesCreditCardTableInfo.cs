@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesCreditCardColumnNames
+	public enum SalesCreditCardFieldNames
 	{	
-		CreditCardID, 	
+		Id, 	
 		CardType, 	
 		CardNumber, 	
 		ExpMonth, 	
@@ -30,20 +30,39 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesCreditCardCascadeNames
 	{	
-		salessalesorderheader, 	
-		salespersoncreditcard, 	
+		salessalesorderheaders, 	
+		salespersoncreditcards, 	
 		}
 
 	public class SalesCreditCardTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesCreditCardColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCreditCardFieldNames.Id, "CreditCardID" }, 
+						{ (int)SalesCreditCardFieldNames.CardType, "CardType" }, 
+						{ (int)SalesCreditCardFieldNames.CardNumber, "CardNumber" }, 
+						{ (int)SalesCreditCardFieldNames.ExpMonth, "ExpMonth" }, 
+						{ (int)SalesCreditCardFieldNames.ExpYear, "ExpYear" }, 
+						{ (int)SalesCreditCardFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesCreditCardIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCreditCardFieldNames.Id, "CreditCardID" }, 
+				};
+
 		public SalesCreditCardTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesCreditCardColumnNames.CreditCardID.ToString();
-			//Schema = "Sales.CreditCard";
+			Schema = "Sales";
 			TableName = "Sales.CreditCard";
 			TableAlias = "salescreditcard";
-			ColumnNames = typeof(SalesCreditCardColumnNames).ToDataList<Type, int>();
+			Columns = SalesCreditCardColumnNames;
+			IdColumns = SalesCreditCardIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

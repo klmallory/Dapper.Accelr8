@@ -18,29 +18,45 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionUnitMeasureColumnNames
+	public enum ProductionUnitMeasureFieldNames
 	{	
-		UnitMeasureCode, 	
+		Id, 	
 		Name, 	
 		ModifiedDate, 	
 	}
 
 	public enum ProductionUnitMeasureCascadeNames
 	{	
-		purchasingproductvendor, 	
-		productionproduct, 	
+		purchasingproductvendors, 	
+		productionproducts1, 	
 		}
 
 	public class ProductionUnitMeasureTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionUnitMeasureColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionUnitMeasureFieldNames.Id, "UnitMeasureCode" }, 
+						{ (int)ProductionUnitMeasureFieldNames.Name, "Name" }, 
+						{ (int)ProductionUnitMeasureFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionUnitMeasureIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionUnitMeasureFieldNames.Id, "UnitMeasureCode" }, 
+				};
+
 		public ProductionUnitMeasureTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionUnitMeasureColumnNames.UnitMeasureCode.ToString();
-			//Schema = "Production.UnitMeasure";
+			Schema = "Production";
 			TableName = "Production.UnitMeasure";
 			TableAlias = "productionunitmeasure";
-			ColumnNames = typeof(ProductionUnitMeasureColumnNames).ToDataList<Type, int>();
+			Columns = ProductionUnitMeasureColumnNames;
+			IdColumns = ProductionUnitMeasureIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

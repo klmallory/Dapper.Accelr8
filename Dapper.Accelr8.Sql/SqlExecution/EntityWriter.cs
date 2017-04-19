@@ -9,7 +9,6 @@ using System.Text;
 using Dapper;
 using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
-using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Contracts;
 
@@ -47,10 +46,9 @@ namespace Dapper.Accelr8.Sql
             _loc8r = loc8r;
 
             UniqueId = tableInfo.UniqueId;
-            IdColumn = tableInfo.IdColumn;
             TableName = tableInfo.TableName;
             TableAlias = tableInfo.TableAlias;
-            ColumnNames = tableInfo.ColumnNames.OrderBy(c => c.Value).ToList();
+            ColumnNames = tableInfo.Columns.OrderBy(c => c.Value).ToList();
             TableInfo = tableInfo;
         }
 
@@ -213,7 +211,6 @@ namespace Dapper.Accelr8.Sql
         protected abstract void UpdateIdsFromReferences(IList<string> cascades, EntityType entity);
 
         public virtual bool UniqueId { get; protected set; }
-        public virtual string IdColumn { get; protected set; }
         public virtual string TableName { get; protected set; }
         public virtual string TableAlias { get; protected set; }
         public virtual IList<KeyValuePair<int, string>> ColumnNames { get; protected set; }
@@ -417,7 +414,7 @@ namespace Dapper.Accelr8.Sql
 
         public IEntityWriter<IdType, EntityType> WithColumn(string column)
         {
-            var matchingColumn = this.TableInfo.ColumnNames.FirstOrDefault(c => string.Equals(c.Value, column, StringComparison.CurrentCultureIgnoreCase));
+            var matchingColumn = this.TableInfo.Columns.FirstOrDefault(c => string.Equals(c.Value, column, StringComparison.CurrentCultureIgnoreCase));
 
             if (matchingColumn.Value == null)
                 throw new KeyNotFoundException(string.Format("column {0} not found.", column));
@@ -498,13 +495,20 @@ namespace Dapper.Accelr8.Sql
                 Entity = entity
             };
 
-            task.Queries.Add(new QueryElement()
+            if (entity.Id is CompoundKey)
             {
-                FieldName = IdColumn,
-                Operator = Operator.Equals,
-                TableAlias = TableAlias,
-                Value = entity.Id
-            });
+
+            }
+            else
+            {
+                task.Queries.Add(new QueryElement()
+                {
+                    FieldName = TableInfo.IdColumns.First(),
+                    Operator = Operator.Equals,
+                    TableAlias = TableAlias,
+                    Value = entity.Id
+                });
+            }
 
             _tasks.Add(task);
 

@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionTransactionHistoryArchive();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
+			domain.Id = GetRowData<int>(dataRow, "TransactionID"); 
+      		domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
       		domain.ReferenceOrderID = GetRowData<int>(dataRow, "ReferenceOrderID"); 
       		domain.ReferenceOrderLineID = GetRowData<int>(dataRow, "ReferenceOrderLineID"); 
       		domain.TransactionDate = GetRowData<DateTime>(dataRow, "TransactionDate"); 
@@ -63,13 +68,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionTransactionHistoryArchive></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionTransactionHistoryArchive> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionTransactionHistoryArchive> WithAllChildrenForExisting(ProductionTransactionHistoryArchive existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionTransactionHistoryArchive entity)
         {

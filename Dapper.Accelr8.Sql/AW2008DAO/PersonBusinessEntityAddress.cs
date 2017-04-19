@@ -8,20 +8,77 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PersonBusinessEntityAddress : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PersonBusinessEntityAddress : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public PersonBusinessEntityAddress()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(PersonBusinessEntityAddress dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.BusinessEntityID,
+							dao.AddressID,
+							dao.AddressTypeID,
+						
+				}
+			};
+		}
+
+			
+			protected int _businessEntityID;
+		public int BusinessEntityID 
+		{ 
+			get { return _businessEntityID; }
+			set 
+			{ 
+				_businessEntityID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _addressID;
+		public int AddressID 
+		{ 
+			get { return _addressID; }
+			set 
+			{ 
+				_addressID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _addressTypeID;
+		public int AddressTypeID 
+		{ 
+			get { return _addressTypeID; }
+			set 
+			{ 
+				_addressTypeID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected Guid _rowguid;
 		public Guid rowguid 

@@ -18,28 +18,44 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionIllustrationColumnNames
+	public enum ProductionIllustrationFieldNames
 	{	
-		IllustrationID, 	
+		Id, 	
 		Diagram, 	
 		ModifiedDate, 	
 	}
 
 	public enum ProductionIllustrationCascadeNames
 	{	
-		productionproductmodelillustration, 	
+		productionproductmodelillustrations, 	
 		}
 
 	public class ProductionIllustrationTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionIllustrationColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionIllustrationFieldNames.Id, "IllustrationID" }, 
+						{ (int)ProductionIllustrationFieldNames.Diagram, "Diagram" }, 
+						{ (int)ProductionIllustrationFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionIllustrationIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionIllustrationFieldNames.Id, "IllustrationID" }, 
+				};
+
 		public ProductionIllustrationTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionIllustrationColumnNames.IllustrationID.ToString();
-			//Schema = "Production.Illustration";
+			Schema = "Production";
 			TableName = "Production.Illustration";
 			TableAlias = "productionillustration";
-			ColumnNames = typeof(ProductionIllustrationColumnNames).ToDataList<Type, int>();
+			Columns = ProductionIllustrationColumnNames;
+			IdColumns = ProductionIllustrationIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

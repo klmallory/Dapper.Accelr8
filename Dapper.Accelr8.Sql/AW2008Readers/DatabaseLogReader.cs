@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new DatabaseLog();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.PostTime = GetRowData<DateTime>(dataRow, "PostTime"); 
+			domain.Id = GetRowData<int>(dataRow, "DatabaseLogID"); 
+      		domain.PostTime = GetRowData<DateTime>(dataRow, "PostTime"); 
       		domain.DatabaseUser = GetRowData<object>(dataRow, "DatabaseUser"); 
       		domain.Event = GetRowData<object>(dataRow, "Event"); 
       		domain.Schema = GetRowData<object>(dataRow, "Schema"); 
@@ -62,13 +67,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, DatabaseLog></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, DatabaseLog> WithAllChildrenForId(int id)
+        public override IEntityReader<int, DatabaseLog> WithAllChildrenForExisting(DatabaseLog existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(DatabaseLog entity)
         {

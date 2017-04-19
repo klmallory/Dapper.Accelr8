@@ -8,28 +8,31 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class HumanResourcesEmployee : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class HumanResourcesEmployee : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public HumanResourcesEmployee()
-		{			
+		{
+							
 			IsDirty = false; 
-			_purchasingPurchaseOrderHeaders = new List<PurchasingPurchaseOrderHeader>();
-		_productionDocuments = new List<ProductionDocument>();
+			_productionDocuments = new List<ProductionDocument>();
 		_humanResourcesEmployeeDepartmentHistories = new List<HumanResourcesEmployeeDepartmentHistory>();
 		_humanResourcesEmployeePayHistories = new List<HumanResourcesEmployeePayHistory>();
-		_salesSalesPeople = new List<SalesSalesPerson>();
 		_humanResourcesJobCandidates = new List<HumanResourcesJobCandidate>();
+		_purchasingPurchaseOrderHeaders = new List<PurchasingPurchaseOrderHeader>();
+		_salesSalesPeople = new List<SalesSalesPerson>();
 		_birthDate = (DateTime)SqlDateTime.MinValue;
 		_hireDate = (DateTime)SqlDateTime.MinValue;
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected string _nationalIDNumber;
 		public string NationalIDNumber 
@@ -208,18 +211,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
-	//From Foreign Key FK_PurchaseOrderHeader_Employee_EmployeeID	
-		protected IList<PurchasingPurchaseOrderHeader> _purchasingPurchaseOrderHeaders;
-		public virtual IList<PurchasingPurchaseOrderHeader> PurchasingPurchaseOrderHeaders 
-		{ 
-			get { return _purchasingPurchaseOrderHeaders; }
-			set 
-			{ 
-				_purchasingPurchaseOrderHeaders = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_Document_Employee_Owner	
 		protected IList<ProductionDocument> _productionDocuments;
 		public virtual IList<ProductionDocument> ProductionDocuments 
@@ -256,18 +247,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 			 
-	//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID	
-		protected IList<SalesSalesPerson> _salesSalesPeople;
-		public virtual IList<SalesSalesPerson> SalesSalesPeople 
-		{ 
-			get { return _salesSalesPeople; }
-			set 
-			{ 
-				_salesSalesPeople = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_JobCandidate_Employee_BusinessEntityID	
 		protected IList<HumanResourcesJobCandidate> _humanResourcesJobCandidates;
 		public virtual IList<HumanResourcesJobCandidate> HumanResourcesJobCandidates 
@@ -276,6 +255,30 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_humanResourcesJobCandidates = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_PurchaseOrderHeader_Employee_EmployeeID	
+		protected IList<PurchasingPurchaseOrderHeader> _purchasingPurchaseOrderHeaders;
+		public virtual IList<PurchasingPurchaseOrderHeader> PurchasingPurchaseOrderHeaders 
+		{ 
+			get { return _purchasingPurchaseOrderHeaders; }
+			set 
+			{ 
+				_purchasingPurchaseOrderHeaders = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID	
+		protected IList<SalesSalesPerson> _salesSalesPeople;
+		public virtual IList<SalesSalesPerson> SalesSalesPeople 
+		{ 
+			get { return _salesSalesPeople; }
+			set 
+			{ 
+				_salesSalesPeople = value;  
 				IsDirty = true;
 			}
 		} 

@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesCountryRegionCurrencyColumnNames
+	public enum SalesCountryRegionCurrencyFieldNames
 	{	
 		CountryRegionCode, 	
 		CurrencyCode, 	
@@ -32,15 +32,32 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		salescurrency_p, 	}
 
 	public class SalesCountryRegionCurrencyTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesCountryRegionCurrencyColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCountryRegionCurrencyFieldNames.CountryRegionCode, "CountryRegionCode" }, 
+						{ (int)SalesCountryRegionCurrencyFieldNames.CurrencyCode, "CurrencyCode" }, 
+						{ (int)SalesCountryRegionCurrencyFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesCountryRegionCurrencyIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCountryRegionCurrencyFieldNames.CountryRegionCode, "CountryRegionCode" }, 
+						{ (int)SalesCountryRegionCurrencyFieldNames.CurrencyCode, "CurrencyCode" }, 
+				};
+
 		public SalesCountryRegionCurrencyTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesCountryRegionCurrencyColumnNames.CountryRegionCode.ToString();
-			//Schema = "Sales.CountryRegionCurrency";
+			Schema = "Sales";
 			TableName = "Sales.CountryRegionCurrency";
 			TableAlias = "salescountryregioncurrency";
-			ColumnNames = typeof(SalesCountryRegionCurrencyColumnNames).ToDataList<Type, int>();
+			Columns = SalesCountryRegionCurrencyColumnNames;
+			IdColumns = SalesCountryRegionCurrencyIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_CountryRegionCurrency_CountryRegion_CountryRegionCode

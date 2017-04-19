@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,7 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionvProductModelCatalogDescription();
 			domain.Loaded = false;
 
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.ProductModelID = GetRowData<int>(dataRow, "ProductModelID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.Summary = GetRowData<string>(dataRow, "Summary"); 
       		domain.Manufacturer = GetRowData<string>(dataRow, "Manufacturer"); 
       		domain.Copyright = GetRowData<string>(dataRow, "Copyright"); 
@@ -78,13 +84,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionvProductModelCatalogDescription></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionvProductModelCatalogDescription> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionvProductModelCatalogDescription> WithAllChildrenForExisting(ProductionvProductModelCatalogDescription existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionvProductModelCatalogDescription entity)
         {

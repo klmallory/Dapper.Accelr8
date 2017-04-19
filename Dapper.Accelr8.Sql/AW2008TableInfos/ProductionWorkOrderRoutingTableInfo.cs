@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionWorkOrderRoutingColumnNames
+	public enum ProductionWorkOrderRoutingFieldNames
 	{	
 		WorkOrderID, 	
 		ProductID, 	
@@ -41,15 +41,42 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionlocation_p, 	}
 
 	public class ProductionWorkOrderRoutingTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionWorkOrderRoutingColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionWorkOrderRoutingFieldNames.WorkOrderID, "WorkOrderID" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.OperationSequence, "OperationSequence" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.LocationID, "LocationID" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ScheduledStartDate, "ScheduledStartDate" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ScheduledEndDate, "ScheduledEndDate" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ActualStartDate, "ActualStartDate" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ActualEndDate, "ActualEndDate" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ActualResourceHrs, "ActualResourceHrs" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.PlannedCost, "PlannedCost" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ActualCost, "ActualCost" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionWorkOrderRoutingIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionWorkOrderRoutingFieldNames.WorkOrderID, "WorkOrderID" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionWorkOrderRoutingFieldNames.OperationSequence, "OperationSequence" }, 
+				};
+
 		public ProductionWorkOrderRoutingTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionWorkOrderRoutingColumnNames.WorkOrderID.ToString();
-			//Schema = "Production.WorkOrderRouting";
+			Schema = "Production";
 			TableName = "Production.WorkOrderRouting";
 			TableAlias = "productionworkorderrouting";
-			ColumnNames = typeof(ProductionWorkOrderRoutingColumnNames).ToDataList<Type, int>();
+			Columns = ProductionWorkOrderRoutingColumnNames;
+			IdColumns = ProductionWorkOrderRoutingIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_WorkOrderRouting_WorkOrder_WorkOrderID

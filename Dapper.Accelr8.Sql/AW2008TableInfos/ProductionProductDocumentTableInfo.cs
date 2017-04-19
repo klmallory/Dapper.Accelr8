@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductDocumentColumnNames
+	public enum ProductionProductDocumentFieldNames
 	{	
 		ProductID, 	
 		DocumentNode, 	
@@ -31,15 +31,32 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class ProductionProductDocumentTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductDocumentColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductDocumentFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductDocumentFieldNames.DocumentNode, "DocumentNode" }, 
+						{ (int)ProductionProductDocumentFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductDocumentIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductDocumentFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductDocumentFieldNames.DocumentNode, "DocumentNode" }, 
+				};
+
 		public ProductionProductDocumentTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductDocumentColumnNames.ProductID.ToString();
-			//Schema = "Production.ProductDocument";
+			Schema = "Production";
 			TableName = "Production.ProductDocument";
 			TableAlias = "productionproductdocument";
-			ColumnNames = typeof(ProductionProductDocumentColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductDocumentColumnNames;
+			IdColumns = ProductionProductDocumentIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductDocument_Product_ProductID

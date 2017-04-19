@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class PurchasingProductVendorWriter : EntityWriter<int, PurchasingProductVendor>
+    public class PurchasingProductVendorWriter : EntityWriter<CompoundKey, PurchasingProductVendor>
     {
         public PurchasingProductVendorWriter
 			(PurchasingProductVendorTableInfo tableInfo
@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<string, ProductionUnitMeasure> GetProductionUnitMeasureWriter()
-		{ return _locator.Resolve<IEntityWriter<string, ProductionUnitMeasure>>(); }
+		{ return s_loc8r.GetWriter<string, ProductionUnitMeasure>(); }
 		static IEntityWriter<int, PurchasingVendor> GetPurchasingVendorWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingVendor>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingVendor>(); }
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,34 +53,34 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PurchasingProductVendorColumnNames)f.Key)
+                switch ((PurchasingProductVendorFieldNames)f.Key)
                 {
                     
-					case PurchasingProductVendorColumnNames.AverageLeadTime:
+					case PurchasingProductVendorFieldNames.AverageLeadTime:
 						parms.Add(GetParamName("AverageLeadTime", actionType, taskIndex, ref count), entity.AverageLeadTime);
 						break;
-					case PurchasingProductVendorColumnNames.StandardPrice:
+					case PurchasingProductVendorFieldNames.StandardPrice:
 						parms.Add(GetParamName("StandardPrice", actionType, taskIndex, ref count), entity.StandardPrice);
 						break;
-					case PurchasingProductVendorColumnNames.LastReceiptCost:
+					case PurchasingProductVendorFieldNames.LastReceiptCost:
 						parms.Add(GetParamName("LastReceiptCost", actionType, taskIndex, ref count), entity.LastReceiptCost);
 						break;
-					case PurchasingProductVendorColumnNames.LastReceiptDate:
+					case PurchasingProductVendorFieldNames.LastReceiptDate:
 						parms.Add(GetParamName("LastReceiptDate", actionType, taskIndex, ref count), entity.LastReceiptDate);
 						break;
-					case PurchasingProductVendorColumnNames.MinOrderQty:
+					case PurchasingProductVendorFieldNames.MinOrderQty:
 						parms.Add(GetParamName("MinOrderQty", actionType, taskIndex, ref count), entity.MinOrderQty);
 						break;
-					case PurchasingProductVendorColumnNames.MaxOrderQty:
+					case PurchasingProductVendorFieldNames.MaxOrderQty:
 						parms.Add(GetParamName("MaxOrderQty", actionType, taskIndex, ref count), entity.MaxOrderQty);
 						break;
-					case PurchasingProductVendorColumnNames.OnOrderQty:
+					case PurchasingProductVendorFieldNames.OnOrderQty:
 						parms.Add(GetParamName("OnOrderQty", actionType, taskIndex, ref count), entity.OnOrderQty);
 						break;
-					case PurchasingProductVendorColumnNames.UnitMeasureCode:
+					case PurchasingProductVendorFieldNames.UnitMeasureCode:
 						parms.Add(GetParamName("UnitMeasureCode", actionType, taskIndex, ref count), entity.UnitMeasureCode);
 						break;
-					case PurchasingProductVendorColumnNames.ModifiedDate:
+					case PurchasingProductVendorFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -96,19 +99,19 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ProductVendor_UnitMeasure_UnitMeasureCode
 			var productionUnitMeasure273 = GetProductionUnitMeasureWriter();
-		if ((_cascades.Contains(PurchasingProductVendorCascadeNames.productionunitmeasure.ToString()) || _cascades.Contains("all")) && entity.ProductionUnitMeasure != null)
+		if ((_cascades.Contains(PurchasingProductVendorCascadeNames.productionunitmeasure_p.ToString()) || _cascades.Contains("all")) && entity.ProductionUnitMeasure != null)
 			if (Cascade(productionUnitMeasure273, entity.ProductionUnitMeasure, context))
 				WithParent(productionUnitMeasure273, entity);
 
 			//From Foreign Key FK_ProductVendor_Vendor_BusinessEntityID
 			var purchasingVendor274 = GetPurchasingVendorWriter();
-		if ((_cascades.Contains(PurchasingProductVendorCascadeNames.purchasingvendor.ToString()) || _cascades.Contains("all")) && entity.PurchasingVendor != null)
+		if ((_cascades.Contains(PurchasingProductVendorCascadeNames.purchasingvendor_p.ToString()) || _cascades.Contains("all")) && entity.PurchasingVendor != null)
 			if (Cascade(purchasingVendor274, entity.PurchasingVendor, context))
 				WithParent(purchasingVendor274, entity);
 
 			//From Foreign Key FK_ProductVendor_Product_ProductID
 			var productionProduct275 = GetProductionProductWriter();
-		if ((_cascades.Contains(PurchasingProductVendorCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(PurchasingProductVendorCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct275, entity.ProductionProduct, context))
 				WithParent(productionProduct275, entity);
 
@@ -122,15 +125,15 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ProductVendor_UnitMeasure_UnitMeasureCode
 			if (entity.ProductionUnitMeasure != null)
-				entity.PurchasingProductVendor = entity.ProductionUnitMeasure.Id;
+				entity.UnitMeasureCode = entity.ProductionUnitMeasure.Id;
 
 			//From Foreign Key FK_ProductVendor_Vendor_BusinessEntityID
 			if (entity.PurchasingVendor != null)
-				entity.PurchasingProductVendor = entity.PurchasingVendor.Id;
+				entity.BusinessEntityID = entity.PurchasingVendor.Id;
 
 			//From Foreign Key FK_ProductVendor_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.PurchasingProductVendor = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSpecialOfferProductColumnNames
+	public enum SalesSpecialOfferProductFieldNames
 	{	
 		SpecialOfferID, 	
 		ProductID, 	
@@ -28,21 +28,39 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesSpecialOfferProductCascadeNames
 	{	
-		salessalesorderdetail, 	
+		salessalesorderdetails1, 	
 		
 		salesspecialoffer_p, 	
 		productionproduct_p, 	}
 
 	public class SalesSpecialOfferProductTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSpecialOfferProductColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSpecialOfferProductFieldNames.SpecialOfferID, "SpecialOfferID" }, 
+						{ (int)SalesSpecialOfferProductFieldNames.ProductID, "ProductID" }, 
+						{ (int)SalesSpecialOfferProductFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSpecialOfferProductFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSpecialOfferProductIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSpecialOfferProductFieldNames.SpecialOfferID, "SpecialOfferID" }, 
+						{ (int)SalesSpecialOfferProductFieldNames.ProductID, "ProductID" }, 
+				};
+
 		public SalesSpecialOfferProductTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSpecialOfferProductColumnNames.SpecialOfferID.ToString();
-			//Schema = "Sales.SpecialOfferProduct";
+			Schema = "Sales";
 			TableName = "Sales.SpecialOfferProduct";
 			TableAlias = "salesspecialofferproduct";
-			ColumnNames = typeof(SalesSpecialOfferProductColumnNames).ToDataList<Type, int>();
+			Columns = SalesSpecialOfferProductColumnNames;
+			IdColumns = SalesSpecialOfferProductIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID

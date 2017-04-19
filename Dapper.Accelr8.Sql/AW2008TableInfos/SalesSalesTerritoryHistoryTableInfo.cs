@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesTerritoryHistoryColumnNames
+	public enum SalesSalesTerritoryHistoryFieldNames
 	{	
 		BusinessEntityID, 	
 		TerritoryID, 	
@@ -35,15 +35,36 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		salessalesterritory_p, 	}
 
 	public class SalesSalesTerritoryHistoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesTerritoryHistoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesTerritoryHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.TerritoryID, "TerritoryID" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.StartDate, "StartDate" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.EndDate, "EndDate" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesTerritoryHistoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesTerritoryHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.TerritoryID, "TerritoryID" }, 
+						{ (int)SalesSalesTerritoryHistoryFieldNames.StartDate, "StartDate" }, 
+				};
+
 		public SalesSalesTerritoryHistoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesTerritoryHistoryColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.SalesTerritoryHistory";
+			Schema = "Sales";
 			TableName = "Sales.SalesTerritoryHistory";
 			TableAlias = "salessalesterritoryhistory";
-			ColumnNames = typeof(SalesSalesTerritoryHistoryColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesTerritoryHistoryColumnNames;
+			IdColumns = SalesSalesTerritoryHistoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID

@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , PersonBusinessEntityContact> _personBusinessEntityContactReader;
-		protected static IEntityReader<int , PersonBusinessEntityContact> GetPersonBusinessEntityContactReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonBusinessEntityContact> GetPersonBusinessEntityContactReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonBusinessEntityContact>>();
+			return s_loc8r.GetReader<CompoundKey , PersonBusinessEntityContact>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonBusinessEntityContacts(IList<PersonContactType> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonBusinessEntityContact
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonBusinessEntityContacts = typedChildren.Where(b => b.PersonBusinessEntityContact == r.Id).ToList();
+				
+
+				r.PersonBusinessEntityContacts = typedChildren.Where(b =>  b.ContactTypeID == r.Id ).ToList();
 				r.PersonBusinessEntityContacts.ToList().ForEach(b => { b.Loaded = false; b.PersonContactType = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonContactType();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "ContactTypeID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -90,15 +98,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonContactType></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonContactType> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonContactType> WithAllChildrenForExisting(PersonContactType existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonBusinessEntityContactReader(), id, IdColumn, SetChildrenPersonBusinessEntityContacts);
+						WithChildForParentValues(GetPersonBusinessEntityContactReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ContactTypeID",  }
+				, SetChildrenPersonBusinessEntityContacts);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonContactType entity)
         {
@@ -107,11 +116,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonBusinessEntityContactReader(), entity.Id
-				, PersonBusinessEntityContactColumnNames.ContactTypeID.ToString()
+						WithChildForParentValues(GetPersonBusinessEntityContactReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ContactTypeID",  }
 				, SetChildrenPersonBusinessEntityContacts);
 
-			QueryResultForChildrenOnly(new List<PersonContactType>() { entity });
+			
+QueryResultForChildrenOnly(new List<PersonContactType>() { entity });
 			entity.Loaded = false;
 			GetPersonBusinessEntityContactReader().SetAllChildrenForExisting(entity.PersonBusinessEntityContacts);
 				
@@ -122,15 +133,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonBusinessEntityContactReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonBusinessEntityContactColumnNames.ContactTypeID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPersonBusinessEntityContactReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ContactTypeID",  }
 				, SetChildrenPersonBusinessEntityContacts);
 
 					

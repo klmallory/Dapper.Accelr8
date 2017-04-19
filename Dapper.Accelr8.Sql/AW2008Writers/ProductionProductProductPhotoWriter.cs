@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class ProductionProductProductPhotoWriter : EntityWriter<int, ProductionProductProductPhoto>
+    public class ProductionProductProductPhotoWriter : EntityWriter<CompoundKey, ProductionProductProductPhoto>
     {
         public ProductionProductProductPhotoWriter
 			(ProductionProductProductPhotoTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionProductPhoto> GetProductionProductPhotoWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductPhoto>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductPhoto>(); }
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,13 +51,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductProductPhotoColumnNames)f.Key)
+                switch ((ProductionProductProductPhotoFieldNames)f.Key)
                 {
                     
-					case ProductionProductProductPhotoColumnNames.Primary:
+					case ProductionProductProductPhotoFieldNames.Primary:
 						parms.Add(GetParamName("Primary", actionType, taskIndex, ref count), entity.Primary);
 						break;
-					case ProductionProductProductPhotoColumnNames.ModifiedDate:
+					case ProductionProductProductPhotoFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -73,13 +76,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ProductProductPhoto_ProductPhoto_ProductPhotoID
 			var productionProductPhoto262 = GetProductionProductPhotoWriter();
-		if ((_cascades.Contains(ProductionProductProductPhotoCascadeNames.productionproductphoto.ToString()) || _cascades.Contains("all")) && entity.ProductionProductPhoto != null)
+		if ((_cascades.Contains(ProductionProductProductPhotoCascadeNames.productionproductphoto_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProductPhoto != null)
 			if (Cascade(productionProductPhoto262, entity.ProductionProductPhoto, context))
 				WithParent(productionProductPhoto262, entity);
 
 			//From Foreign Key FK_ProductProductPhoto_Product_ProductID
 			var productionProduct263 = GetProductionProductWriter();
-		if ((_cascades.Contains(ProductionProductProductPhotoCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(ProductionProductProductPhotoCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct263, entity.ProductionProduct, context))
 				WithParent(productionProduct263, entity);
 
@@ -93,11 +96,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ProductProductPhoto_ProductPhoto_ProductPhotoID
 			if (entity.ProductionProductPhoto != null)
-				entity.ProductionProductProductPhoto = entity.ProductionProductPhoto.Id;
+				entity.ProductPhotoID = entity.ProductionProductPhoto.Id;
 
 			//From Foreign Key FK_ProductProductPhoto_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.ProductionProductProductPhoto = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

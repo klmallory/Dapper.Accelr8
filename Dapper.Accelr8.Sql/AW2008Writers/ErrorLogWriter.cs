@@ -28,8 +28,11 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		
@@ -44,31 +47,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ErrorLogColumnNames)f.Key)
+                switch ((ErrorLogFieldNames)f.Key)
                 {
                     
-					case ErrorLogColumnNames.ErrorTime:
+					case ErrorLogFieldNames.ErrorTime:
 						parms.Add(GetParamName("ErrorTime", actionType, taskIndex, ref count), entity.ErrorTime);
 						break;
-					case ErrorLogColumnNames.UserName:
+					case ErrorLogFieldNames.UserName:
 						parms.Add(GetParamName("UserName", actionType, taskIndex, ref count), entity.UserName);
 						break;
-					case ErrorLogColumnNames.ErrorNumber:
+					case ErrorLogFieldNames.ErrorNumber:
 						parms.Add(GetParamName("ErrorNumber", actionType, taskIndex, ref count), entity.ErrorNumber);
 						break;
-					case ErrorLogColumnNames.ErrorSeverity:
+					case ErrorLogFieldNames.ErrorSeverity:
 						parms.Add(GetParamName("ErrorSeverity", actionType, taskIndex, ref count), entity.ErrorSeverity);
 						break;
-					case ErrorLogColumnNames.ErrorState:
+					case ErrorLogFieldNames.ErrorState:
 						parms.Add(GetParamName("ErrorState", actionType, taskIndex, ref count), entity.ErrorState);
 						break;
-					case ErrorLogColumnNames.ErrorProcedure:
+					case ErrorLogFieldNames.ErrorProcedure:
 						parms.Add(GetParamName("ErrorProcedure", actionType, taskIndex, ref count), entity.ErrorProcedure);
 						break;
-					case ErrorLogColumnNames.ErrorLine:
+					case ErrorLogFieldNames.ErrorLine:
 						parms.Add(GetParamName("ErrorLine", actionType, taskIndex, ref count), entity.ErrorLine);
 						break;
-					case ErrorLogColumnNames.ErrorMessage:
+					case ErrorLogFieldNames.ErrorMessage:
 						parms.Add(GetParamName("ErrorMessage", actionType, taskIndex, ref count), entity.ErrorMessage);
 						break;
 				}

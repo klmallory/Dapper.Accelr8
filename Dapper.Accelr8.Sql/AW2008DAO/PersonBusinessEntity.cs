@@ -8,25 +8,28 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PersonBusinessEntity : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PersonBusinessEntity : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public PersonBusinessEntity()
-		{			
+		{
+							
 			IsDirty = false; 
-			_salesStores = new List<SalesStore>();
-		_personBusinessEntityAddresses = new List<PersonBusinessEntityAddress>();
+			_personBusinessEntityAddresses = new List<PersonBusinessEntityAddress>();
 		_personBusinessEntityContacts = new List<PersonBusinessEntityContact>();
-		_purchasingVendors = new List<PurchasingVendor>();
 		_personPeople = new List<PersonPerson>();
+		_salesStores = new List<SalesStore>();
+		_purchasingVendors = new List<PurchasingVendor>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected Guid _rowguid;
 		public Guid rowguid 
@@ -50,18 +53,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
-	//From Foreign Key FK_Store_BusinessEntity_BusinessEntityID	
-		protected IList<SalesStore> _salesStores;
-		public virtual IList<SalesStore> SalesStores 
-		{ 
-			get { return _salesStores; }
-			set 
-			{ 
-				_salesStores = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID	
 		protected IList<PersonBusinessEntityAddress> _personBusinessEntityAddresses;
 		public virtual IList<PersonBusinessEntityAddress> PersonBusinessEntityAddresses 
@@ -86,18 +77,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 			 
-	//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID	
-		protected IList<PurchasingVendor> _purchasingVendors;
-		public virtual IList<PurchasingVendor> PurchasingVendors 
-		{ 
-			get { return _purchasingVendors; }
-			set 
-			{ 
-				_purchasingVendors = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_Person_BusinessEntity_BusinessEntityID	
 		protected IList<PersonPerson> _personPeople;
 		public virtual IList<PersonPerson> PersonPeople 
@@ -106,6 +85,30 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_personPeople = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_Store_BusinessEntity_BusinessEntityID	
+		protected IList<SalesStore> _salesStores;
+		public virtual IList<SalesStore> SalesStores 
+		{ 
+			get { return _salesStores; }
+			set 
+			{ 
+				_salesStores = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_Vendor_BusinessEntity_BusinessEntityID	
+		protected IList<PurchasingVendor> _purchasingVendors;
+		public virtual IList<PurchasingVendor> PurchasingVendors 
+		{ 
+			get { return _purchasingVendors; }
+			set 
+			{ 
+				_purchasingVendors = value;  
 				IsDirty = true;
 			}
 		} 

@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, ProductionProductSubcategory> GetProductionProductSubcategoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductSubcategory>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductSubcategory>(); }
 		
 		
 		/// <summary>
@@ -46,16 +49,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductCategoryColumnNames)f.Key)
+                switch ((ProductionProductCategoryFieldNames)f.Key)
                 {
                     
-					case ProductionProductCategoryColumnNames.Name:
+					case ProductionProductCategoryFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case ProductionProductCategoryColumnNames.rowguid:
+					case ProductionProductCategoryFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case ProductionProductCategoryColumnNames.ModifiedDate:
+					case ProductionProductCategoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -72,7 +75,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductSubcategory_ProductCategory_ProductCategoryID
 			var productionProductSubcategory224 = GetProductionProductSubcategoryWriter();
-			if (_cascades.Contains(ProductionProductCategoryCascadeNames.production.productsubcategory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductCategoryCascadeNames.productionproductsubcategories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductSubcategories)
 					Cascade(productionProductSubcategory224, item, context);
 
@@ -91,7 +94,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_ProductSubcategory_ProductCategory_ProductCategoryID
 			if (entity.ProductionProductSubcategories != null && entity.ProductionProductSubcategories.Count > 0)
 				foreach (var rel in entity.ProductionProductSubcategories)
-					rel.ProductionProductSubcategory = entity.Id;
+					rel.ProductCategoryID = entity.Id;
 
 				
 		}
@@ -100,7 +103,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_ProductSubcategory_ProductCategory_ProductCategoryID
 			var productionProductSubcategory226 = GetProductionProductSubcategoryWriter();
-			if (_cascades.Contains(ProductionProductCategoryCascadeNames.production.productsubcategory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductCategoryCascadeNames.productionproductsubcategory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductSubcategories)
 					CascadeDelete(productionProductSubcategory226, item, context);
 

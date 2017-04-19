@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, ProductionProductProductPhoto> GetProductionProductProductPhotoWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProductProductPhoto>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProductProductPhoto>(); }
 		
 		
 		/// <summary>
@@ -46,22 +49,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductPhotoColumnNames)f.Key)
+                switch ((ProductionProductPhotoFieldNames)f.Key)
                 {
                     
-					case ProductionProductPhotoColumnNames.ThumbNailPhoto:
+					case ProductionProductPhotoFieldNames.ThumbNailPhoto:
 						parms.Add(GetParamName("ThumbNailPhoto", actionType, taskIndex, ref count), entity.ThumbNailPhoto);
 						break;
-					case ProductionProductPhotoColumnNames.ThumbnailPhotoFileName:
+					case ProductionProductPhotoFieldNames.ThumbnailPhotoFileName:
 						parms.Add(GetParamName("ThumbnailPhotoFileName", actionType, taskIndex, ref count), entity.ThumbnailPhotoFileName);
 						break;
-					case ProductionProductPhotoColumnNames.LargePhoto:
+					case ProductionProductPhotoFieldNames.LargePhoto:
 						parms.Add(GetParamName("LargePhoto", actionType, taskIndex, ref count), entity.LargePhoto);
 						break;
-					case ProductionProductPhotoColumnNames.LargePhotoFileName:
+					case ProductionProductPhotoFieldNames.LargePhotoFileName:
 						parms.Add(GetParamName("LargePhotoFileName", actionType, taskIndex, ref count), entity.LargePhotoFileName);
 						break;
-					case ProductionProductPhotoColumnNames.ModifiedDate:
+					case ProductionProductPhotoFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -78,7 +81,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_ProductProductPhoto_ProductPhoto_ProductPhotoID
 			var productionProductProductPhoto259 = GetProductionProductProductPhotoWriter();
-			if (_cascades.Contains(ProductionProductPhotoCascadeNames.production.productproductphoto.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductPhotoCascadeNames.productionproductproductphotos.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductProductPhotos)
 					Cascade(productionProductProductPhoto259, item, context);
 
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_ProductProductPhoto_ProductPhoto_ProductPhotoID
 			if (entity.ProductionProductProductPhotos != null && entity.ProductionProductProductPhotos.Count > 0)
 				foreach (var rel in entity.ProductionProductProductPhotos)
-					rel.ProductionProductProductPhoto = entity.Id;
+					rel.ProductPhotoID = entity.Id;
 
 				
 		}
@@ -106,7 +109,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_ProductProductPhoto_ProductPhoto_ProductPhotoID
 			var productionProductProductPhoto261 = GetProductionProductProductPhotoWriter();
-			if (_cascades.Contains(ProductionProductPhotoCascadeNames.production.productproductphoto.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionProductPhotoCascadeNames.productionproductproductphoto.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionProductProductPhotos)
 					CascadeDelete(productionProductProductPhoto261, item, context);
 

@@ -8,25 +8,28 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesTerritory : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesTerritory : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesSalesTerritory()
-		{			
+		{
+							
 			IsDirty = false; 
-			_personStateProvinces = new List<PersonStateProvince>();
-		_salesCustomers = new List<SalesCustomer>();
+			_salesCustomers = new List<SalesCustomer>();
 		_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
 		_salesSalesPeople = new List<SalesSalesPerson>();
 		_salesSalesTerritoryHistories = new List<SalesSalesTerritoryHistory>();
+		_personStateProvinces = new List<PersonStateProvince>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 
@@ -139,18 +142,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
-	//From Foreign Key FK_StateProvince_SalesTerritory_TerritoryID	
-		protected IList<PersonStateProvince> _personStateProvinces;
-		public virtual IList<PersonStateProvince> PersonStateProvinces 
-		{ 
-			get { return _personStateProvinces; }
-			set 
-			{ 
-				_personStateProvinces = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_Customer_SalesTerritory_TerritoryID	
 		protected IList<SalesCustomer> _salesCustomers;
 		public virtual IList<SalesCustomer> SalesCustomers 
@@ -195,6 +186,18 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_salesSalesTerritoryHistories = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_StateProvince_SalesTerritory_TerritoryID	
+		protected IList<PersonStateProvince> _personStateProvinces;
+		public virtual IList<PersonStateProvince> PersonStateProvinces 
+		{ 
+			get { return _personStateProvinces; }
+			set 
+			{ 
+				_personStateProvinces = value;  
 				IsDirty = true;
 			}
 		} 

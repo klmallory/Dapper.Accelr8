@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesEmployeeColumnNames
+	public enum HumanResourcesEmployeeFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		NationalIDNumber, 	
 		LoginID, 	
 		OrganizationNode, 	
@@ -40,25 +40,54 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum HumanResourcesEmployeeCascadeNames
 	{	
-		purchasingpurchaseorderheader, 	
-		productiondocument, 	
-		humanresourcesemployeedepartmenthistory, 	
-		humanresourcesemployeepayhistory, 	
-		salessalesperson, 	
-		humanresourcesjobcandidate, 	
+		purchasingpurchaseorderheaders, 	
+		productiondocuments, 	
+		humanresourcesemployeedepartmenthistories, 	
+		humanresourcesemployeepayhistories, 	
+		salessalespeople, 	
+		humanresourcesjobcandidates, 	
 		
 		personperson_p, 	}
 
 	public class HumanResourcesEmployeeTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesEmployeeColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesEmployeeFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.NationalIDNumber, "NationalIDNumber" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.LoginID, "LoginID" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.OrganizationNode, "OrganizationNode" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.OrganizationLevel, "OrganizationLevel" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.JobTitle, "JobTitle" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.BirthDate, "BirthDate" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.MaritalStatus, "MaritalStatus" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.Gender, "Gender" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.HireDate, "HireDate" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.SalariedFlag, "SalariedFlag" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.VacationHours, "VacationHours" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.SickLeaveHours, "SickLeaveHours" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.CurrentFlag, "CurrentFlag" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.rowguid, "rowguid" }, 
+						{ (int)HumanResourcesEmployeeFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesEmployeeIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesEmployeeFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public HumanResourcesEmployeeTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = HumanResourcesEmployeeColumnNames.BusinessEntityID.ToString();
-			//Schema = "HumanResources.Employee";
+			Schema = "HumanResources";
 			TableName = "HumanResources.Employee";
 			TableAlias = "humanresourcesemployee";
-			ColumnNames = typeof(HumanResourcesEmployeeColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesEmployeeColumnNames;
+			IdColumns = HumanResourcesEmployeeIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Employee_Person_BusinessEntityID

@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PurchasingvVendorWithAddressColumnNames
+	public enum PurchasingvVendorWithAddressFieldNames
 	{	
 		BusinessEntityID, 	
 		Name, 	
@@ -36,15 +36,37 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class PurchasingvVendorWithAddressTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PurchasingvVendorWithAddressColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingvVendorWithAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.Name, "Name" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.AddressType, "AddressType" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.AddressLine1, "AddressLine1" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.AddressLine2, "AddressLine2" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.City, "City" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.StateProvinceName, "StateProvinceName" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.PostalCode, "PostalCode" }, 
+						{ (int)PurchasingvVendorWithAddressFieldNames.CountryRegionName, "CountryRegionName" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PurchasingvVendorWithAddressIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)PurchasingvVendorWithAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public PurchasingvVendorWithAddressTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = PurchasingvVendorWithAddressColumnNames.BusinessEntityID.ToString();
-			//Schema = "Purchasing.vVendorWithAddresses";
+			Schema = "Purchasing";
 			TableName = "Purchasing.vVendorWithAddresses";
 			TableAlias = "purchasingvvendorwithaddress";
-			ColumnNames = typeof(PurchasingvVendorWithAddressColumnNames).ToDataList<Type, int>();
+			Columns = PurchasingvVendorWithAddressColumnNames;
+			IdColumns = PurchasingvVendorWithAddressIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

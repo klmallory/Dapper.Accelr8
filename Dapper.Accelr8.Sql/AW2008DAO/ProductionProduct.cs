@@ -8,33 +8,38 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionProduct : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionProduct : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public ProductionProduct()
-		{			
+		{
+							
 			IsDirty = false; 
-			_productionProductInventories = new List<ProductionProductInventory>();
+			_productionBillOfMaterials1 = new List<ProductionBillOfMaterial>();
+		_productionBillOfMaterials2 = new List<ProductionBillOfMaterial>();
+		_productionProductCostHistories = new List<ProductionProductCostHistory>();
+		_productionProductDocuments = new List<ProductionProductDocument>();
+		_productionProductInventories = new List<ProductionProductInventory>();
 		_productionProductListPriceHistories = new List<ProductionProductListPriceHistory>();
-		_salesSpecialOfferProducts = new List<SalesSpecialOfferProduct>();
 		_productionProductProductPhotos = new List<ProductionProductProductPhoto>();
-		_productionTransactionHistories = new List<ProductionTransactionHistory>();
 		_productionProductReviews = new List<ProductionProductReview>();
 		_purchasingProductVendors = new List<PurchasingProductVendor>();
-		_productionWorkOrders = new List<ProductionWorkOrder>();
 		_purchasingPurchaseOrderDetails = new List<PurchasingPurchaseOrderDetail>();
-		_productionProductCostHistories = new List<ProductionProductCostHistory>();
 		_salesShoppingCartItems = new List<SalesShoppingCartItem>();
-		_productionProductDocuments = new List<ProductionProductDocument>();
+		_salesSpecialOfferProducts = new List<SalesSpecialOfferProduct>();
+		_productionTransactionHistories = new List<ProductionTransactionHistory>();
+		_productionWorkOrders = new List<ProductionWorkOrder>();
 		_sellStartDate = (DateTime)SqlDateTime.MinValue;
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 
@@ -325,29 +330,77 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		} 
 		 
 	//From Foreign Key FK_Product_UnitMeasure_SizeUnitMeasureCode	
-		protected ProductionUnitMeasure _productionUnitMeasure;
-		public virtual ProductionUnitMeasure ProductionUnitMeasure 
+		protected ProductionUnitMeasure _productionUnitMeasure1;
+		public virtual ProductionUnitMeasure ProductionUnitMeasure1 
 		{ 
-			get { return _productionUnitMeasure; }
+			get { return _productionUnitMeasure1; }
 			set 
 			{ 
-				_productionUnitMeasure = value;  
+				_productionUnitMeasure1 = value;  
 				IsDirty = true;
 			}
 		} 
 		 
 	//From Foreign Key FK_Product_UnitMeasure_WeightUnitMeasureCode	
-		protected ProductionUnitMeasure _productionUnitMeasure;
-		public virtual ProductionUnitMeasure ProductionUnitMeasure 
+		protected ProductionUnitMeasure _productionUnitMeasure2;
+		public virtual ProductionUnitMeasure ProductionUnitMeasure2 
 		{ 
-			get { return _productionUnitMeasure; }
+			get { return _productionUnitMeasure2; }
 			set 
 			{ 
-				_productionUnitMeasure = value;  
+				_productionUnitMeasure2 = value;  
 				IsDirty = true;
 			}
 		} 
 		 
+	//From Foreign Key FK_BillOfMaterials_Product_ComponentID	
+		protected IList<ProductionBillOfMaterial> _productionBillOfMaterials1;
+		public virtual IList<ProductionBillOfMaterial> ProductionBillOfMaterials1 
+		{ 
+			get { return _productionBillOfMaterials1; }
+			set 
+			{ 
+				_productionBillOfMaterials1 = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_BillOfMaterials_Product_ProductAssemblyID	
+		protected IList<ProductionBillOfMaterial> _productionBillOfMaterials2;
+		public virtual IList<ProductionBillOfMaterial> ProductionBillOfMaterials2 
+		{ 
+			get { return _productionBillOfMaterials2; }
+			set 
+			{ 
+				_productionBillOfMaterials2 = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_ProductCostHistory_Product_ProductID	
+		protected IList<ProductionProductCostHistory> _productionProductCostHistories;
+		public virtual IList<ProductionProductCostHistory> ProductionProductCostHistories 
+		{ 
+			get { return _productionProductCostHistories; }
+			set 
+			{ 
+				_productionProductCostHistories = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_ProductDocument_Product_ProductID	
+		protected IList<ProductionProductDocument> _productionProductDocuments;
+		public virtual IList<ProductionProductDocument> ProductionProductDocuments 
+		{ 
+			get { return _productionProductDocuments; }
+			set 
+			{ 
+				_productionProductDocuments = value;  
+				IsDirty = true;
+			}
+		} 
+			 
 	//From Foreign Key FK_ProductInventory_Product_ProductID	
 		protected IList<ProductionProductInventory> _productionProductInventories;
 		public virtual IList<ProductionProductInventory> ProductionProductInventories 
@@ -372,18 +425,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 			 
-	//From Foreign Key FK_SpecialOfferProduct_Product_ProductID	
-		protected IList<SalesSpecialOfferProduct> _salesSpecialOfferProducts;
-		public virtual IList<SalesSpecialOfferProduct> SalesSpecialOfferProducts 
-		{ 
-			get { return _salesSpecialOfferProducts; }
-			set 
-			{ 
-				_salesSpecialOfferProducts = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_ProductProductPhoto_Product_ProductID	
 		protected IList<ProductionProductProductPhoto> _productionProductProductPhotos;
 		public virtual IList<ProductionProductProductPhoto> ProductionProductProductPhotos 
@@ -392,18 +433,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_productionProductProductPhotos = value;  
-				IsDirty = true;
-			}
-		} 
-			 
-	//From Foreign Key FK_TransactionHistory_Product_ProductID	
-		protected IList<ProductionTransactionHistory> _productionTransactionHistories;
-		public virtual IList<ProductionTransactionHistory> ProductionTransactionHistories 
-		{ 
-			get { return _productionTransactionHistories; }
-			set 
-			{ 
-				_productionTransactionHistories = value;  
 				IsDirty = true;
 			}
 		} 
@@ -432,18 +461,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 			 
-	//From Foreign Key FK_WorkOrder_Product_ProductID	
-		protected IList<ProductionWorkOrder> _productionWorkOrders;
-		public virtual IList<ProductionWorkOrder> ProductionWorkOrders 
-		{ 
-			get { return _productionWorkOrders; }
-			set 
-			{ 
-				_productionWorkOrders = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_PurchaseOrderDetail_Product_ProductID	
 		protected IList<PurchasingPurchaseOrderDetail> _purchasingPurchaseOrderDetails;
 		public virtual IList<PurchasingPurchaseOrderDetail> PurchasingPurchaseOrderDetails 
@@ -452,18 +469,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_purchasingPurchaseOrderDetails = value;  
-				IsDirty = true;
-			}
-		} 
-			 
-	//From Foreign Key FK_ProductCostHistory_Product_ProductID	
-		protected IList<ProductionProductCostHistory> _productionProductCostHistories;
-		public virtual IList<ProductionProductCostHistory> ProductionProductCostHistories 
-		{ 
-			get { return _productionProductCostHistories; }
-			set 
-			{ 
-				_productionProductCostHistories = value;  
 				IsDirty = true;
 			}
 		} 
@@ -480,14 +485,38 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 			 
-	//From Foreign Key FK_ProductDocument_Product_ProductID	
-		protected IList<ProductionProductDocument> _productionProductDocuments;
-		public virtual IList<ProductionProductDocument> ProductionProductDocuments 
+	//From Foreign Key FK_SpecialOfferProduct_Product_ProductID	
+		protected IList<SalesSpecialOfferProduct> _salesSpecialOfferProducts;
+		public virtual IList<SalesSpecialOfferProduct> SalesSpecialOfferProducts 
 		{ 
-			get { return _productionProductDocuments; }
+			get { return _salesSpecialOfferProducts; }
 			set 
 			{ 
-				_productionProductDocuments = value;  
+				_salesSpecialOfferProducts = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_TransactionHistory_Product_ProductID	
+		protected IList<ProductionTransactionHistory> _productionTransactionHistories;
+		public virtual IList<ProductionTransactionHistory> ProductionTransactionHistories 
+		{ 
+			get { return _productionTransactionHistories; }
+			set 
+			{ 
+				_productionTransactionHistories = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_WorkOrder_Product_ProductID	
+		protected IList<ProductionWorkOrder> _productionWorkOrders;
+		public virtual IList<ProductionWorkOrder> ProductionWorkOrders 
+		{ 
+			get { return _productionWorkOrders; }
+			set 
+			{ 
+				_productionWorkOrders = value;  
 				IsDirty = true;
 			}
 		} 

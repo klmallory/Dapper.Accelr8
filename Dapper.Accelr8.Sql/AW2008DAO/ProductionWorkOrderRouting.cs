@@ -8,15 +8,18 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionWorkOrderRouting : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionWorkOrderRouting : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public ProductionWorkOrderRouting()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_scheduledStartDate = (DateTime)SqlDateTime.MinValue;
 		_scheduledEndDate = (DateTime)SqlDateTime.MinValue;
@@ -24,6 +27,60 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(ProductionWorkOrderRouting dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.WorkOrderID,
+							dao.ProductID,
+							dao.OperationSequence,
+						
+				}
+			};
+		}
+
+			
+			protected int _workOrderID;
+		public int WorkOrderID 
+		{ 
+			get { return _workOrderID; }
+			set 
+			{ 
+				_workOrderID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _productID;
+		public int ProductID 
+		{ 
+			get { return _productID; }
+			set 
+			{ 
+				_productID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected short _operationSequence;
+		public short OperationSequence 
+		{ 
+			get { return _operationSequence; }
+			set 
+			{ 
+				_operationSequence = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected short _locationID;
 		public short LocationID 

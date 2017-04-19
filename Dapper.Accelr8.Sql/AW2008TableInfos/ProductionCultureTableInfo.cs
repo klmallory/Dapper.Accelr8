@@ -18,28 +18,44 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionCultureColumnNames
+	public enum ProductionCultureFieldNames
 	{	
-		CultureID, 	
+		Id, 	
 		Name, 	
 		ModifiedDate, 	
 	}
 
 	public enum ProductionCultureCascadeNames
 	{	
-		productionproductmodelproductdescriptionculture, 	
+		productionproductmodelproductdescriptioncultures, 	
 		}
 
 	public class ProductionCultureTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionCultureColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionCultureFieldNames.Id, "CultureID" }, 
+						{ (int)ProductionCultureFieldNames.Name, "Name" }, 
+						{ (int)ProductionCultureFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionCultureIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionCultureFieldNames.Id, "CultureID" }, 
+				};
+
 		public ProductionCultureTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionCultureColumnNames.CultureID.ToString();
-			//Schema = "Production.Culture";
+			Schema = "Production";
 			TableName = "Production.Culture";
 			TableAlias = "productionculture";
-			ColumnNames = typeof(ProductionCultureColumnNames).ToDataList<Type, int>();
+			Columns = ProductionCultureColumnNames;
+			IdColumns = ProductionCultureIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

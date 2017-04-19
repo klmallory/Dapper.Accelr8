@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class SalesSalesPersonQuotaHistoryWriter : EntityWriter<int, SalesSalesPersonQuotaHistory>
+    public class SalesSalesPersonQuotaHistoryWriter : EntityWriter<CompoundKey, SalesSalesPersonQuotaHistory>
     {
         public SalesSalesPersonQuotaHistoryWriter
 			(SalesSalesPersonQuotaHistoryTableInfo tableInfo
@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, SalesSalesPerson> GetSalesSalesPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesPerson>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesPerson>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,16 +49,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSalesPersonQuotaHistoryColumnNames)f.Key)
+                switch ((SalesSalesPersonQuotaHistoryFieldNames)f.Key)
                 {
                     
-					case SalesSalesPersonQuotaHistoryColumnNames.SalesQuota:
+					case SalesSalesPersonQuotaHistoryFieldNames.SalesQuota:
 						parms.Add(GetParamName("SalesQuota", actionType, taskIndex, ref count), entity.SalesQuota);
 						break;
-					case SalesSalesPersonQuotaHistoryColumnNames.rowguid:
+					case SalesSalesPersonQuotaHistoryFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSalesPersonQuotaHistoryColumnNames.ModifiedDate:
+					case SalesSalesPersonQuotaHistoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -74,7 +77,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID
 			var salesSalesPerson340 = GetSalesSalesPersonWriter();
-		if ((_cascades.Contains(SalesSalesPersonQuotaHistoryCascadeNames.salessalesperson.ToString()) || _cascades.Contains("all")) && entity.SalesSalesPerson != null)
+		if ((_cascades.Contains(SalesSalesPersonQuotaHistoryCascadeNames.salessalesperson_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesPerson != null)
 			if (Cascade(salesSalesPerson340, entity.SalesSalesPerson, context))
 				WithParent(salesSalesPerson340, entity);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID
 			if (entity.SalesSalesPerson != null)
-				entity.SalesSalesPersonQuotaHistory = entity.SalesSalesPerson.Id;
+				entity.BusinessEntityID = entity.SalesSalesPerson.Id;
 
 		}
 

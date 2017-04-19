@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductInventoryColumnNames
+	public enum ProductionProductInventoryFieldNames
 	{	
 		ProductID, 	
 		LocationID, 	
@@ -36,15 +36,36 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class ProductionProductInventoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductInventoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductInventoryFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductInventoryFieldNames.LocationID, "LocationID" }, 
+						{ (int)ProductionProductInventoryFieldNames.Shelf, "Shelf" }, 
+						{ (int)ProductionProductInventoryFieldNames.Bin, "Bin" }, 
+						{ (int)ProductionProductInventoryFieldNames.Quantity, "Quantity" }, 
+						{ (int)ProductionProductInventoryFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionProductInventoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductInventoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductInventoryFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductInventoryFieldNames.LocationID, "LocationID" }, 
+				};
+
 		public ProductionProductInventoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductInventoryColumnNames.ProductID.ToString();
-			//Schema = "Production.ProductInventory";
+			Schema = "Production";
 			TableName = "Production.ProductInventory";
 			TableAlias = "productionproductinventory";
-			ColumnNames = typeof(ProductionProductInventoryColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductInventoryColumnNames;
+			IdColumns = ProductionProductInventoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductInventory_Location_LocationID

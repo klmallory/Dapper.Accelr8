@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,31 +49,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionTransactionHistoryColumnNames)f.Key)
+                switch ((ProductionTransactionHistoryFieldNames)f.Key)
                 {
                     
-					case ProductionTransactionHistoryColumnNames.ProductID:
+					case ProductionTransactionHistoryFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case ProductionTransactionHistoryColumnNames.ReferenceOrderID:
+					case ProductionTransactionHistoryFieldNames.ReferenceOrderID:
 						parms.Add(GetParamName("ReferenceOrderID", actionType, taskIndex, ref count), entity.ReferenceOrderID);
 						break;
-					case ProductionTransactionHistoryColumnNames.ReferenceOrderLineID:
+					case ProductionTransactionHistoryFieldNames.ReferenceOrderLineID:
 						parms.Add(GetParamName("ReferenceOrderLineID", actionType, taskIndex, ref count), entity.ReferenceOrderLineID);
 						break;
-					case ProductionTransactionHistoryColumnNames.TransactionDate:
+					case ProductionTransactionHistoryFieldNames.TransactionDate:
 						parms.Add(GetParamName("TransactionDate", actionType, taskIndex, ref count), entity.TransactionDate);
 						break;
-					case ProductionTransactionHistoryColumnNames.TransactionType:
+					case ProductionTransactionHistoryFieldNames.TransactionType:
 						parms.Add(GetParamName("TransactionType", actionType, taskIndex, ref count), entity.TransactionType);
 						break;
-					case ProductionTransactionHistoryColumnNames.Quantity:
+					case ProductionTransactionHistoryFieldNames.Quantity:
 						parms.Add(GetParamName("Quantity", actionType, taskIndex, ref count), entity.Quantity);
 						break;
-					case ProductionTransactionHistoryColumnNames.ActualCost:
+					case ProductionTransactionHistoryFieldNames.ActualCost:
 						parms.Add(GetParamName("ActualCost", actionType, taskIndex, ref count), entity.ActualCost);
 						break;
-					case ProductionTransactionHistoryColumnNames.ModifiedDate:
+					case ProductionTransactionHistoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -89,7 +92,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_TransactionHistory_Product_ProductID
 			var productionProduct412 = GetProductionProductWriter();
-		if ((_cascades.Contains(ProductionTransactionHistoryCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(ProductionTransactionHistoryCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct412, entity.ProductionProduct, context))
 				WithParent(productionProduct412, entity);
 
@@ -103,7 +106,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_TransactionHistory_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.ProductionTransactionHistory = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

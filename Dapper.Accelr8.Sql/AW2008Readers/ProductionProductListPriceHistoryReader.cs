@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class ProductionProductListPriceHistoryReader : EntityReader<int, ProductionProductListPriceHistory>
+    public class ProductionProductListPriceHistoryReader : EntityReader<CompoundKey, ProductionProductListPriceHistory>
     {
         public ProductionProductListPriceHistoryReader(
             ProductionProductListPriceHistoryTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,28 +48,28 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProductListPriceHistory();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.EndDate = GetRowData<DateTime?>(dataRow, "EndDate"); 
+			domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
+      		domain.StartDate = GetRowData<DateTime>(dataRow, "StartDate"); 
+      		domain.EndDate = GetRowData<DateTime?>(dataRow, "EndDate"); 
       		domain.ListPrice = GetRowData<decimal>(dataRow, "ListPrice"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+      				domain.Id = ProductionProductListPriceHistory.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, ProductionProductListPriceHistory></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProductListPriceHistory> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, ProductionProductListPriceHistory></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, ProductionProductListPriceHistory> WithAllChildrenForExisting(ProductionProductListPriceHistory existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProductListPriceHistory entity)
         {

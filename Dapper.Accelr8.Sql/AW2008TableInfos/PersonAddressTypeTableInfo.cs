@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonAddressTypeColumnNames
+	public enum PersonAddressTypeFieldNames
 	{	
-		AddressTypeID, 	
+		Id, 	
 		Name, 	
 		rowguid, 	
 		ModifiedDate, 	
@@ -28,19 +28,36 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum PersonAddressTypeCascadeNames
 	{	
-		personbusinessentityaddress, 	
+		personbusinessentityaddresses, 	
 		}
 
 	public class PersonAddressTypeTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonAddressTypeColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonAddressTypeFieldNames.Id, "AddressTypeID" }, 
+						{ (int)PersonAddressTypeFieldNames.Name, "Name" }, 
+						{ (int)PersonAddressTypeFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonAddressTypeFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonAddressTypeIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonAddressTypeFieldNames.Id, "AddressTypeID" }, 
+				};
+
 		public PersonAddressTypeTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonAddressTypeColumnNames.AddressTypeID.ToString();
-			//Schema = "Person.AddressType";
+			Schema = "Person";
 			TableName = "Person.AddressType";
 			TableAlias = "personaddresstype";
-			ColumnNames = typeof(PersonAddressTypeColumnNames).ToDataList<Type, int>();
+			Columns = PersonAddressTypeColumnNames;
+			IdColumns = PersonAddressTypeIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

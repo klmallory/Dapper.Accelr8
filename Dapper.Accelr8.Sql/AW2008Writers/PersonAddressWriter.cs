@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PersonBusinessEntityAddress> GetPersonBusinessEntityAddressWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonBusinessEntityAddress>>(); }
+		{ return s_loc8r.GetWriter<int, PersonBusinessEntityAddress>(); }
 		static IEntityWriter<int, SalesSalesOrderHeader> GetSalesSalesOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderHeader>(); }
 		
 		static IEntityWriter<int, PersonStateProvince> GetPersonStateProvinceWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonStateProvince>>(); }
+		{ return s_loc8r.GetWriter<int, PersonStateProvince>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,31 +53,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonAddressColumnNames)f.Key)
+                switch ((PersonAddressFieldNames)f.Key)
                 {
                     
-					case PersonAddressColumnNames.AddressLine1:
+					case PersonAddressFieldNames.AddressLine1:
 						parms.Add(GetParamName("AddressLine1", actionType, taskIndex, ref count), entity.AddressLine1);
 						break;
-					case PersonAddressColumnNames.AddressLine2:
+					case PersonAddressFieldNames.AddressLine2:
 						parms.Add(GetParamName("AddressLine2", actionType, taskIndex, ref count), entity.AddressLine2);
 						break;
-					case PersonAddressColumnNames.City:
+					case PersonAddressFieldNames.City:
 						parms.Add(GetParamName("City", actionType, taskIndex, ref count), entity.City);
 						break;
-					case PersonAddressColumnNames.StateProvinceID:
+					case PersonAddressFieldNames.StateProvinceID:
 						parms.Add(GetParamName("StateProvinceID", actionType, taskIndex, ref count), entity.StateProvinceID);
 						break;
-					case PersonAddressColumnNames.PostalCode:
+					case PersonAddressFieldNames.PostalCode:
 						parms.Add(GetParamName("PostalCode", actionType, taskIndex, ref count), entity.PostalCode);
 						break;
-					case PersonAddressColumnNames.SpatialLocation:
+					case PersonAddressFieldNames.SpatialLocation:
 						parms.Add(GetParamName("SpatialLocation", actionType, taskIndex, ref count), entity.SpatialLocation);
 						break;
-					case PersonAddressColumnNames.rowguid:
+					case PersonAddressFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case PersonAddressColumnNames.ModifiedDate:
+					case PersonAddressFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -91,7 +94,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_BusinessEntityAddress_Address_AddressID
 			var personBusinessEntityAddress1 = GetPersonBusinessEntityAddressWriter();
-			if (_cascades.Contains(PersonAddressCascadeNames.person.businessentityaddress.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonAddressCascadeNames.personbusinessentityaddresses.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityAddresses)
 					Cascade(personBusinessEntityAddress1, item, context);
 
@@ -100,8 +103,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID
 			var salesSalesOrderHeader2 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(PersonAddressCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.SalesSalesOrderHeaders)
+			if (_cascades.Contains(PersonAddressCascadeNames.salessalesorderheaders1.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.SalesSalesOrderHeaders1s)
 					Cascade(salesSalesOrderHeader2, item, context);
 
 			if (salesSalesOrderHeader2.Count > 0)
@@ -109,8 +112,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID
 			var salesSalesOrderHeader3 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(PersonAddressCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.SalesSalesOrderHeaders)
+			if (_cascades.Contains(PersonAddressCascadeNames.salessalesorderheaders2.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.SalesSalesOrderHeaders2s)
 					Cascade(salesSalesOrderHeader3, item, context);
 
 			if (salesSalesOrderHeader3.Count > 0)
@@ -120,7 +123,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_Address_StateProvince_StateProvinceID
 			var personStateProvince4 = GetPersonStateProvinceWriter();
-		if ((_cascades.Contains(PersonAddressCascadeNames.personstateprovince.ToString()) || _cascades.Contains("all")) && entity.PersonStateProvince != null)
+		if ((_cascades.Contains(PersonAddressCascadeNames.personstateprovince_p.ToString()) || _cascades.Contains("all")) && entity.PersonStateProvince != null)
 			if (Cascade(personStateProvince4, entity.PersonStateProvince, context))
 				WithParent(personStateProvince4, entity);
 
@@ -134,22 +137,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_BusinessEntityAddress_Address_AddressID
 			if (entity.PersonBusinessEntityAddresses != null && entity.PersonBusinessEntityAddresses.Count > 0)
 				foreach (var rel in entity.PersonBusinessEntityAddresses)
-					rel.PersonBusinessEntityAddress = entity.Id;
+					rel.AddressID = entity.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID
 			if (entity.SalesSalesOrderHeaders != null && entity.SalesSalesOrderHeaders.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderHeaders)
-					rel.SalesSalesOrderHeader = entity.Id;
+					rel.BillToAddressID = entity.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID
 			if (entity.SalesSalesOrderHeaders != null && entity.SalesSalesOrderHeaders.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderHeaders)
-					rel.SalesSalesOrderHeader = entity.Id;
+					rel.ShipToAddressID = entity.Id;
 
 				
 			//From Foreign Key FK_Address_StateProvince_StateProvinceID
 			if (entity.PersonStateProvince != null)
-				entity.PersonAddress = entity.PersonStateProvince.Id;
+				entity.StateProvinceID = entity.PersonStateProvince.Id;
 
 		}
 
@@ -157,7 +160,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_BusinessEntityAddress_Address_AddressID
 			var personBusinessEntityAddress9 = GetPersonBusinessEntityAddressWriter();
-			if (_cascades.Contains(PersonAddressCascadeNames.person.businessentityaddress.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonAddressCascadeNames.personbusinessentityaddress.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityAddresses)
 					CascadeDelete(personBusinessEntityAddress9, item, context);
 
@@ -166,7 +169,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID
 			var salesSalesOrderHeader10 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(PersonAddressCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonAddressCascadeNames.salessalesorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					CascadeDelete(salesSalesOrderHeader10, item, context);
 
@@ -175,7 +178,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID
 			var salesSalesOrderHeader11 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(PersonAddressCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonAddressCascadeNames.salessalesorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					CascadeDelete(salesSalesOrderHeader11, item, context);
 

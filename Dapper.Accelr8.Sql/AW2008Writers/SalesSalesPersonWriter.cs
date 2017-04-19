@@ -28,22 +28,25 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, SalesStore> GetSalesStoreWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesStore>>(); }
+		{ return s_loc8r.GetWriter<int, SalesStore>(); }
 		static IEntityWriter<int, SalesSalesOrderHeader> GetSalesSalesOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderHeader>(); }
 		static IEntityWriter<int, SalesSalesPersonQuotaHistory> GetSalesSalesPersonQuotaHistoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesPersonQuotaHistory>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesPersonQuotaHistory>(); }
 		static IEntityWriter<int, SalesSalesTerritoryHistory> GetSalesSalesTerritoryHistoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesTerritoryHistory>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesTerritoryHistory>(); }
 		
 		static IEntityWriter<int, HumanResourcesEmployee> GetHumanResourcesEmployeeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployee>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployee>(); }
 		static IEntityWriter<int, SalesSalesTerritory> GetSalesSalesTerritoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesTerritory>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesTerritory>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -56,31 +59,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSalesPersonColumnNames)f.Key)
+                switch ((SalesSalesPersonFieldNames)f.Key)
                 {
                     
-					case SalesSalesPersonColumnNames.TerritoryID:
+					case SalesSalesPersonFieldNames.TerritoryID:
 						parms.Add(GetParamName("TerritoryID", actionType, taskIndex, ref count), entity.TerritoryID);
 						break;
-					case SalesSalesPersonColumnNames.SalesQuota:
+					case SalesSalesPersonFieldNames.SalesQuota:
 						parms.Add(GetParamName("SalesQuota", actionType, taskIndex, ref count), entity.SalesQuota);
 						break;
-					case SalesSalesPersonColumnNames.Bonus:
+					case SalesSalesPersonFieldNames.Bonus:
 						parms.Add(GetParamName("Bonus", actionType, taskIndex, ref count), entity.Bonus);
 						break;
-					case SalesSalesPersonColumnNames.CommissionPct:
+					case SalesSalesPersonFieldNames.CommissionPct:
 						parms.Add(GetParamName("CommissionPct", actionType, taskIndex, ref count), entity.CommissionPct);
 						break;
-					case SalesSalesPersonColumnNames.SalesYTD:
+					case SalesSalesPersonFieldNames.SalesYTD:
 						parms.Add(GetParamName("SalesYTD", actionType, taskIndex, ref count), entity.SalesYTD);
 						break;
-					case SalesSalesPersonColumnNames.SalesLastYear:
+					case SalesSalesPersonFieldNames.SalesLastYear:
 						parms.Add(GetParamName("SalesLastYear", actionType, taskIndex, ref count), entity.SalesLastYear);
 						break;
-					case SalesSalesPersonColumnNames.rowguid:
+					case SalesSalesPersonFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSalesPersonColumnNames.ModifiedDate:
+					case SalesSalesPersonFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Store_SalesPerson_SalesPersonID
 			var salesStore324 = GetSalesStoreWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.store.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salesstores.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesStores)
 					Cascade(salesStore324, item, context);
 
@@ -106,7 +109,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderHeader_SalesPerson_SalesPersonID
 			var salesSalesOrderHeader325 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salessalesorderheaders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					Cascade(salesSalesOrderHeader325, item, context);
 
@@ -115,7 +118,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID
 			var salesSalesPersonQuotaHistory326 = GetSalesSalesPersonQuotaHistoryWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.salespersonquotahistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salessalespersonquotahistories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesPersonQuotaHistories)
 					Cascade(salesSalesPersonQuotaHistory326, item, context);
 
@@ -124,7 +127,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID
 			var salesSalesTerritoryHistory327 = GetSalesSalesTerritoryHistoryWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.salesterritoryhistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salessalesterritoryhistories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesTerritoryHistories)
 					Cascade(salesSalesTerritoryHistory327, item, context);
 
@@ -135,13 +138,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID
 			var humanResourcesEmployee328 = GetHumanResourcesEmployeeWriter();
-		if ((_cascades.Contains(SalesSalesPersonCascadeNames.humanresourcesemployee.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
+		if ((_cascades.Contains(SalesSalesPersonCascadeNames.humanresourcesemployee_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
 			if (Cascade(humanResourcesEmployee328, entity.HumanResourcesEmployee, context))
 				WithParent(humanResourcesEmployee328, entity);
 
 			//From Foreign Key FK_SalesPerson_SalesTerritory_TerritoryID
 			var salesSalesTerritory329 = GetSalesSalesTerritoryWriter();
-		if ((_cascades.Contains(SalesSalesPersonCascadeNames.salessalesterritory.ToString()) || _cascades.Contains("all")) && entity.SalesSalesTerritory != null)
+		if ((_cascades.Contains(SalesSalesPersonCascadeNames.salessalesterritory_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesTerritory != null)
 			if (Cascade(salesSalesTerritory329, entity.SalesSalesTerritory, context))
 				WithParent(salesSalesTerritory329, entity);
 
@@ -155,31 +158,31 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_Store_SalesPerson_SalesPersonID
 			if (entity.SalesStores != null && entity.SalesStores.Count > 0)
 				foreach (var rel in entity.SalesStores)
-					rel.SalesStore = entity.Id;
+					rel.SalesPersonID = entity.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_SalesPerson_SalesPersonID
 			if (entity.SalesSalesOrderHeaders != null && entity.SalesSalesOrderHeaders.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderHeaders)
-					rel.SalesSalesOrderHeader = entity.Id;
+					rel.SalesPersonID = entity.Id;
 
 			//From Foreign Key FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID
 			if (entity.SalesSalesPersonQuotaHistories != null && entity.SalesSalesPersonQuotaHistories.Count > 0)
 				foreach (var rel in entity.SalesSalesPersonQuotaHistories)
-					rel.SalesSalesPersonQuotaHistory = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID
 			if (entity.SalesSalesTerritoryHistories != null && entity.SalesSalesTerritoryHistories.Count > 0)
 				foreach (var rel in entity.SalesSalesTerritoryHistories)
-					rel.SalesSalesTerritoryHistory = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 				
 			//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID
 			if (entity.HumanResourcesEmployee != null)
-				entity.SalesSalesPerson = entity.HumanResourcesEmployee.Id;
+				entity.BusinessEntityID = entity.HumanResourcesEmployee.Id;
 
 			//From Foreign Key FK_SalesPerson_SalesTerritory_TerritoryID
 			if (entity.SalesSalesTerritory != null)
-				entity.SalesSalesPerson = entity.SalesSalesTerritory.Id;
+				entity.TerritoryID = entity.SalesSalesTerritory.Id;
 
 		}
 
@@ -187,7 +190,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_Store_SalesPerson_SalesPersonID
 			var salesStore336 = GetSalesStoreWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.store.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salesstore.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesStores)
 					CascadeDelete(salesStore336, item, context);
 
@@ -196,7 +199,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesOrderHeader_SalesPerson_SalesPersonID
 			var salesSalesOrderHeader337 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salessalesorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					CascadeDelete(salesSalesOrderHeader337, item, context);
 
@@ -205,7 +208,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID
 			var salesSalesPersonQuotaHistory338 = GetSalesSalesPersonQuotaHistoryWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.salespersonquotahistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salessalespersonquotahistory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesPersonQuotaHistories)
 					CascadeDelete(salesSalesPersonQuotaHistory338, item, context);
 
@@ -214,7 +217,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID
 			var salesSalesTerritoryHistory339 = GetSalesSalesTerritoryHistoryWriter();
-			if (_cascades.Contains(SalesSalesPersonCascadeNames.sales.salesterritoryhistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesSalesPersonCascadeNames.salessalesterritoryhistory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesTerritoryHistories)
 					CascadeDelete(salesSalesTerritoryHistory339, item, context);
 

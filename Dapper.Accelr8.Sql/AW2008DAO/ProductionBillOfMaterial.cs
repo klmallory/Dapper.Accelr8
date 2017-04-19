@@ -8,21 +8,24 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionBillOfMaterial : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionBillOfMaterial : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public ProductionBillOfMaterial()
-		{			
+		{
+							
 			IsDirty = false; 
 			_startDate = (DateTime)SqlDateTime.MinValue;
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected int? _productAssemblyID;
 		public int? ProductAssemblyID 
@@ -125,25 +128,25 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		} 
 		 
 	//From Foreign Key FK_BillOfMaterials_Product_ProductAssemblyID	
-		protected ProductionProduct _productionProduct;
-		public virtual ProductionProduct ProductionProduct 
+		protected ProductionProduct _productionProduct1;
+		public virtual ProductionProduct ProductionProduct1 
 		{ 
-			get { return _productionProduct; }
+			get { return _productionProduct1; }
 			set 
 			{ 
-				_productionProduct = value;  
+				_productionProduct1 = value;  
 				IsDirty = true;
 			}
 		} 
 		 
 	//From Foreign Key FK_BillOfMaterials_Product_ComponentID	
-		protected ProductionProduct _productionProduct;
-		public virtual ProductionProduct ProductionProduct 
+		protected ProductionProduct _productionProduct2;
+		public virtual ProductionProduct ProductionProduct2 
 		{ 
-			get { return _productionProduct; }
+			get { return _productionProduct2; }
 			set 
 			{ 
-				_productionProduct = value;  
+				_productionProduct2 = value;  
 				IsDirty = true;
 			}
 		} 

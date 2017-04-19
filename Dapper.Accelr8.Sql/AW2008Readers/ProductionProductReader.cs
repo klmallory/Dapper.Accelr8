@@ -27,83 +27,214 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
 
-		//Child Count 12
+		static ILoc8 s_loc8r = null;
+
+		//Child Count 14
 		//Parent Count 4
-		static IEntityReader<int , ProductionProductInventory> _productionProductInventoryReader;
-		protected static IEntityReader<int , ProductionProductInventory> GetProductionProductInventoryReader()
+				//Is CompoundKey False
+		protected static IEntityReader<int , ProductionBillOfMaterial> GetProductionBillOfMaterialReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductInventory>>();
+			return s_loc8r.GetReader<int , ProductionBillOfMaterial>();
 		}
 
-		static IEntityReader<int , ProductionProductListPriceHistory> _productionProductListPriceHistoryReader;
-		protected static IEntityReader<int , ProductionProductListPriceHistory> GetProductionProductListPriceHistoryReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductCostHistory> GetProductionProductCostHistoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductListPriceHistory>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductCostHistory>();
 		}
 
-		static IEntityReader<int , SalesSpecialOfferProduct> _salesSpecialOfferProductReader;
-		protected static IEntityReader<int , SalesSpecialOfferProduct> GetSalesSpecialOfferProductReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductDocument> GetProductionProductDocumentReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSpecialOfferProduct>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductDocument>();
 		}
 
-		static IEntityReader<int , ProductionProductProductPhoto> _productionProductProductPhotoReader;
-		protected static IEntityReader<int , ProductionProductProductPhoto> GetProductionProductProductPhotoReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductInventory> GetProductionProductInventoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductProductPhoto>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductInventory>();
 		}
 
-		static IEntityReader<int , ProductionTransactionHistory> _productionTransactionHistoryReader;
-		protected static IEntityReader<int , ProductionTransactionHistory> GetProductionTransactionHistoryReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductListPriceHistory> GetProductionProductListPriceHistoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionTransactionHistory>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductListPriceHistory>();
 		}
 
-		static IEntityReader<int , ProductionProductReview> _productionProductReviewReader;
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductProductPhoto> GetProductionProductProductPhotoReader()
+		{
+			return s_loc8r.GetReader<CompoundKey , ProductionProductProductPhoto>();
+		}
+
+				//Is CompoundKey False
 		protected static IEntityReader<int , ProductionProductReview> GetProductionProductReviewReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductReview>>();
+			return s_loc8r.GetReader<int , ProductionProductReview>();
 		}
 
-		static IEntityReader<int , PurchasingProductVendor> _purchasingProductVendorReader;
-		protected static IEntityReader<int , PurchasingProductVendor> GetPurchasingProductVendorReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PurchasingProductVendor> GetPurchasingProductVendorReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PurchasingProductVendor>>();
+			return s_loc8r.GetReader<CompoundKey , PurchasingProductVendor>();
 		}
 
-		static IEntityReader<int , ProductionWorkOrder> _productionWorkOrderReader;
-		protected static IEntityReader<int , ProductionWorkOrder> GetProductionWorkOrderReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PurchasingPurchaseOrderDetail> GetPurchasingPurchaseOrderDetailReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionWorkOrder>>();
+			return s_loc8r.GetReader<CompoundKey , PurchasingPurchaseOrderDetail>();
 		}
 
-		static IEntityReader<int , PurchasingPurchaseOrderDetail> _purchasingPurchaseOrderDetailReader;
-		protected static IEntityReader<int , PurchasingPurchaseOrderDetail> GetPurchasingPurchaseOrderDetailReader()
-		{
-			return _locator.Resolve<IEntityReader<int , PurchasingPurchaseOrderDetail>>();
-		}
-
-		static IEntityReader<int , ProductionProductCostHistory> _productionProductCostHistoryReader;
-		protected static IEntityReader<int , ProductionProductCostHistory> GetProductionProductCostHistoryReader()
-		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductCostHistory>>();
-		}
-
-		static IEntityReader<int , SalesShoppingCartItem> _salesShoppingCartItemReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesShoppingCartItem> GetSalesShoppingCartItemReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesShoppingCartItem>>();
+			return s_loc8r.GetReader<int , SalesShoppingCartItem>();
 		}
 
-		static IEntityReader<int , ProductionProductDocument> _productionProductDocumentReader;
-		protected static IEntityReader<int , ProductionProductDocument> GetProductionProductDocumentReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesSpecialOfferProduct> GetSalesSpecialOfferProductReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductDocument>>();
+			return s_loc8r.GetReader<CompoundKey , SalesSpecialOfferProduct>();
+		}
+
+				//Is CompoundKey False
+		protected static IEntityReader<int , ProductionTransactionHistory> GetProductionTransactionHistoryReader()
+		{
+			return s_loc8r.GetReader<int , ProductionTransactionHistory>();
+		}
+
+				//Is CompoundKey False
+		protected static IEntityReader<int , ProductionWorkOrder> GetProductionWorkOrderReader()
+		{
+			return s_loc8r.GetReader<int , ProductionWorkOrder>();
 		}
 
 		
+		/// <summary>
+		/// Sets the children of type ProductionBillOfMaterial on the parent on ProductionBillOfMaterials.
+		/// From foriegn key FK_BillOfMaterials_Product_ComponentID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionBillOfMaterials1(IList<ProductionProduct> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: ProductionBillOfMaterial
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionBillOfMaterial>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionBillOfMaterials1 = typedChildren.Where(b =>  b.ComponentID == r.Id ).ToList();
+				r.ProductionBillOfMaterials1.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct2 = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionBillOfMaterial on the parent on ProductionBillOfMaterials.
+		/// From foriegn key FK_BillOfMaterials_Product_ProductAssemblyID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionBillOfMaterials2(IList<ProductionProduct> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: ProductionBillOfMaterial
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionBillOfMaterial>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionBillOfMaterials2 = typedChildren.Where(b =>  b.ProductAssemblyID == r.Id ).ToList();
+				r.ProductionBillOfMaterials2.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct1 = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionProductCostHistory on the parent on ProductionProductCostHistories.
+		/// From foriegn key FK_ProductCostHistory_Product_ProductID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionProductCostHistories(IList<ProductionProduct> results, IList<object> children)
+		{
+			//Child Id Type: CompoundKey
+			//Child Type: ProductionProductCostHistory
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionProductCostHistory>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionProductCostHistories = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
+				r.ProductionProductCostHistories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionProductDocument on the parent on ProductionProductDocuments.
+		/// From foriegn key FK_ProductDocument_Product_ProductID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionProductDocuments(IList<ProductionProduct> results, IList<object> children)
+		{
+			//Child Id Type: CompoundKey
+			//Child Type: ProductionProductDocument
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionProductDocument>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionProductDocuments = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
+				r.ProductionProductDocuments.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
 		/// <summary>
 		/// Sets the children of type ProductionProductInventory on the parent on ProductionProductInventories.
 		/// From foriegn key FK_ProductInventory_Product_ProductID
@@ -112,7 +243,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductInventories(IList<ProductionProduct> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductInventory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -125,8 +256,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductInventories = typedChildren.Where(b => b.ProductionProductInventory == r.Id).ToList();
+				
+
+				r.ProductionProductInventories = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.ProductionProductInventories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -139,7 +273,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductListPriceHistories(IList<ProductionProduct> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductListPriceHistory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -152,35 +286,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductListPriceHistories = typedChildren.Where(b => b.ProductionProductListPriceHistory == r.Id).ToList();
+				
+
+				r.ProductionProductListPriceHistories = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.ProductionProductListPriceHistories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type SalesSpecialOfferProduct on the parent on SalesSpecialOfferProducts.
-		/// From foriegn key FK_SpecialOfferProduct_Product_ProductID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenSalesSpecialOfferProducts(IList<ProductionProduct> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: SalesSpecialOfferProduct
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<SalesSpecialOfferProduct>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.SalesSpecialOfferProducts = typedChildren.Where(b => b.SalesSpecialOfferProduct == r.Id).ToList();
-				r.SalesSpecialOfferProducts.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -193,7 +303,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductProductPhotos(IList<ProductionProduct> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductProductPhoto
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -206,35 +316,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductProductPhotos = typedChildren.Where(b => b.ProductionProductProductPhoto == r.Id).ToList();
+				
+
+				r.ProductionProductProductPhotos = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.ProductionProductProductPhotos.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type ProductionTransactionHistory on the parent on ProductionTransactionHistories.
-		/// From foriegn key FK_TransactionHistory_Product_ProductID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenProductionTransactionHistories(IList<ProductionProduct> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: ProductionTransactionHistory
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<ProductionTransactionHistory>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.ProductionTransactionHistories = typedChildren.Where(b => b.ProductionTransactionHistory == r.Id).ToList();
-				r.ProductionTransactionHistories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -260,8 +346,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductReviews = typedChildren.Where(b => b.ProductionProductReview == r.Id).ToList();
+				
+
+				r.ProductionProductReviews = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.ProductionProductReviews.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -274,7 +363,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPurchasingProductVendors(IList<ProductionProduct> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PurchasingProductVendor
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -287,35 +376,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PurchasingProductVendors = typedChildren.Where(b => b.PurchasingProductVendor == r.Id).ToList();
+				
+
+				r.PurchasingProductVendors = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.PurchasingProductVendors.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type ProductionWorkOrder on the parent on ProductionWorkOrders.
-		/// From foriegn key FK_WorkOrder_Product_ProductID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenProductionWorkOrders(IList<ProductionProduct> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: ProductionWorkOrder
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<ProductionWorkOrder>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.ProductionWorkOrders = typedChildren.Where(b => b.ProductionWorkOrder == r.Id).ToList();
-				r.ProductionWorkOrders.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -328,7 +393,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPurchasingPurchaseOrderDetails(IList<ProductionProduct> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PurchasingPurchaseOrderDetail
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -341,35 +406,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PurchasingPurchaseOrderDetails = typedChildren.Where(b => b.PurchasingPurchaseOrderDetail == r.Id).ToList();
+				
+
+				r.PurchasingPurchaseOrderDetails = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.PurchasingPurchaseOrderDetails.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type ProductionProductCostHistory on the parent on ProductionProductCostHistories.
-		/// From foriegn key FK_ProductCostHistory_Product_ProductID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenProductionProductCostHistories(IList<ProductionProduct> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: ProductionProductCostHistory
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<ProductionProductCostHistory>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.ProductionProductCostHistories = typedChildren.Where(b => b.ProductionProductCostHistory == r.Id).ToList();
-				r.ProductionProductCostHistories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -395,35 +436,101 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesShoppingCartItems = typedChildren.Where(b => b.SalesShoppingCartItem == r.Id).ToList();
+				
+
+				r.SalesShoppingCartItems = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
 				r.SalesShoppingCartItems.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
 
 		/// <summary>
-		/// Sets the children of type ProductionProductDocument on the parent on ProductionProductDocuments.
-		/// From foriegn key FK_ProductDocument_Product_ProductID
+		/// Sets the children of type SalesSpecialOfferProduct on the parent on SalesSpecialOfferProducts.
+		/// From foriegn key FK_SpecialOfferProduct_Product_ProductID
 		/// </summary>
 		/// <param name="results"></param>
 		/// <param name="children"></param>
-		public void SetChildrenProductionProductDocuments(IList<ProductionProduct> results, IList<object> children)
+		public void SetChildrenSalesSpecialOfferProducts(IList<ProductionProduct> results, IList<object> children)
 		{
-			//Child Id Type: int
-			//Child Type: ProductionProductDocument
+			//Child Id Type: CompoundKey
+			//Child Type: SalesSpecialOfferProduct
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
 				return;
 
-			var typedChildren = children.OfType<ProductionProductDocument>();
+			var typedChildren = children.OfType<SalesSpecialOfferProduct>();
 
 			foreach (var r in results)
 			{
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductDocuments = typedChildren.Where(b => b.ProductionProductDocument == r.Id).ToList();
-				r.ProductionProductDocuments.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
+
+				r.SalesSpecialOfferProducts = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
+				r.SalesSpecialOfferProducts.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionTransactionHistory on the parent on ProductionTransactionHistories.
+		/// From foriegn key FK_TransactionHistory_Product_ProductID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionTransactionHistories(IList<ProductionProduct> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: ProductionTransactionHistory
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionTransactionHistory>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionTransactionHistories = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
+				r.ProductionTransactionHistories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionWorkOrder on the parent on ProductionWorkOrders.
+		/// From foriegn key FK_WorkOrder_Product_ProductID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionWorkOrders(IList<ProductionProduct> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: ProductionWorkOrder
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionWorkOrder>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionWorkOrders = typedChildren.Where(b =>  b.ProductID == r.Id ).ToList();
+				r.ProductionWorkOrders.ToList().ForEach(b => { b.Loaded = false; b.ProductionProduct = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -439,8 +546,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProduct();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "ProductID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ProductNumber = GetRowData<string>(dataRow, "ProductNumber"); 
       		domain.MakeFlag = GetRowData<object>(dataRow, "MakeFlag"); 
       		domain.FinishedGoodsFlag = GetRowData<object>(dataRow, "FinishedGoodsFlag"); 
@@ -475,37 +582,68 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionProduct></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProduct> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionProduct> WithAllChildrenForExisting(ProductionProduct existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductInventoryReader(), id, IdColumn, SetChildrenProductionProductInventories);
-			
-			WithChildForParentId(GetProductionProductListPriceHistoryReader(), id, IdColumn, SetChildrenProductionProductListPriceHistories);
-			
-			WithChildForParentId(GetSalesSpecialOfferProductReader(), id, IdColumn, SetChildrenSalesSpecialOfferProducts);
-			
-			WithChildForParentId(GetProductionProductProductPhotoReader(), id, IdColumn, SetChildrenProductionProductProductPhotos);
-			
-			WithChildForParentId(GetProductionTransactionHistoryReader(), id, IdColumn, SetChildrenProductionTransactionHistories);
-			
-			WithChildForParentId(GetProductionProductReviewReader(), id, IdColumn, SetChildrenProductionProductReviews);
-			
-			WithChildForParentId(GetPurchasingProductVendorReader(), id, IdColumn, SetChildrenPurchasingProductVendors);
-			
-			WithChildForParentId(GetProductionWorkOrderReader(), id, IdColumn, SetChildrenProductionWorkOrders);
-			
-			WithChildForParentId(GetPurchasingPurchaseOrderDetailReader(), id, IdColumn, SetChildrenPurchasingPurchaseOrderDetails);
-			
-			WithChildForParentId(GetProductionProductCostHistoryReader(), id, IdColumn, SetChildrenProductionProductCostHistories);
-			
-			WithChildForParentId(GetSalesShoppingCartItemReader(), id, IdColumn, SetChildrenSalesShoppingCartItems);
-			
-			WithChildForParentId(GetProductionProductDocumentReader(), id, IdColumn, SetChildrenProductionProductDocuments);
+						WithChildForParentValues(GetProductionBillOfMaterialReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ComponentID",  }
+				, SetChildrenProductionBillOfMaterials1);
+						WithChildForParentValues(GetProductionBillOfMaterialReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductAssemblyID",  }
+				, SetChildrenProductionBillOfMaterials2);
+						WithChildForParentValues(GetProductionProductCostHistoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductCostHistories);
+						WithChildForParentValues(GetProductionProductDocumentReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductDocuments);
+						WithChildForParentValues(GetProductionProductInventoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductInventories);
+						WithChildForParentValues(GetProductionProductListPriceHistoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductListPriceHistories);
+						WithChildForParentValues(GetProductionProductProductPhotoReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductProductPhotos);
+						WithChildForParentValues(GetProductionProductReviewReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductReviews);
+						WithChildForParentValues(GetPurchasingProductVendorReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenPurchasingProductVendors);
+						WithChildForParentValues(GetPurchasingPurchaseOrderDetailReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenPurchasingPurchaseOrderDetails);
+						WithChildForParentValues(GetSalesShoppingCartItemReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenSalesShoppingCartItems);
+						WithChildForParentValues(GetSalesSpecialOfferProductReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenSalesSpecialOfferProducts);
+						WithChildForParentValues(GetProductionTransactionHistoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionTransactionHistories);
+						WithChildForParentValues(GetProductionWorkOrderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionWorkOrders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProduct entity)
         {
@@ -514,68 +652,93 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductInventoryReader(), entity.Id
-				, ProductionProductInventoryColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductInventories);
+						WithChildForParentValues(GetProductionBillOfMaterialReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ComponentID",  }
+				, SetChildrenProductionBillOfMaterials1);
 
-			WithChildForParentId(GetProductionProductListPriceHistoryReader(), entity.Id
-				, ProductionProductListPriceHistoryColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductListPriceHistories);
+						WithChildForParentValues(GetProductionBillOfMaterialReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductAssemblyID",  }
+				, SetChildrenProductionBillOfMaterials2);
 
-			WithChildForParentId(GetSalesSpecialOfferProductReader(), entity.Id
-				, SalesSpecialOfferProductColumnNames.ProductID.ToString()
-				, SetChildrenSalesSpecialOfferProducts);
-
-			WithChildForParentId(GetProductionProductProductPhotoReader(), entity.Id
-				, ProductionProductProductPhotoColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductProductPhotos);
-
-			WithChildForParentId(GetProductionTransactionHistoryReader(), entity.Id
-				, ProductionTransactionHistoryColumnNames.ProductID.ToString()
-				, SetChildrenProductionTransactionHistories);
-
-			WithChildForParentId(GetProductionProductReviewReader(), entity.Id
-				, ProductionProductReviewColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductReviews);
-
-			WithChildForParentId(GetPurchasingProductVendorReader(), entity.Id
-				, PurchasingProductVendorColumnNames.ProductID.ToString()
-				, SetChildrenPurchasingProductVendors);
-
-			WithChildForParentId(GetProductionWorkOrderReader(), entity.Id
-				, ProductionWorkOrderColumnNames.ProductID.ToString()
-				, SetChildrenProductionWorkOrders);
-
-			WithChildForParentId(GetPurchasingPurchaseOrderDetailReader(), entity.Id
-				, PurchasingPurchaseOrderDetailColumnNames.ProductID.ToString()
-				, SetChildrenPurchasingPurchaseOrderDetails);
-
-			WithChildForParentId(GetProductionProductCostHistoryReader(), entity.Id
-				, ProductionProductCostHistoryColumnNames.ProductID.ToString()
+						WithChildForParentValues(GetProductionProductCostHistoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
 				, SetChildrenProductionProductCostHistories);
 
-			WithChildForParentId(GetSalesShoppingCartItemReader(), entity.Id
-				, SalesShoppingCartItemColumnNames.ProductID.ToString()
-				, SetChildrenSalesShoppingCartItems);
-
-			WithChildForParentId(GetProductionProductDocumentReader(), entity.Id
-				, ProductionProductDocumentColumnNames.ProductID.ToString()
+						WithChildForParentValues(GetProductionProductDocumentReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
 				, SetChildrenProductionProductDocuments);
 
-			QueryResultForChildrenOnly(new List<ProductionProduct>() { entity });
+						WithChildForParentValues(GetProductionProductInventoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductInventories);
+
+						WithChildForParentValues(GetProductionProductListPriceHistoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductListPriceHistories);
+
+						WithChildForParentValues(GetProductionProductProductPhotoReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductProductPhotos);
+
+						WithChildForParentValues(GetProductionProductReviewReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductReviews);
+
+						WithChildForParentValues(GetPurchasingProductVendorReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenPurchasingProductVendors);
+
+						WithChildForParentValues(GetPurchasingPurchaseOrderDetailReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenPurchasingPurchaseOrderDetails);
+
+						WithChildForParentValues(GetSalesShoppingCartItemReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenSalesShoppingCartItems);
+
+						WithChildForParentValues(GetSalesSpecialOfferProductReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenSalesSpecialOfferProducts);
+
+						WithChildForParentValues(GetProductionTransactionHistoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionTransactionHistories);
+
+						WithChildForParentValues(GetProductionWorkOrderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionWorkOrders);
+
+			
+QueryResultForChildrenOnly(new List<ProductionProduct>() { entity });
 			entity.Loaded = false;
+			GetProductionBillOfMaterialReader().SetAllChildrenForExisting(entity.ProductionBillOfMaterials);
+			GetProductionBillOfMaterialReader().SetAllChildrenForExisting(entity.ProductionBillOfMaterials);
+			GetProductionProductCostHistoryReader().SetAllChildrenForExisting(entity.ProductionProductCostHistories);
+			GetProductionProductDocumentReader().SetAllChildrenForExisting(entity.ProductionProductDocuments);
 			GetProductionProductInventoryReader().SetAllChildrenForExisting(entity.ProductionProductInventories);
 			GetProductionProductListPriceHistoryReader().SetAllChildrenForExisting(entity.ProductionProductListPriceHistories);
-			GetSalesSpecialOfferProductReader().SetAllChildrenForExisting(entity.SalesSpecialOfferProducts);
 			GetProductionProductProductPhotoReader().SetAllChildrenForExisting(entity.ProductionProductProductPhotos);
-			GetProductionTransactionHistoryReader().SetAllChildrenForExisting(entity.ProductionTransactionHistories);
 			GetProductionProductReviewReader().SetAllChildrenForExisting(entity.ProductionProductReviews);
 			GetPurchasingProductVendorReader().SetAllChildrenForExisting(entity.PurchasingProductVendors);
-			GetProductionWorkOrderReader().SetAllChildrenForExisting(entity.ProductionWorkOrders);
 			GetPurchasingPurchaseOrderDetailReader().SetAllChildrenForExisting(entity.PurchasingPurchaseOrderDetails);
-			GetProductionProductCostHistoryReader().SetAllChildrenForExisting(entity.ProductionProductCostHistories);
 			GetSalesShoppingCartItemReader().SetAllChildrenForExisting(entity.SalesShoppingCartItems);
-			GetProductionProductDocumentReader().SetAllChildrenForExisting(entity.ProductionProductDocuments);
+			GetSalesSpecialOfferProductReader().SetAllChildrenForExisting(entity.SalesSpecialOfferProducts);
+			GetProductionTransactionHistoryReader().SetAllChildrenForExisting(entity.ProductionTransactionHistories);
+			GetProductionWorkOrderReader().SetAllChildrenForExisting(entity.ProductionWorkOrders);
 				
 			entity.Loaded = true;
 		}
@@ -584,98 +747,101 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductInventoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductInventoryColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductInventories);
+			entities = entities.Where(e => e != null).ToList();
 
-			WithChildForParentIds(GetProductionProductListPriceHistoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductListPriceHistoryColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductListPriceHistories);
+            if (entities.Count < 1)
+                return;
 
-			WithChildForParentIds(GetSalesSpecialOfferProductReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSpecialOfferProductColumnNames.ProductID.ToString()
-				, SetChildrenSalesSpecialOfferProducts);
+			WithChildForParentsValues(GetProductionBillOfMaterialReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ComponentID",  }
+				, SetChildrenProductionBillOfMaterials1);
 
-			WithChildForParentIds(GetProductionProductProductPhotoReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductProductPhotoColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductProductPhotos);
+			WithChildForParentsValues(GetProductionBillOfMaterialReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductAssemblyID",  }
+				, SetChildrenProductionBillOfMaterials2);
 
-			WithChildForParentIds(GetProductionTransactionHistoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionTransactionHistoryColumnNames.ProductID.ToString()
-				, SetChildrenProductionTransactionHistories);
-
-			WithChildForParentIds(GetProductionProductReviewReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductReviewColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductReviews);
-
-			WithChildForParentIds(GetPurchasingProductVendorReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingProductVendorColumnNames.ProductID.ToString()
-				, SetChildrenPurchasingProductVendors);
-
-			WithChildForParentIds(GetProductionWorkOrderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionWorkOrderColumnNames.ProductID.ToString()
-				, SetChildrenProductionWorkOrders);
-
-			WithChildForParentIds(GetPurchasingPurchaseOrderDetailReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingPurchaseOrderDetailColumnNames.ProductID.ToString()
-				, SetChildrenPurchasingPurchaseOrderDetails);
-
-			WithChildForParentIds(GetProductionProductCostHistoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductCostHistoryColumnNames.ProductID.ToString()
+			WithChildForParentsValues(GetProductionProductCostHistoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
 				, SetChildrenProductionProductCostHistories);
 
-			WithChildForParentIds(GetSalesShoppingCartItemReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesShoppingCartItemColumnNames.ProductID.ToString()
+			WithChildForParentsValues(GetProductionProductDocumentReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductDocuments);
+
+			WithChildForParentsValues(GetProductionProductInventoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductInventories);
+
+			WithChildForParentsValues(GetProductionProductListPriceHistoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductListPriceHistories);
+
+			WithChildForParentsValues(GetProductionProductProductPhotoReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductProductPhotos);
+
+			WithChildForParentsValues(GetProductionProductReviewReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionProductReviews);
+
+			WithChildForParentsValues(GetPurchasingProductVendorReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenPurchasingProductVendors);
+
+			WithChildForParentsValues(GetPurchasingPurchaseOrderDetailReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenPurchasingPurchaseOrderDetails);
+
+			WithChildForParentsValues(GetSalesShoppingCartItemReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
 				, SetChildrenSalesShoppingCartItems);
 
-			WithChildForParentIds(GetProductionProductDocumentReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductDocumentColumnNames.ProductID.ToString()
-				, SetChildrenProductionProductDocuments);
+			WithChildForParentsValues(GetSalesSpecialOfferProductReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenSalesSpecialOfferProducts);
+
+			WithChildForParentsValues(GetProductionTransactionHistoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionTransactionHistories);
+
+			WithChildForParentsValues(GetProductionWorkOrderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductID",  }
+				, SetChildrenProductionWorkOrders);
 
 					
 			QueryResultForChildrenOnly(entities);
 
+			GetProductionBillOfMaterialReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionBillOfMaterials1).ToList());
+			GetProductionBillOfMaterialReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionBillOfMaterials2).ToList());
+			GetProductionProductCostHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductCostHistories).ToList());
+			GetProductionProductDocumentReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductDocuments).ToList());
 			GetProductionProductInventoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductInventories).ToList());
 			GetProductionProductListPriceHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductListPriceHistories).ToList());
-			GetSalesSpecialOfferProductReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSpecialOfferProducts).ToList());
 			GetProductionProductProductPhotoReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductProductPhotos).ToList());
-			GetProductionTransactionHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionTransactionHistories).ToList());
 			GetProductionProductReviewReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductReviews).ToList());
 			GetPurchasingProductVendorReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PurchasingProductVendors).ToList());
-			GetProductionWorkOrderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionWorkOrders).ToList());
 			GetPurchasingPurchaseOrderDetailReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PurchasingPurchaseOrderDetails).ToList());
-			GetProductionProductCostHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductCostHistories).ToList());
 			GetSalesShoppingCartItemReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesShoppingCartItems).ToList());
-			GetProductionProductDocumentReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductDocuments).ToList());
+			GetSalesSpecialOfferProductReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSpecialOfferProducts).ToList());
+			GetProductionTransactionHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionTransactionHistories).ToList());
+			GetProductionWorkOrderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionWorkOrders).ToList());
 					
 		}
     }

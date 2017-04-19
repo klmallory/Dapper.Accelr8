@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonvStateProvinceCountryRegionColumnNames
+	public enum PersonvStateProvinceCountryRegionFieldNames
 	{	
 		StateProvinceID, 	
 		StateProvinceCode, 	
@@ -34,15 +34,35 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class PersonvStateProvinceCountryRegionTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonvStateProvinceCountryRegionColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonvStateProvinceCountryRegionFieldNames.StateProvinceID, "StateProvinceID" }, 
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.StateProvinceCode, "StateProvinceCode" }, 
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.IsOnlyStateProvinceFlag, "IsOnlyStateProvinceFlag" }, 
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.StateProvinceName, "StateProvinceName" }, 
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.TerritoryID, "TerritoryID" }, 
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.CountryRegionCode, "CountryRegionCode" }, 
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.CountryRegionName, "CountryRegionName" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonvStateProvinceCountryRegionIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)PersonvStateProvinceCountryRegionFieldNames.StateProvinceID, "StateProvinceID" }, 
+				};
+
 		public PersonvStateProvinceCountryRegionTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = PersonvStateProvinceCountryRegionColumnNames.StateProvinceID.ToString();
-			//Schema = "Person.vStateProvinceCountryRegion";
+			Schema = "Person";
 			TableName = "Person.vStateProvinceCountryRegion";
 			TableAlias = "personvstateprovincecountryregion";
-			ColumnNames = typeof(PersonvStateProvinceCountryRegionColumnNames).ToDataList<Type, int>();
+			Columns = PersonvStateProvinceCountryRegionColumnNames;
+			IdColumns = PersonvStateProvinceCountryRegionIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

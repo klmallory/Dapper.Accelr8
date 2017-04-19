@@ -27,20 +27,25 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 2
 		//Parent Count 0
-		static IEntityReader<int , ProductionProductInventory> _productionProductInventoryReader;
-		protected static IEntityReader<int , ProductionProductInventory> GetProductionProductInventoryReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductInventory> GetProductionProductInventoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductInventory>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductInventory>();
 		}
 
-		static IEntityReader<int , ProductionWorkOrderRouting> _productionWorkOrderRoutingReader;
-		protected static IEntityReader<int , ProductionWorkOrderRouting> GetProductionWorkOrderRoutingReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionWorkOrderRouting> GetProductionWorkOrderRoutingReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionWorkOrderRouting>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionWorkOrderRouting>();
 		}
 
 		
@@ -52,7 +57,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductInventories(IList<ProductionLocation> results, IList<object> children)
 		{
-			//Child Id Type: short
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductInventory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -65,8 +70,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductInventories = typedChildren.Where(b => b.ProductionProductInventory == r.Id).ToList();
+				
+
+				r.ProductionProductInventories = typedChildren.Where(b =>  b.LocationID == r.Id ).ToList();
 				r.ProductionProductInventories.ToList().ForEach(b => { b.Loaded = false; b.ProductionLocation = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -79,7 +87,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionWorkOrderRoutings(IList<ProductionLocation> results, IList<object> children)
 		{
-			//Child Id Type: short
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionWorkOrderRouting
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -92,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionWorkOrderRoutings = typedChildren.Where(b => b.ProductionWorkOrderRouting == r.Id).ToList();
+				
+
+				r.ProductionWorkOrderRoutings = typedChildren.Where(b =>  b.LocationID == r.Id ).ToList();
 				r.ProductionWorkOrderRoutings.ToList().ForEach(b => { b.Loaded = false; b.ProductionLocation = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -109,8 +120,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionLocation();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<short>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<short>(dataRow, "LocationID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.CostRate = GetRowData<decimal>(dataRow, "CostRate"); 
       		domain.Availability = GetRowData<decimal>(dataRow, "Availability"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
@@ -125,17 +136,20 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<short, ProductionLocation></param>
 		/// <param name="id">short</param>
-        public override IEntityReader<short, ProductionLocation> WithAllChildrenForId(short id)
+        public override IEntityReader<short, ProductionLocation> WithAllChildrenForExisting(ProductionLocation existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductInventoryReader(), id, IdColumn, SetChildrenProductionProductInventories);
-			
-			WithChildForParentId(GetProductionWorkOrderRoutingReader(), id, IdColumn, SetChildrenProductionWorkOrderRoutings);
+						WithChildForParentValues(GetProductionProductInventoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "LocationID",  }
+				, SetChildrenProductionProductInventories);
+						WithChildForParentValues(GetProductionWorkOrderRoutingReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "LocationID",  }
+				, SetChildrenProductionWorkOrderRoutings);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionLocation entity)
         {
@@ -144,15 +158,18 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductInventoryReader(), entity.Id
-				, ProductionProductInventoryColumnNames.LocationID.ToString()
+						WithChildForParentValues(GetProductionProductInventoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "LocationID",  }
 				, SetChildrenProductionProductInventories);
 
-			WithChildForParentId(GetProductionWorkOrderRoutingReader(), entity.Id
-				, ProductionWorkOrderRoutingColumnNames.LocationID.ToString()
+						WithChildForParentValues(GetProductionWorkOrderRoutingReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "LocationID",  }
 				, SetChildrenProductionWorkOrderRoutings);
 
-			QueryResultForChildrenOnly(new List<ProductionLocation>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionLocation>() { entity });
 			entity.Loaded = false;
 			GetProductionProductInventoryReader().SetAllChildrenForExisting(entity.ProductionProductInventories);
 			GetProductionWorkOrderRoutingReader().SetAllChildrenForExisting(entity.ProductionWorkOrderRoutings);
@@ -164,21 +181,22 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductInventoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductInventoryColumnNames.LocationID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionProductInventoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "LocationID",  }
 				, SetChildrenProductionProductInventories);
 
-			WithChildForParentIds(GetProductionWorkOrderRoutingReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionWorkOrderRoutingColumnNames.LocationID.ToString()
+			WithChildForParentsValues(GetProductionWorkOrderRoutingReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "LocationID",  }
 				, SetChildrenProductionWorkOrderRoutings);
 
 					

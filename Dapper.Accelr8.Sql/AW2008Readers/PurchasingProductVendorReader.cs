@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class PurchasingProductVendorReader : EntityReader<int, PurchasingProductVendor>
+    public class PurchasingProductVendorReader : EntityReader<CompoundKey, PurchasingProductVendor>
     {
         public PurchasingProductVendorReader(
             PurchasingProductVendorTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 3
@@ -43,8 +48,9 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PurchasingProductVendor();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.AverageLeadTime = GetRowData<int>(dataRow, "AverageLeadTime"); 
+			domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
+      		domain.BusinessEntityID = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.AverageLeadTime = GetRowData<int>(dataRow, "AverageLeadTime"); 
       		domain.StandardPrice = GetRowData<decimal>(dataRow, "StandardPrice"); 
       		domain.LastReceiptCost = GetRowData<decimal?>(dataRow, "LastReceiptCost"); 
       		domain.LastReceiptDate = GetRowData<DateTime?>(dataRow, "LastReceiptDate"); 
@@ -53,24 +59,23 @@ namespace Dapper.Accelr8.AW2008Readers
       		domain.OnOrderQty = GetRowData<int?>(dataRow, "OnOrderQty"); 
       		domain.UnitMeasureCode = GetRowData<string>(dataRow, "UnitMeasureCode"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+      				domain.Id = PurchasingProductVendor.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, PurchasingProductVendor></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, PurchasingProductVendor> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, PurchasingProductVendor></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, PurchasingProductVendor> WithAllChildrenForExisting(PurchasingProductVendor existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PurchasingProductVendor entity)
         {

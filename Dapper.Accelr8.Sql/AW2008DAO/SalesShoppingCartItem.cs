@@ -8,21 +8,24 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesShoppingCartItem : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesShoppingCartItem : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesShoppingCartItem()
-		{			
+		{
+							
 			IsDirty = false; 
 			_dateCreated = (DateTime)SqlDateTime.MinValue;
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected string _shoppingCartID;
 		public string ShoppingCartID 

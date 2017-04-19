@@ -8,20 +8,77 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesTerritoryHistory : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesTerritoryHistory : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public SalesSalesTerritoryHistory()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(SalesSalesTerritoryHistory dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.BusinessEntityID,
+							dao.TerritoryID,
+							dao.StartDate,
+						
+				}
+			};
+		}
+
+			
+			protected int _businessEntityID;
+		public int BusinessEntityID 
+		{ 
+			get { return _businessEntityID; }
+			set 
+			{ 
+				_businessEntityID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _territoryID;
+		public int TerritoryID 
+		{ 
+			get { return _territoryID; }
+			set 
+			{ 
+				_territoryID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected DateTime _startDate;
+		public DateTime StartDate 
+		{ 
+			get { return _startDate; }
+			set 
+			{ 
+				_startDate = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected DateTime? _endDate;
 		public DateTime? EndDate 

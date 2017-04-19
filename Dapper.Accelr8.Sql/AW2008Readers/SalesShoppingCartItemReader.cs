@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesShoppingCartItem();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ShoppingCartID = GetRowData<string>(dataRow, "ShoppingCartID"); 
+			domain.Id = GetRowData<int>(dataRow, "ShoppingCartItemID"); 
+      		domain.ShoppingCartID = GetRowData<string>(dataRow, "ShoppingCartID"); 
       		domain.Quantity = GetRowData<int>(dataRow, "Quantity"); 
       		domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
       		domain.DateCreated = GetRowData<DateTime>(dataRow, "DateCreated"); 
@@ -60,13 +65,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesShoppingCartItem></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesShoppingCartItem> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesShoppingCartItem> WithAllChildrenForExisting(SalesShoppingCartItem existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesShoppingCartItem entity)
         {

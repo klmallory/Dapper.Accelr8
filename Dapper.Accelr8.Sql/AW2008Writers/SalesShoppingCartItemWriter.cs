@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,22 +49,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesShoppingCartItemColumnNames)f.Key)
+                switch ((SalesShoppingCartItemFieldNames)f.Key)
                 {
                     
-					case SalesShoppingCartItemColumnNames.ShoppingCartID:
+					case SalesShoppingCartItemFieldNames.ShoppingCartID:
 						parms.Add(GetParamName("ShoppingCartID", actionType, taskIndex, ref count), entity.ShoppingCartID);
 						break;
-					case SalesShoppingCartItemColumnNames.Quantity:
+					case SalesShoppingCartItemFieldNames.Quantity:
 						parms.Add(GetParamName("Quantity", actionType, taskIndex, ref count), entity.Quantity);
 						break;
-					case SalesShoppingCartItemColumnNames.ProductID:
+					case SalesShoppingCartItemFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case SalesShoppingCartItemColumnNames.DateCreated:
+					case SalesShoppingCartItemFieldNames.DateCreated:
 						parms.Add(GetParamName("DateCreated", actionType, taskIndex, ref count), entity.DateCreated);
 						break;
-					case SalesShoppingCartItemColumnNames.ModifiedDate:
+					case SalesShoppingCartItemFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -80,7 +83,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ShoppingCartItem_Product_ProductID
 			var productionProduct380 = GetProductionProductWriter();
-		if ((_cascades.Contains(SalesShoppingCartItemCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(SalesShoppingCartItemCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct380, entity.ProductionProduct, context))
 				WithParent(productionProduct380, entity);
 
@@ -94,7 +97,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ShoppingCartItem_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.SalesShoppingCartItem = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

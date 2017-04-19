@@ -28,24 +28,27 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingPurchaseOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingPurchaseOrderHeader>(); }
 		static IEntityWriter<int, ProductionDocument> GetProductionDocumentWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionDocument>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionDocument>(); }
 		static IEntityWriter<int, HumanResourcesEmployeeDepartmentHistory> GetHumanResourcesEmployeeDepartmentHistoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployeeDepartmentHistory>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployeeDepartmentHistory>(); }
 		static IEntityWriter<int, HumanResourcesEmployeePayHistory> GetHumanResourcesEmployeePayHistoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployeePayHistory>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployeePayHistory>(); }
 		static IEntityWriter<int, SalesSalesPerson> GetSalesSalesPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesPerson>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesPerson>(); }
 		static IEntityWriter<int, HumanResourcesJobCandidate> GetHumanResourcesJobCandidateWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesJobCandidate>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesJobCandidate>(); }
 		
 		static IEntityWriter<int, PersonPerson> GetPersonPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPerson>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPerson>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -58,52 +61,52 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((HumanResourcesEmployeeColumnNames)f.Key)
+                switch ((HumanResourcesEmployeeFieldNames)f.Key)
                 {
                     
-					case HumanResourcesEmployeeColumnNames.NationalIDNumber:
+					case HumanResourcesEmployeeFieldNames.NationalIDNumber:
 						parms.Add(GetParamName("NationalIDNumber", actionType, taskIndex, ref count), entity.NationalIDNumber);
 						break;
-					case HumanResourcesEmployeeColumnNames.LoginID:
+					case HumanResourcesEmployeeFieldNames.LoginID:
 						parms.Add(GetParamName("LoginID", actionType, taskIndex, ref count), entity.LoginID);
 						break;
-					case HumanResourcesEmployeeColumnNames.OrganizationNode:
+					case HumanResourcesEmployeeFieldNames.OrganizationNode:
 						parms.Add(GetParamName("OrganizationNode", actionType, taskIndex, ref count), entity.OrganizationNode);
 						break;
-					case HumanResourcesEmployeeColumnNames.OrganizationLevel:
+					case HumanResourcesEmployeeFieldNames.OrganizationLevel:
 						parms.Add(GetParamName("OrganizationLevel", actionType, taskIndex, ref count), entity.OrganizationLevel);
 						break;
-					case HumanResourcesEmployeeColumnNames.JobTitle:
+					case HumanResourcesEmployeeFieldNames.JobTitle:
 						parms.Add(GetParamName("JobTitle", actionType, taskIndex, ref count), entity.JobTitle);
 						break;
-					case HumanResourcesEmployeeColumnNames.BirthDate:
+					case HumanResourcesEmployeeFieldNames.BirthDate:
 						parms.Add(GetParamName("BirthDate", actionType, taskIndex, ref count), entity.BirthDate);
 						break;
-					case HumanResourcesEmployeeColumnNames.MaritalStatus:
+					case HumanResourcesEmployeeFieldNames.MaritalStatus:
 						parms.Add(GetParamName("MaritalStatus", actionType, taskIndex, ref count), entity.MaritalStatus);
 						break;
-					case HumanResourcesEmployeeColumnNames.Gender:
+					case HumanResourcesEmployeeFieldNames.Gender:
 						parms.Add(GetParamName("Gender", actionType, taskIndex, ref count), entity.Gender);
 						break;
-					case HumanResourcesEmployeeColumnNames.HireDate:
+					case HumanResourcesEmployeeFieldNames.HireDate:
 						parms.Add(GetParamName("HireDate", actionType, taskIndex, ref count), entity.HireDate);
 						break;
-					case HumanResourcesEmployeeColumnNames.SalariedFlag:
+					case HumanResourcesEmployeeFieldNames.SalariedFlag:
 						parms.Add(GetParamName("SalariedFlag", actionType, taskIndex, ref count), entity.SalariedFlag);
 						break;
-					case HumanResourcesEmployeeColumnNames.VacationHours:
+					case HumanResourcesEmployeeFieldNames.VacationHours:
 						parms.Add(GetParamName("VacationHours", actionType, taskIndex, ref count), entity.VacationHours);
 						break;
-					case HumanResourcesEmployeeColumnNames.SickLeaveHours:
+					case HumanResourcesEmployeeFieldNames.SickLeaveHours:
 						parms.Add(GetParamName("SickLeaveHours", actionType, taskIndex, ref count), entity.SickLeaveHours);
 						break;
-					case HumanResourcesEmployeeColumnNames.CurrentFlag:
+					case HumanResourcesEmployeeFieldNames.CurrentFlag:
 						parms.Add(GetParamName("CurrentFlag", actionType, taskIndex, ref count), entity.CurrentFlag);
 						break;
-					case HumanResourcesEmployeeColumnNames.rowguid:
+					case HumanResourcesEmployeeFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case HumanResourcesEmployeeColumnNames.ModifiedDate:
+					case HumanResourcesEmployeeFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -120,7 +123,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_PurchaseOrderHeader_Employee_EmployeeID
 			var purchasingPurchaseOrderHeader105 = GetPurchasingPurchaseOrderHeaderWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.purchasing.purchaseorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.purchasingpurchaseorderheaders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingPurchaseOrderHeaders)
 					Cascade(purchasingPurchaseOrderHeader105, item, context);
 
@@ -129,7 +132,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_Document_Employee_Owner
 			var productionDocument106 = GetProductionDocumentWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.production.document.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.productiondocuments.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionDocuments)
 					Cascade(productionDocument106, item, context);
 
@@ -138,7 +141,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Employee_BusinessEntityID
 			var humanResourcesEmployeeDepartmentHistory107 = GetHumanResourcesEmployeeDepartmentHistoryWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresources.employeedepartmenthistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresourcesemployeedepartmenthistories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesEmployeeDepartmentHistories)
 					Cascade(humanResourcesEmployeeDepartmentHistory107, item, context);
 
@@ -147,7 +150,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_EmployeePayHistory_Employee_BusinessEntityID
 			var humanResourcesEmployeePayHistory108 = GetHumanResourcesEmployeePayHistoryWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresources.employeepayhistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresourcesemployeepayhistories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesEmployeePayHistories)
 					Cascade(humanResourcesEmployeePayHistory108, item, context);
 
@@ -156,8 +159,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID
 			var salesSalesPerson109 = GetSalesSalesPersonWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.sales.salesperson.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.SalesSalesPeople)
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.salessalespeople.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.SalesSalesPeoples)
 					Cascade(salesSalesPerson109, item, context);
 
 			if (salesSalesPerson109.Count > 0)
@@ -165,7 +168,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_JobCandidate_Employee_BusinessEntityID
 			var humanResourcesJobCandidate110 = GetHumanResourcesJobCandidateWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresources.jobcandidate.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresourcesjobcandidates.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesJobCandidates)
 					Cascade(humanResourcesJobCandidate110, item, context);
 
@@ -176,7 +179,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_Employee_Person_BusinessEntityID
 			var personPerson111 = GetPersonPersonWriter();
-		if ((_cascades.Contains(HumanResourcesEmployeeCascadeNames.personperson.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
+		if ((_cascades.Contains(HumanResourcesEmployeeCascadeNames.personperson_p.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
 			if (Cascade(personPerson111, entity.PersonPerson, context))
 				WithParent(personPerson111, entity);
 
@@ -190,37 +193,37 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_PurchaseOrderHeader_Employee_EmployeeID
 			if (entity.PurchasingPurchaseOrderHeaders != null && entity.PurchasingPurchaseOrderHeaders.Count > 0)
 				foreach (var rel in entity.PurchasingPurchaseOrderHeaders)
-					rel.PurchasingPurchaseOrderHeader = entity.Id;
+					rel.EmployeeID = entity.Id;
 
 			//From Foreign Key FK_Document_Employee_Owner
 			if (entity.ProductionDocuments != null && entity.ProductionDocuments.Count > 0)
 				foreach (var rel in entity.ProductionDocuments)
-					rel.ProductionDocument = entity.Id;
+					rel.Owner = entity.Id;
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Employee_BusinessEntityID
 			if (entity.HumanResourcesEmployeeDepartmentHistories != null && entity.HumanResourcesEmployeeDepartmentHistories.Count > 0)
 				foreach (var rel in entity.HumanResourcesEmployeeDepartmentHistories)
-					rel.HumanResourcesEmployeeDepartmentHistory = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_EmployeePayHistory_Employee_BusinessEntityID
 			if (entity.HumanResourcesEmployeePayHistories != null && entity.HumanResourcesEmployeePayHistories.Count > 0)
 				foreach (var rel in entity.HumanResourcesEmployeePayHistories)
-					rel.HumanResourcesEmployeePayHistory = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID
 			if (entity.SalesSalesPeople != null && entity.SalesSalesPeople.Count > 0)
 				foreach (var rel in entity.SalesSalesPeople)
-					rel.SalesSalesPerson = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 			//From Foreign Key FK_JobCandidate_Employee_BusinessEntityID
 			if (entity.HumanResourcesJobCandidates != null && entity.HumanResourcesJobCandidates.Count > 0)
 				foreach (var rel in entity.HumanResourcesJobCandidates)
-					rel.HumanResourcesJobCandidate = entity.Id;
+					rel.BusinessEntityID = entity.Id;
 
 				
 			//From Foreign Key FK_Employee_Person_BusinessEntityID
 			if (entity.PersonPerson != null)
-				entity.HumanResourcesEmployee = entity.PersonPerson.Id;
+				entity.BusinessEntityID = entity.PersonPerson.Id;
 
 		}
 
@@ -228,7 +231,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_PurchaseOrderHeader_Employee_EmployeeID
 			var purchasingPurchaseOrderHeader119 = GetPurchasingPurchaseOrderHeaderWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.purchasing.purchaseorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.purchasingpurchaseorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingPurchaseOrderHeaders)
 					CascadeDelete(purchasingPurchaseOrderHeader119, item, context);
 
@@ -237,7 +240,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_Document_Employee_Owner
 			var productionDocument120 = GetProductionDocumentWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.production.document.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.productiondocument.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionDocuments)
 					CascadeDelete(productionDocument120, item, context);
 
@@ -246,7 +249,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_EmployeeDepartmentHistory_Employee_BusinessEntityID
 			var humanResourcesEmployeeDepartmentHistory121 = GetHumanResourcesEmployeeDepartmentHistoryWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresources.employeedepartmenthistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresourcesemployeedepartmenthistory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesEmployeeDepartmentHistories)
 					CascadeDelete(humanResourcesEmployeeDepartmentHistory121, item, context);
 
@@ -255,7 +258,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_EmployeePayHistory_Employee_BusinessEntityID
 			var humanResourcesEmployeePayHistory122 = GetHumanResourcesEmployeePayHistoryWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresources.employeepayhistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresourcesemployeepayhistory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesEmployeePayHistories)
 					CascadeDelete(humanResourcesEmployeePayHistory122, item, context);
 
@@ -264,7 +267,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesPerson_Employee_BusinessEntityID
 			var salesSalesPerson123 = GetSalesSalesPersonWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.sales.salesperson.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.salessalesperson.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesPeople)
 					CascadeDelete(salesSalesPerson123, item, context);
 
@@ -273,7 +276,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_JobCandidate_Employee_BusinessEntityID
 			var humanResourcesJobCandidate124 = GetHumanResourcesJobCandidateWriter();
-			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresources.jobcandidate.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesEmployeeCascadeNames.humanresourcesjobcandidate.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesJobCandidates)
 					CascadeDelete(humanResourcesJobCandidate124, item, context);
 

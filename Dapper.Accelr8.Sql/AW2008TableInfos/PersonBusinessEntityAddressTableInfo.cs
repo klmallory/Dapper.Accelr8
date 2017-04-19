@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonBusinessEntityAddressColumnNames
+	public enum PersonBusinessEntityAddressFieldNames
 	{	
 		BusinessEntityID, 	
 		AddressID, 	
@@ -35,15 +35,35 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		personbusinessentity_p, 	}
 
 	public class PersonBusinessEntityAddressTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonBusinessEntityAddressColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonBusinessEntityAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonBusinessEntityAddressFieldNames.AddressID, "AddressID" }, 
+						{ (int)PersonBusinessEntityAddressFieldNames.AddressTypeID, "AddressTypeID" }, 
+						{ (int)PersonBusinessEntityAddressFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonBusinessEntityAddressFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonBusinessEntityAddressIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonBusinessEntityAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonBusinessEntityAddressFieldNames.AddressID, "AddressID" }, 
+						{ (int)PersonBusinessEntityAddressFieldNames.AddressTypeID, "AddressTypeID" }, 
+				};
+
 		public PersonBusinessEntityAddressTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonBusinessEntityAddressColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.BusinessEntityAddress";
+			Schema = "Person";
 			TableName = "Person.BusinessEntityAddress";
 			TableAlias = "personbusinessentityaddress";
-			ColumnNames = typeof(PersonBusinessEntityAddressColumnNames).ToDataList<Type, int>();
+			Columns = PersonBusinessEntityAddressColumnNames;
+			IdColumns = PersonBusinessEntityAddressIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_BusinessEntityAddress_Address_AddressID

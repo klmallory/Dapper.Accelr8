@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionLocation : Dapper.Accelr8.Repo.Domain.BaseEntity<short>
+	public class ProductionLocation : Dapper.Accelr8.Repo.Domain.BaseEntity<short>
 	{
 			public ProductionLocation()
-		{			
+		{
+							
 			IsDirty = false; 
 			_productionProductInventories = new List<ProductionProductInventory>();
 		_productionWorkOrderRoutings = new List<ProductionWorkOrderRouting>();
@@ -24,6 +26,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 

@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionDocument();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<Microsoft.SqlServer.Types.SqlHierarchyId>(dataRow, IdColumn);
-				domain.DocumentLevel = GetRowData<short?>(dataRow, "DocumentLevel"); 
+			domain.Id = GetRowData<Microsoft.SqlServer.Types.SqlHierarchyId>(dataRow, "DocumentNode"); 
+      		domain.DocumentLevel = GetRowData<short?>(dataRow, "DocumentLevel"); 
       		domain.Title = GetRowData<string>(dataRow, "Title"); 
       		domain.Owner = GetRowData<int>(dataRow, "Owner"); 
       		domain.FolderFlag = GetRowData<bool>(dataRow, "FolderFlag"); 
@@ -68,13 +73,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument></param>
 		/// <param name="id">Microsoft.SqlServer.Types.SqlHierarchyId</param>
-        public override IEntityReader<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument> WithAllChildrenForId(Microsoft.SqlServer.Types.SqlHierarchyId id)
+        public override IEntityReader<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument> WithAllChildrenForExisting(ProductionDocument existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionDocument entity)
         {

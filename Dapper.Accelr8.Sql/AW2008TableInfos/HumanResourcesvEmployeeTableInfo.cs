@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesvEmployeeColumnNames
+	public enum HumanResourcesvEmployeeFieldNames
 	{	
 		BusinessEntityID, 	
 		Title, 	
@@ -45,15 +45,46 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class HumanResourcesvEmployeeTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesvEmployeeColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesvEmployeeFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.Title, "Title" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.FirstName, "FirstName" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.MiddleName, "MiddleName" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.LastName, "LastName" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.Suffix, "Suffix" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.JobTitle, "JobTitle" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.PhoneNumber, "PhoneNumber" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.PhoneNumberType, "PhoneNumberType" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.EmailAddress, "EmailAddress" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.EmailPromotion, "EmailPromotion" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.AddressLine1, "AddressLine1" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.AddressLine2, "AddressLine2" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.City, "City" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.StateProvinceName, "StateProvinceName" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.PostalCode, "PostalCode" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.CountryRegionName, "CountryRegionName" }, 
+						{ (int)HumanResourcesvEmployeeFieldNames.AdditionalContactInfo, "AdditionalContactInfo" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesvEmployeeIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)HumanResourcesvEmployeeFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public HumanResourcesvEmployeeTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = HumanResourcesvEmployeeColumnNames.BusinessEntityID.ToString();
-			//Schema = "HumanResources.vEmployee";
+			Schema = "HumanResources";
 			TableName = "HumanResources.vEmployee";
 			TableAlias = "humanresourcesvemployee";
-			ColumnNames = typeof(HumanResourcesvEmployeeColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesvEmployeeColumnNames;
+			IdColumns = HumanResourcesvEmployeeIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

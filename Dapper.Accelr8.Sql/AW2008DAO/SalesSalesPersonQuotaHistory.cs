@@ -8,20 +8,63 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesPersonQuotaHistory : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesPersonQuotaHistory : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public SalesSalesPersonQuotaHistory()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(SalesSalesPersonQuotaHistory dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.BusinessEntityID,
+							dao.QuotaDate,
+						
+				}
+			};
+		}
+
+			
+			protected int _businessEntityID;
+		public int BusinessEntityID 
+		{ 
+			get { return _businessEntityID; }
+			set 
+			{ 
+				_businessEntityID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected DateTime _quotaDate;
+		public DateTime QuotaDate 
+		{ 
+			get { return _quotaDate; }
+			set 
+			{ 
+				_quotaDate = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected decimal _salesQuota;
 		public decimal SalesQuota 

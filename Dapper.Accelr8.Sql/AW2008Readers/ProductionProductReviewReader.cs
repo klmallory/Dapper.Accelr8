@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProductReview();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
+			domain.Id = GetRowData<int>(dataRow, "ProductReviewID"); 
+      		domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
       		domain.ReviewerName = GetRowData<object>(dataRow, "ReviewerName"); 
       		domain.ReviewDate = GetRowData<DateTime>(dataRow, "ReviewDate"); 
       		domain.EmailAddress = GetRowData<string>(dataRow, "EmailAddress"); 
@@ -62,13 +67,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionProductReview></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProductReview> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionProductReview> WithAllChildrenForExisting(ProductionProductReview existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProductReview entity)
         {

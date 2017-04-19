@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionvProductModelInstructionColumnNames
+	public enum ProductionvProductModelInstructionFieldNames
 	{	
 		ProductModelID, 	
 		Name, 	
@@ -38,15 +38,39 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class ProductionvProductModelInstructionTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionvProductModelInstructionColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionvProductModelInstructionFieldNames.ProductModelID, "ProductModelID" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.Name, "Name" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.Instructions, "Instructions" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.LocationID, "LocationID" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.SetupHours, "SetupHours" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.MachineHours, "MachineHours" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.LaborHours, "LaborHours" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.LotSize, "LotSize" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.Step, "Step" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionvProductModelInstructionFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionvProductModelInstructionIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)ProductionvProductModelInstructionFieldNames.ProductModelID, "ProductModelID" }, 
+				};
+
 		public ProductionvProductModelInstructionTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = ProductionvProductModelInstructionColumnNames.ProductModelID.ToString();
-			//Schema = "Production.vProductModelInstructions";
+			Schema = "Production";
 			TableName = "Production.vProductModelInstructions";
 			TableAlias = "productionvproductmodelinstruction";
-			ColumnNames = typeof(ProductionvProductModelInstructionColumnNames).ToDataList<Type, int>();
+			Columns = ProductionvProductModelInstructionColumnNames;
+			IdColumns = ProductionvProductModelInstructionIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

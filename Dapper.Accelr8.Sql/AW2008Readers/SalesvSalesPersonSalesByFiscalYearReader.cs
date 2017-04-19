@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,13 +48,13 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesvSalesPersonSalesByFiscalYear();
 			domain.Loaded = false;
 
-				domain.SalesPersonID = GetRowData<int?>(dataRow, "SalesPersonID"); 
+			domain.SalesPersonID = GetRowData<int?>(dataRow, "SalesPersonID"); 
       		domain.FullName = GetRowData<string>(dataRow, "FullName"); 
       		domain.JobTitle = GetRowData<string>(dataRow, "JobTitle"); 
       		domain.SalesTerritory = GetRowData<object>(dataRow, "SalesTerritory"); 
-      		domain._n_2002 = GetRowData<decimal?>(dataRow, "2002"); 
-      		domain._n_2003 = GetRowData<decimal?>(dataRow, "2003"); 
-      		domain._n_2004 = GetRowData<decimal?>(dataRow, "2004"); 
+      		domain._N_2002 = GetRowData<decimal?>(dataRow, "2002"); 
+      		domain._N_2003 = GetRowData<decimal?>(dataRow, "2003"); 
+      		domain._N_2004 = GetRowData<decimal?>(dataRow, "2004"); 
       			
 			domain.IsDirty = false;
 			domain.Loaded = true;
@@ -61,13 +66,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesvSalesPersonSalesByFiscalYear></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesvSalesPersonSalesByFiscalYear> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesvSalesPersonSalesByFiscalYear> WithAllChildrenForExisting(SalesvSalesPersonSalesByFiscalYear existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesvSalesPersonSalesByFiscalYear entity)
         {

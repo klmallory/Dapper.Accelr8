@@ -10,7 +10,6 @@ namespace Dapper.Accelr8.Repo.Contracts
     public interface IEntityWriter : IDisposable
     {
         bool UniqueId { get; }
-        string IdColumn { get; }
         string TableName { get; }
         IList<KeyValuePair<int, string>> ColumnNames { get; }
         string TableAlias { get; }

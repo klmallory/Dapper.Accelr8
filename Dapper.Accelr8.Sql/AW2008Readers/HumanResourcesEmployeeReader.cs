@@ -27,74 +27,52 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 6
 		//Parent Count 1
-		static IEntityReader<int , PurchasingPurchaseOrderHeader> _purchasingPurchaseOrderHeaderReader;
-		protected static IEntityReader<int , PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderReader()
+				//Is CompoundKey False
+		protected static IEntityReader<Microsoft.SqlServer.Types.SqlHierarchyId , ProductionDocument> GetProductionDocumentReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PurchasingPurchaseOrderHeader>>();
+			return s_loc8r.GetReader<Microsoft.SqlServer.Types.SqlHierarchyId , ProductionDocument>();
 		}
 
-		static IEntityReader<int , ProductionDocument> _productionDocumentReader;
-		protected static IEntityReader<int , ProductionDocument> GetProductionDocumentReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , HumanResourcesEmployeeDepartmentHistory> GetHumanResourcesEmployeeDepartmentHistoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionDocument>>();
+			return s_loc8r.GetReader<CompoundKey , HumanResourcesEmployeeDepartmentHistory>();
 		}
 
-		static IEntityReader<int , HumanResourcesEmployeeDepartmentHistory> _humanResourcesEmployeeDepartmentHistoryReader;
-		protected static IEntityReader<int , HumanResourcesEmployeeDepartmentHistory> GetHumanResourcesEmployeeDepartmentHistoryReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , HumanResourcesEmployeePayHistory> GetHumanResourcesEmployeePayHistoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , HumanResourcesEmployeeDepartmentHistory>>();
+			return s_loc8r.GetReader<CompoundKey , HumanResourcesEmployeePayHistory>();
 		}
 
-		static IEntityReader<int , HumanResourcesEmployeePayHistory> _humanResourcesEmployeePayHistoryReader;
-		protected static IEntityReader<int , HumanResourcesEmployeePayHistory> GetHumanResourcesEmployeePayHistoryReader()
-		{
-			return _locator.Resolve<IEntityReader<int , HumanResourcesEmployeePayHistory>>();
-		}
-
-		static IEntityReader<int , SalesSalesPerson> _salesSalesPersonReader;
-		protected static IEntityReader<int , SalesSalesPerson> GetSalesSalesPersonReader()
-		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesPerson>>();
-		}
-
-		static IEntityReader<int , HumanResourcesJobCandidate> _humanResourcesJobCandidateReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , HumanResourcesJobCandidate> GetHumanResourcesJobCandidateReader()
 		{
-			return _locator.Resolve<IEntityReader<int , HumanResourcesJobCandidate>>();
+			return s_loc8r.GetReader<int , HumanResourcesJobCandidate>();
+		}
+
+				//Is CompoundKey False
+		protected static IEntityReader<int , PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderReader()
+		{
+			return s_loc8r.GetReader<int , PurchasingPurchaseOrderHeader>();
+		}
+
+				//Is CompoundKey False
+		protected static IEntityReader<int , SalesSalesPerson> GetSalesSalesPersonReader()
+		{
+			return s_loc8r.GetReader<int , SalesSalesPerson>();
 		}
 
 		
-		/// <summary>
-		/// Sets the children of type PurchasingPurchaseOrderHeader on the parent on PurchasingPurchaseOrderHeaders.
-		/// From foriegn key FK_PurchaseOrderHeader_Employee_EmployeeID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenPurchasingPurchaseOrderHeaders(IList<HumanResourcesEmployee> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: PurchasingPurchaseOrderHeader
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<PurchasingPurchaseOrderHeader>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.PurchasingPurchaseOrderHeaders = typedChildren.Where(b => b.PurchasingPurchaseOrderHeader == r.Id).ToList();
-				r.PurchasingPurchaseOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
 		/// <summary>
 		/// Sets the children of type ProductionDocument on the parent on ProductionDocuments.
 		/// From foriegn key FK_Document_Employee_Owner
@@ -103,7 +81,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionDocuments(IList<HumanResourcesEmployee> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: Microsoft.SqlServer.Types.SqlHierarchyId
 			//Child Type: ProductionDocument
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -116,8 +94,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionDocuments = typedChildren.Where(b => b.ProductionDocument == r.Id).ToList();
+				
+
+				r.ProductionDocuments = typedChildren.Where(b =>  b.Owner == r.Id ).ToList();
 				r.ProductionDocuments.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -130,7 +111,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenHumanResourcesEmployeeDepartmentHistories(IList<HumanResourcesEmployee> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: HumanResourcesEmployeeDepartmentHistory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -143,8 +124,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.HumanResourcesEmployeeDepartmentHistories = typedChildren.Where(b => b.HumanResourcesEmployeeDepartmentHistory == r.Id).ToList();
+				
+
+				r.HumanResourcesEmployeeDepartmentHistories = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.HumanResourcesEmployeeDepartmentHistories.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -157,7 +141,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenHumanResourcesEmployeePayHistories(IList<HumanResourcesEmployee> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: HumanResourcesEmployeePayHistory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -170,35 +154,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.HumanResourcesEmployeePayHistories = typedChildren.Where(b => b.HumanResourcesEmployeePayHistory == r.Id).ToList();
+				
+
+				r.HumanResourcesEmployeePayHistories = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.HumanResourcesEmployeePayHistories.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type SalesSalesPerson on the parent on SalesSalesPeople.
-		/// From foriegn key FK_SalesPerson_Employee_BusinessEntityID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenSalesSalesPeople(IList<HumanResourcesEmployee> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: SalesSalesPerson
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<SalesSalesPerson>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.SalesSalesPeople = typedChildren.Where(b => b.SalesSalesPerson == r.Id).ToList();
-				r.SalesSalesPeople.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -224,8 +184,71 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.HumanResourcesJobCandidates = typedChildren.Where(b => b.HumanResourcesJobCandidate == r.Id).ToList();
+				
+
+				r.HumanResourcesJobCandidates = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.HumanResourcesJobCandidates.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type PurchasingPurchaseOrderHeader on the parent on PurchasingPurchaseOrderHeaders.
+		/// From foriegn key FK_PurchaseOrderHeader_Employee_EmployeeID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenPurchasingPurchaseOrderHeaders(IList<HumanResourcesEmployee> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: PurchasingPurchaseOrderHeader
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<PurchasingPurchaseOrderHeader>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.PurchasingPurchaseOrderHeaders = typedChildren.Where(b =>  b.EmployeeID == r.Id ).ToList();
+				r.PurchasingPurchaseOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type SalesSalesPerson on the parent on SalesSalesPeople.
+		/// From foriegn key FK_SalesPerson_Employee_BusinessEntityID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenSalesSalesPeople(IList<HumanResourcesEmployee> results, IList<object> children)
+		{
+			//Child Id Type: int
+			//Child Type: SalesSalesPerson
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<SalesSalesPerson>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.SalesSalesPeople = typedChildren.Where(b =>  b.Id == r.Id ).ToList();
+				r.SalesSalesPeople.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesEmployee = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -241,8 +264,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new HumanResourcesEmployee();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.NationalIDNumber = GetRowData<string>(dataRow, "NationalIDNumber"); 
+			domain.Id = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.NationalIDNumber = GetRowData<string>(dataRow, "NationalIDNumber"); 
       		domain.LoginID = GetRowData<string>(dataRow, "LoginID"); 
       		domain.OrganizationNode = GetRowData<Microsoft.SqlServer.Types.SqlHierarchyId?>(dataRow, "OrganizationNode"); 
       		domain.OrganizationLevel = GetRowData<short?>(dataRow, "OrganizationLevel"); 
@@ -268,25 +291,36 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, HumanResourcesEmployee></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, HumanResourcesEmployee> WithAllChildrenForId(int id)
+        public override IEntityReader<int, HumanResourcesEmployee> WithAllChildrenForExisting(HumanResourcesEmployee existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPurchasingPurchaseOrderHeaderReader(), id, IdColumn, SetChildrenPurchasingPurchaseOrderHeaders);
-			
-			WithChildForParentId(GetProductionDocumentReader(), id, IdColumn, SetChildrenProductionDocuments);
-			
-			WithChildForParentId(GetHumanResourcesEmployeeDepartmentHistoryReader(), id, IdColumn, SetChildrenHumanResourcesEmployeeDepartmentHistories);
-			
-			WithChildForParentId(GetHumanResourcesEmployeePayHistoryReader(), id, IdColumn, SetChildrenHumanResourcesEmployeePayHistories);
-			
-			WithChildForParentId(GetSalesSalesPersonReader(), id, IdColumn, SetChildrenSalesSalesPeople);
-			
-			WithChildForParentId(GetHumanResourcesJobCandidateReader(), id, IdColumn, SetChildrenHumanResourcesJobCandidates);
+						WithChildForParentValues(GetProductionDocumentReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "Owner",  }
+				, SetChildrenProductionDocuments);
+						WithChildForParentValues(GetHumanResourcesEmployeeDepartmentHistoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenHumanResourcesEmployeeDepartmentHistories);
+						WithChildForParentValues(GetHumanResourcesEmployeePayHistoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenHumanResourcesEmployeePayHistories);
+						WithChildForParentValues(GetHumanResourcesJobCandidateReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenHumanResourcesJobCandidates);
+						WithChildForParentValues(GetPurchasingPurchaseOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "EmployeeID",  }
+				, SetChildrenPurchasingPurchaseOrderHeaders);
+						WithChildForParentValues(GetSalesSalesPersonReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "Id",  }
+				, SetChildrenSalesSalesPeople);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(HumanResourcesEmployee entity)
         {
@@ -295,38 +329,45 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPurchasingPurchaseOrderHeaderReader(), entity.Id
-				, PurchasingPurchaseOrderHeaderColumnNames.EmployeeID.ToString()
-				, SetChildrenPurchasingPurchaseOrderHeaders);
-
-			WithChildForParentId(GetProductionDocumentReader(), entity.Id
-				, ProductionDocumentColumnNames.Owner.ToString()
+						WithChildForParentValues(GetProductionDocumentReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "Owner",  }
 				, SetChildrenProductionDocuments);
 
-			WithChildForParentId(GetHumanResourcesEmployeeDepartmentHistoryReader(), entity.Id
-				, HumanResourcesEmployeeDepartmentHistoryColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetHumanResourcesEmployeeDepartmentHistoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenHumanResourcesEmployeeDepartmentHistories);
 
-			WithChildForParentId(GetHumanResourcesEmployeePayHistoryReader(), entity.Id
-				, HumanResourcesEmployeePayHistoryColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetHumanResourcesEmployeePayHistoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenHumanResourcesEmployeePayHistories);
 
-			WithChildForParentId(GetSalesSalesPersonReader(), entity.Id
-				, SalesSalesPersonColumnNames.BusinessEntityID.ToString()
-				, SetChildrenSalesSalesPeople);
-
-			WithChildForParentId(GetHumanResourcesJobCandidateReader(), entity.Id
-				, HumanResourcesJobCandidateColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetHumanResourcesJobCandidateReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenHumanResourcesJobCandidates);
 
-			QueryResultForChildrenOnly(new List<HumanResourcesEmployee>() { entity });
+						WithChildForParentValues(GetPurchasingPurchaseOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "EmployeeID",  }
+				, SetChildrenPurchasingPurchaseOrderHeaders);
+
+						WithChildForParentValues(GetSalesSalesPersonReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "Id",  }
+				, SetChildrenSalesSalesPeople);
+
+			
+QueryResultForChildrenOnly(new List<HumanResourcesEmployee>() { entity });
 			entity.Loaded = false;
-			GetPurchasingPurchaseOrderHeaderReader().SetAllChildrenForExisting(entity.PurchasingPurchaseOrderHeaders);
 			GetProductionDocumentReader().SetAllChildrenForExisting(entity.ProductionDocuments);
 			GetHumanResourcesEmployeeDepartmentHistoryReader().SetAllChildrenForExisting(entity.HumanResourcesEmployeeDepartmentHistories);
 			GetHumanResourcesEmployeePayHistoryReader().SetAllChildrenForExisting(entity.HumanResourcesEmployeePayHistories);
-			GetSalesSalesPersonReader().SetAllChildrenForExisting(entity.SalesSalesPeople);
 			GetHumanResourcesJobCandidateReader().SetAllChildrenForExisting(entity.HumanResourcesJobCandidates);
+			GetPurchasingPurchaseOrderHeaderReader().SetAllChildrenForExisting(entity.PurchasingPurchaseOrderHeaders);
+			GetSalesSalesPersonReader().SetAllChildrenForExisting(entity.SalesSalesPeople);
 				
 			entity.Loaded = true;
 		}
@@ -335,56 +376,53 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPurchasingPurchaseOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingPurchaseOrderHeaderColumnNames.EmployeeID.ToString()
-				, SetChildrenPurchasingPurchaseOrderHeaders);
+			entities = entities.Where(e => e != null).ToList();
 
-			WithChildForParentIds(GetProductionDocumentReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionDocumentColumnNames.Owner.ToString()
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionDocumentReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "Owner",  }
 				, SetChildrenProductionDocuments);
 
-			WithChildForParentIds(GetHumanResourcesEmployeeDepartmentHistoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), HumanResourcesEmployeeDepartmentHistoryColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetHumanResourcesEmployeeDepartmentHistoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenHumanResourcesEmployeeDepartmentHistories);
 
-			WithChildForParentIds(GetHumanResourcesEmployeePayHistoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), HumanResourcesEmployeePayHistoryColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetHumanResourcesEmployeePayHistoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenHumanResourcesEmployeePayHistories);
 
-			WithChildForParentIds(GetSalesSalesPersonReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesPersonColumnNames.BusinessEntityID.ToString()
-				, SetChildrenSalesSalesPeople);
-
-			WithChildForParentIds(GetHumanResourcesJobCandidateReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), HumanResourcesJobCandidateColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetHumanResourcesJobCandidateReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenHumanResourcesJobCandidates);
+
+			WithChildForParentsValues(GetPurchasingPurchaseOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "EmployeeID",  }
+				, SetChildrenPurchasingPurchaseOrderHeaders);
+
+			WithChildForParentsValues(GetSalesSalesPersonReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "Id",  }
+				, SetChildrenSalesSalesPeople);
 
 					
 			QueryResultForChildrenOnly(entities);
 
-			GetPurchasingPurchaseOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PurchasingPurchaseOrderHeaders).ToList());
 			GetProductionDocumentReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionDocuments).ToList());
 			GetHumanResourcesEmployeeDepartmentHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.HumanResourcesEmployeeDepartmentHistories).ToList());
 			GetHumanResourcesEmployeePayHistoryReader().SetAllChildrenForExisting(entities.SelectMany(e => e.HumanResourcesEmployeePayHistories).ToList());
-			GetSalesSalesPersonReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesPeople).ToList());
 			GetHumanResourcesJobCandidateReader().SetAllChildrenForExisting(entities.SelectMany(e => e.HumanResourcesJobCandidates).ToList());
+			GetPurchasingPurchaseOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.PurchasingPurchaseOrderHeaders).ToList());
+			GetSalesSalesPersonReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesPeople).ToList());
 					
 		}
     }

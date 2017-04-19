@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionBillOfMaterialColumnNames
+	public enum ProductionBillOfMaterialFieldNames
 	{	
-		BillOfMaterialsID, 	
+		Id, 	
 		ProductAssemblyID, 	
 		ComponentID, 	
 		StartDate, 	
@@ -35,18 +35,41 @@ namespace Dapper.Accelr8.AW2008TableInfos
 	{	
 		
 		productionunitmeasure_p, 	
-		productionproduct_p, 	}
+		productionproduct1_p, 	
+		productionproduct2_p, 	}
 
 	public class ProductionBillOfMaterialTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionBillOfMaterialColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionBillOfMaterialFieldNames.Id, "BillOfMaterialsID" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.ProductAssemblyID, "ProductAssemblyID" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.ComponentID, "ComponentID" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.StartDate, "StartDate" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.EndDate, "EndDate" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.UnitMeasureCode, "UnitMeasureCode" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.BOMLevel, "BOMLevel" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.PerAssemblyQty, "PerAssemblyQty" }, 
+						{ (int)ProductionBillOfMaterialFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionBillOfMaterialIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionBillOfMaterialFieldNames.Id, "BillOfMaterialsID" }, 
+				};
+
 		public ProductionBillOfMaterialTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionBillOfMaterialColumnNames.BillOfMaterialsID.ToString();
-			//Schema = "Production.BillOfMaterials";
+			Schema = "Production";
 			TableName = "Production.BillOfMaterials";
 			TableAlias = "productionbillofmaterial";
-			ColumnNames = typeof(ProductionBillOfMaterialColumnNames).ToDataList<Type, int>();
+			Columns = ProductionBillOfMaterialColumnNames;
+			IdColumns = ProductionBillOfMaterialIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_BillOfMaterials_UnitMeasure_UnitMeasureCode
@@ -86,7 +109,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<int, ProductionProduct>("ProductionProduct")),
 			TableName = "Production.Product",
-			Alias = TableAlias + "_" + "ProductionProduct",
+			Alias = TableAlias + "_" + "ProductionProduct2",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -99,7 +122,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.ProductID == null || row.ProductID == default(int))
 						return st;
 
-					st.ProductionProduct = reader.LoadEntityObject(row);
+					st.ProductionProduct2 = reader.LoadEntityObject(row);
 
 					return st;
 				},
@@ -119,7 +142,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<int, ProductionProduct>("ProductionProduct")),
 			TableName = "Production.Product",
-			Alias = TableAlias + "_" + "ProductionProduct",
+			Alias = TableAlias + "_" + "ProductionProduct1",
 			Outer = true,
 			Load = (entity, row) =>
 				{ 
@@ -132,7 +155,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.ProductID == null || row.ProductID == default(int))
 						return st;
 
-					st.ProductionProduct = reader.LoadEntityObject(row);
+					st.ProductionProduct1 = reader.LoadEntityObject(row);
 
 					return st;
 				},

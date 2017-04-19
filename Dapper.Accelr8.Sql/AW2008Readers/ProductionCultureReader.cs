@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , ProductionProductModelProductDescriptionCulture> _productionProductModelProductDescriptionCultureReader;
-		protected static IEntityReader<int , ProductionProductModelProductDescriptionCulture> GetProductionProductModelProductDescriptionCultureReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductModelProductDescriptionCulture> GetProductionProductModelProductDescriptionCultureReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductModelProductDescriptionCulture>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductModelProductDescriptionCulture>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductModelProductDescriptionCultures(IList<ProductionCulture> results, IList<object> children)
 		{
-			//Child Id Type: string
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductModelProductDescriptionCulture
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductModelProductDescriptionCultures = typedChildren.Where(b => b.ProductionProductModelProductDescriptionCulture == r.Id).ToList();
+				
+
+				r.ProductionProductModelProductDescriptionCultures = typedChildren.Where(b =>  b.CultureID == r.Id ).ToList();
 				r.ProductionProductModelProductDescriptionCultures.ToList().ForEach(b => { b.Loaded = false; b.ProductionCulture = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionCulture();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<string>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<string>(dataRow, "CultureID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -90,15 +98,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<string, ProductionCulture></param>
 		/// <param name="id">string</param>
-        public override IEntityReader<string, ProductionCulture> WithAllChildrenForId(string id)
+        public override IEntityReader<string, ProductionCulture> WithAllChildrenForExisting(ProductionCulture existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductModelProductDescriptionCultureReader(), id, IdColumn, SetChildrenProductionProductModelProductDescriptionCultures);
+						WithChildForParentValues(GetProductionProductModelProductDescriptionCultureReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CultureID",  }
+				, SetChildrenProductionProductModelProductDescriptionCultures);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionCulture entity)
         {
@@ -107,11 +116,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductModelProductDescriptionCultureReader(), entity.Id
-				, ProductionProductModelProductDescriptionCultureColumnNames.CultureID.ToString()
+						WithChildForParentValues(GetProductionProductModelProductDescriptionCultureReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CultureID",  }
 				, SetChildrenProductionProductModelProductDescriptionCultures);
 
-			QueryResultForChildrenOnly(new List<ProductionCulture>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionCulture>() { entity });
 			entity.Loaded = false;
 			GetProductionProductModelProductDescriptionCultureReader().SetAllChildrenForExisting(entity.ProductionProductModelProductDescriptionCultures);
 				
@@ -122,15 +133,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductModelProductDescriptionCultureReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductModelProductDescriptionCultureColumnNames.CultureID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionProductModelProductDescriptionCultureReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CultureID",  }
 				, SetChildrenProductionProductModelProductDescriptionCultures);
 
 					

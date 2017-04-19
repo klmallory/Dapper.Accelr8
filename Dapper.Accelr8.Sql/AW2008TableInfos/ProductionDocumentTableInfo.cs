@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionDocumentColumnNames
+	public enum ProductionDocumentFieldNames
 	{	
-		DocumentNode, 	
+		Id, 	
 		DocumentLevel, 	
 		Title, 	
 		Owner, 	
@@ -42,15 +42,42 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		humanresourcesemployee_p, 	}
 
 	public class ProductionDocumentTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionDocumentColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionDocumentFieldNames.Id, "DocumentNode" }, 
+						{ (int)ProductionDocumentFieldNames.DocumentLevel, "DocumentLevel" }, 
+						{ (int)ProductionDocumentFieldNames.Title, "Title" }, 
+						{ (int)ProductionDocumentFieldNames.Owner, "Owner" }, 
+						{ (int)ProductionDocumentFieldNames.FolderFlag, "FolderFlag" }, 
+						{ (int)ProductionDocumentFieldNames.FileName, "FileName" }, 
+						{ (int)ProductionDocumentFieldNames.FileExtension, "FileExtension" }, 
+						{ (int)ProductionDocumentFieldNames.Revision, "Revision" }, 
+						{ (int)ProductionDocumentFieldNames.ChangeNumber, "ChangeNumber" }, 
+						{ (int)ProductionDocumentFieldNames.Status, "Status" }, 
+						{ (int)ProductionDocumentFieldNames.DocumentSummary, "DocumentSummary" }, 
+						{ (int)ProductionDocumentFieldNames.Document, "Document" }, 
+						{ (int)ProductionDocumentFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionDocumentFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionDocumentIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionDocumentFieldNames.Id, "DocumentNode" }, 
+				};
+
 		public ProductionDocumentTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionDocumentColumnNames.DocumentNode.ToString();
-			//Schema = "Production.Document";
+			Schema = "Production";
 			TableName = "Production.Document";
 			TableAlias = "productiondocument";
-			ColumnNames = typeof(ProductionDocumentColumnNames).ToDataList<Type, int>();
+			Columns = ProductionDocumentColumnNames;
+			IdColumns = ProductionDocumentIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Document_Employee_Owner

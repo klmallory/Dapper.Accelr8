@@ -8,21 +8,64 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PurchasingPurchaseOrderDetail : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PurchasingPurchaseOrderDetail : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public PurchasingPurchaseOrderDetail()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_dueDate = (DateTime)SqlDateTime.MinValue;
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(PurchasingPurchaseOrderDetail dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.PurchaseOrderID,
+							dao.PurchaseOrderDetailID,
+						
+				}
+			};
+		}
+
+			
+			protected int _purchaseOrderID;
+		public int PurchaseOrderID 
+		{ 
+			get { return _purchaseOrderID; }
+			set 
+			{ 
+				_purchaseOrderID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _purchaseOrderDetailID;
+		public int PurchaseOrderDetailID 
+		{ 
+			get { return _purchaseOrderDetailID; }
+			set 
+			{ 
+				_purchaseOrderDetailID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected DateTime _dueDate;
 		public DateTime DueDate 

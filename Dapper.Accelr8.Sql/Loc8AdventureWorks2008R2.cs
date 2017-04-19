@@ -5,21 +5,21 @@ using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-
-using ArcIDPortal.DAO;
-using ArcIDPortal.Sql.Portal.TableInfos;
-using ArcIDPortal.Sql.Portal.Readers;
-using ArcIDPortal.Sql.Portal.Writers;
+using System.Configuration;
 using Dapper;
 using Dapper.Accelr8.Sql;
 using Dapper.Accelr8.Domain;
 using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Repo.Extensions;
 using Dapper.Accelr8.Repo.Parameters;
-using Dapper.Accelr8.Repo.Contracts.Readers;
-using Dapper.Accelr8.Repo.Contracts.Writers;
-using System.Configuration;
 using Dapper.Accelr8.Repo.Contracts;
+
+using Dapper.Accelr8.Sql.AW2008DAO;
+using Dapper.Accelr8.AW2008TableInfos;
+using Dapper.Accelr8.AW2008Readers;
+using Dapper.Accelr8.AW2008Writers;
+using Dapper.Accelr8.Repo.Dynamic;
+using System.Reflection;
 
 namespace Dapper.Accelr8.Sql
 {
@@ -34,40 +34,41 @@ namespace Dapper.Accelr8.Sql
         IDictionary<string, Func<IEntityReader>> _readers = new Dictionary<string, Func<IEntityReader>>();
         IDictionary<string, Func<IEntityWriter>> _writers= new Dictionary<string, Func<IEntityWriter>>();
         IDictionary<string, TableInfo> _tableInfos = new Dictionary<string, TableInfo>();
+        IDictionary<string, IDynamicMapper> _mappers = new Dictionary<string, IDynamicMapper>();
 
-		public IDictionary<Type, Type> ClassesToRegister { get; private set; }
+        public IDictionary<Type, Type> ClassesToRegister { get; private set; }
         public string ConnectionStringName { get; set; }
         public IDictionary<string, string> ConnectionStringContainer { get; set; }
 
-		public IUnitOfWork GetUnitOfWork(string type = null)
+		public IUnitOfWork GetUnitOfWork(LockType type = LockType.Safe)
 		{
 			return new UnitOfWork(type);
 		}
 
         public virtual IEntityReader<IdType, EntityType> GetReader<IdType, EntityType>()
             where EntityType : class, IHaveId<IdType>
-            where IdType : IComparable<IdType>, IEquatable<IdType>
+            where IdType : IComparable
         {
             return _readers[typeof(EntityType).Name].Invoke() as IEntityReader<IdType, EntityType>;
         }
 
         public virtual IEntityWriter<IdType, EntityType> GetWriter<IdType, EntityType>()
             where EntityType : class, IHaveId<IdType>
-            where IdType : IComparable<IdType>, IEquatable<IdType>
+            where IdType : IComparable
         {
             return _writers[typeof(EntityType).Name].Invoke() as IEntityWriter<IdType, EntityType>;
         }
 
         public virtual IEntityReader<IdType, EntityType> GetReader<IdType, EntityType>(string className)
             where EntityType : class, IHaveId<IdType>
-            where IdType : IComparable<IdType>, IEquatable<IdType>
+            where IdType : IComparable
         {
             return _readers[className].Invoke() as IEntityReader<IdType, EntityType>;
         }
 
         public virtual IEntityWriter<IdType, EntityType> GetWriter<IdType, EntityType>(string className)
             where EntityType : class, IHaveId<IdType>
-            where IdType : IComparable<IdType>, IEquatable<IdType>
+            where IdType : IComparable
         {
             return _writers[className].Invoke() as IEntityWriter<IdType, EntityType>;
         }
@@ -75,6 +76,16 @@ namespace Dapper.Accelr8.Sql
         public TableInfo GetTableInfo<IdType, EntityType>(string className)
         {
             return _tableInfos[className];
+        }
+
+        public IDynamicMapper<EntityType> GetMapper<EntityType>() where EntityType : class, IEntity
+        {
+            return _mappers[typeof(EntityType).Name] as IDynamicMapper<EntityType>;
+        }
+
+        public IDynamicMapper GetMapper(string className)
+        {
+            return _mappers[className] as IDynamicMapper;
         }
 
         protected Loc8AdventureWorks2008R2()
@@ -100,279 +111,279 @@ namespace Dapper.Accelr8.Sql
             _joinBuilder = new JoinBuilder();
             _queryBuilder = new QueryBuilder();
 
-			 ClassesToRegister.Add(typeof(IEntityReader<int, PersonAddress>), typeof(PersonAddressReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonAddress>), typeof(PersonAddressWriter));
-				ClassesToRegister.Add(typeof(PersonAddressTableInfo), typeof(PersonAddressTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonAddressType>), typeof(PersonAddressTypeReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonAddressType>), typeof(PersonAddressTypeWriter));
-				ClassesToRegister.Add(typeof(PersonAddressTypeTableInfo), typeof(PersonAddressTypeTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<byte, AWBuildVersion>), typeof(AWBuildVersionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<byte, AWBuildVersion>), typeof(AWBuildVersionWriter));
-				ClassesToRegister.Add(typeof(AWBuildVersionTableInfo), typeof(AWBuildVersionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionBillOfMaterial>), typeof(ProductionBillOfMaterialReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionBillOfMaterial>), typeof(ProductionBillOfMaterialWriter));
-				ClassesToRegister.Add(typeof(ProductionBillOfMaterialTableInfo), typeof(ProductionBillOfMaterialTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonBusinessEntity>), typeof(PersonBusinessEntityReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonBusinessEntity>), typeof(PersonBusinessEntityWriter));
-				ClassesToRegister.Add(typeof(PersonBusinessEntityTableInfo), typeof(PersonBusinessEntityTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonBusinessEntityAddress>), typeof(PersonBusinessEntityAddressReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonBusinessEntityAddress>), typeof(PersonBusinessEntityAddressWriter));
-				ClassesToRegister.Add(typeof(PersonBusinessEntityAddressTableInfo), typeof(PersonBusinessEntityAddressTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonBusinessEntityContact>), typeof(PersonBusinessEntityContactReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonBusinessEntityContact>), typeof(PersonBusinessEntityContactWriter));
-				ClassesToRegister.Add(typeof(PersonBusinessEntityContactTableInfo), typeof(PersonBusinessEntityContactTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonContactType>), typeof(PersonContactTypeReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonContactType>), typeof(PersonContactTypeWriter));
-				ClassesToRegister.Add(typeof(PersonContactTypeTableInfo), typeof(PersonContactTypeTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<string, PersonCountryRegion>), typeof(PersonCountryRegionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<string, PersonCountryRegion>), typeof(PersonCountryRegionWriter));
-				ClassesToRegister.Add(typeof(PersonCountryRegionTableInfo), typeof(PersonCountryRegionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<string, SalesCountryRegionCurrency>), typeof(SalesCountryRegionCurrencyReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<string, SalesCountryRegionCurrency>), typeof(SalesCountryRegionCurrencyWriter));
-				ClassesToRegister.Add(typeof(SalesCountryRegionCurrencyTableInfo), typeof(SalesCountryRegionCurrencyTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesCreditCard>), typeof(SalesCreditCardReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesCreditCard>), typeof(SalesCreditCardWriter));
-				ClassesToRegister.Add(typeof(SalesCreditCardTableInfo), typeof(SalesCreditCardTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<string, ProductionCulture>), typeof(ProductionCultureReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<string, ProductionCulture>), typeof(ProductionCultureWriter));
-				ClassesToRegister.Add(typeof(ProductionCultureTableInfo), typeof(ProductionCultureTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<string, SalesCurrency>), typeof(SalesCurrencyReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<string, SalesCurrency>), typeof(SalesCurrencyWriter));
-				ClassesToRegister.Add(typeof(SalesCurrencyTableInfo), typeof(SalesCurrencyTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesCurrencyRate>), typeof(SalesCurrencyRateReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesCurrencyRate>), typeof(SalesCurrencyRateWriter));
-				ClassesToRegister.Add(typeof(SalesCurrencyRateTableInfo), typeof(SalesCurrencyRateTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesCustomer>), typeof(SalesCustomerReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesCustomer>), typeof(SalesCustomerWriter));
-				ClassesToRegister.Add(typeof(SalesCustomerTableInfo), typeof(SalesCustomerTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, DatabaseLog>), typeof(DatabaseLogReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, DatabaseLog>), typeof(DatabaseLogWriter));
-				ClassesToRegister.Add(typeof(DatabaseLogTableInfo), typeof(DatabaseLogTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<short, HumanResourcesDepartment>), typeof(HumanResourcesDepartmentReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<short, HumanResourcesDepartment>), typeof(HumanResourcesDepartmentWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesDepartmentTableInfo), typeof(HumanResourcesDepartmentTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument>), typeof(ProductionDocumentReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument>), typeof(ProductionDocumentWriter));
-				ClassesToRegister.Add(typeof(ProductionDocumentTableInfo), typeof(ProductionDocumentTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonEmailAddress>), typeof(PersonEmailAddressReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonEmailAddress>), typeof(PersonEmailAddressWriter));
-				ClassesToRegister.Add(typeof(PersonEmailAddressTableInfo), typeof(PersonEmailAddressTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesEmployee>), typeof(HumanResourcesEmployeeReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesEmployee>), typeof(HumanResourcesEmployeeWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesEmployeeTableInfo), typeof(HumanResourcesEmployeeTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesEmployeeDepartmentHistory>), typeof(HumanResourcesEmployeeDepartmentHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesEmployeeDepartmentHistory>), typeof(HumanResourcesEmployeeDepartmentHistoryWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesEmployeeDepartmentHistoryTableInfo), typeof(HumanResourcesEmployeeDepartmentHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesEmployeePayHistory>), typeof(HumanResourcesEmployeePayHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesEmployeePayHistory>), typeof(HumanResourcesEmployeePayHistoryWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesEmployeePayHistoryTableInfo), typeof(HumanResourcesEmployeePayHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ErrorLog>), typeof(ErrorLogReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ErrorLog>), typeof(ErrorLogWriter));
-				ClassesToRegister.Add(typeof(ErrorLogTableInfo), typeof(ErrorLogTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionIllustration>), typeof(ProductionIllustrationReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionIllustration>), typeof(ProductionIllustrationWriter));
-				ClassesToRegister.Add(typeof(ProductionIllustrationTableInfo), typeof(ProductionIllustrationTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesJobCandidate>), typeof(HumanResourcesJobCandidateReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesJobCandidate>), typeof(HumanResourcesJobCandidateWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesJobCandidateTableInfo), typeof(HumanResourcesJobCandidateTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<short, ProductionLocation>), typeof(ProductionLocationReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<short, ProductionLocation>), typeof(ProductionLocationWriter));
-				ClassesToRegister.Add(typeof(ProductionLocationTableInfo), typeof(ProductionLocationTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonPassword>), typeof(PersonPasswordReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPassword>), typeof(PersonPasswordWriter));
-				ClassesToRegister.Add(typeof(PersonPasswordTableInfo), typeof(PersonPasswordTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonPerson>), typeof(PersonPersonReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPerson>), typeof(PersonPersonWriter));
-				ClassesToRegister.Add(typeof(PersonPersonTableInfo), typeof(PersonPersonTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesPersonCreditCard>), typeof(SalesPersonCreditCardReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesPersonCreditCard>), typeof(SalesPersonCreditCardWriter));
-				ClassesToRegister.Add(typeof(SalesPersonCreditCardTableInfo), typeof(SalesPersonCreditCardTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonPersonPhone>), typeof(PersonPersonPhoneReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPersonPhone>), typeof(PersonPersonPhoneWriter));
-				ClassesToRegister.Add(typeof(PersonPersonPhoneTableInfo), typeof(PersonPersonPhoneTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonPhoneNumberType>), typeof(PersonPhoneNumberTypeReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPhoneNumberType>), typeof(PersonPhoneNumberTypeWriter));
-				ClassesToRegister.Add(typeof(PersonPhoneNumberTypeTableInfo), typeof(PersonPhoneNumberTypeTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProduct>), typeof(ProductionProductReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProduct>), typeof(ProductionProductWriter));
-				ClassesToRegister.Add(typeof(ProductionProductTableInfo), typeof(ProductionProductTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductCategory>), typeof(ProductionProductCategoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductCategory>), typeof(ProductionProductCategoryWriter));
-				ClassesToRegister.Add(typeof(ProductionProductCategoryTableInfo), typeof(ProductionProductCategoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductCostHistory>), typeof(ProductionProductCostHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductCostHistory>), typeof(ProductionProductCostHistoryWriter));
-				ClassesToRegister.Add(typeof(ProductionProductCostHistoryTableInfo), typeof(ProductionProductCostHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductDescription>), typeof(ProductionProductDescriptionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductDescription>), typeof(ProductionProductDescriptionWriter));
-				ClassesToRegister.Add(typeof(ProductionProductDescriptionTableInfo), typeof(ProductionProductDescriptionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductDocument>), typeof(ProductionProductDocumentReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductDocument>), typeof(ProductionProductDocumentWriter));
-				ClassesToRegister.Add(typeof(ProductionProductDocumentTableInfo), typeof(ProductionProductDocumentTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductInventory>), typeof(ProductionProductInventoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductInventory>), typeof(ProductionProductInventoryWriter));
-				ClassesToRegister.Add(typeof(ProductionProductInventoryTableInfo), typeof(ProductionProductInventoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductListPriceHistory>), typeof(ProductionProductListPriceHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductListPriceHistory>), typeof(ProductionProductListPriceHistoryWriter));
-				ClassesToRegister.Add(typeof(ProductionProductListPriceHistoryTableInfo), typeof(ProductionProductListPriceHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductModel>), typeof(ProductionProductModelReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductModel>), typeof(ProductionProductModelWriter));
-				ClassesToRegister.Add(typeof(ProductionProductModelTableInfo), typeof(ProductionProductModelTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductModelIllustration>), typeof(ProductionProductModelIllustrationReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductModelIllustration>), typeof(ProductionProductModelIllustrationWriter));
-				ClassesToRegister.Add(typeof(ProductionProductModelIllustrationTableInfo), typeof(ProductionProductModelIllustrationTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductModelProductDescriptionCulture>), typeof(ProductionProductModelProductDescriptionCultureReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductModelProductDescriptionCulture>), typeof(ProductionProductModelProductDescriptionCultureWriter));
-				ClassesToRegister.Add(typeof(ProductionProductModelProductDescriptionCultureTableInfo), typeof(ProductionProductModelProductDescriptionCultureTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductPhoto>), typeof(ProductionProductPhotoReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductPhoto>), typeof(ProductionProductPhotoWriter));
-				ClassesToRegister.Add(typeof(ProductionProductPhotoTableInfo), typeof(ProductionProductPhotoTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductProductPhoto>), typeof(ProductionProductProductPhotoReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductProductPhoto>), typeof(ProductionProductProductPhotoWriter));
-				ClassesToRegister.Add(typeof(ProductionProductProductPhotoTableInfo), typeof(ProductionProductProductPhotoTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductReview>), typeof(ProductionProductReviewReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductReview>), typeof(ProductionProductReviewWriter));
-				ClassesToRegister.Add(typeof(ProductionProductReviewTableInfo), typeof(ProductionProductReviewTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductSubcategory>), typeof(ProductionProductSubcategoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductSubcategory>), typeof(ProductionProductSubcategoryWriter));
-				ClassesToRegister.Add(typeof(ProductionProductSubcategoryTableInfo), typeof(ProductionProductSubcategoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingProductVendor>), typeof(PurchasingProductVendorReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingProductVendor>), typeof(PurchasingProductVendorWriter));
-				ClassesToRegister.Add(typeof(PurchasingProductVendorTableInfo), typeof(PurchasingProductVendorTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingPurchaseOrderDetail>), typeof(PurchasingPurchaseOrderDetailReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingPurchaseOrderDetail>), typeof(PurchasingPurchaseOrderDetailWriter));
-				ClassesToRegister.Add(typeof(PurchasingPurchaseOrderDetailTableInfo), typeof(PurchasingPurchaseOrderDetailTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingPurchaseOrderHeader>), typeof(PurchasingPurchaseOrderHeaderReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingPurchaseOrderHeader>), typeof(PurchasingPurchaseOrderHeaderWriter));
-				ClassesToRegister.Add(typeof(PurchasingPurchaseOrderHeaderTableInfo), typeof(PurchasingPurchaseOrderHeaderTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesOrderDetail>), typeof(SalesSalesOrderDetailReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesOrderDetail>), typeof(SalesSalesOrderDetailWriter));
-				ClassesToRegister.Add(typeof(SalesSalesOrderDetailTableInfo), typeof(SalesSalesOrderDetailTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesOrderHeader>), typeof(SalesSalesOrderHeaderReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesOrderHeader>), typeof(SalesSalesOrderHeaderWriter));
-				ClassesToRegister.Add(typeof(SalesSalesOrderHeaderTableInfo), typeof(SalesSalesOrderHeaderTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesOrderHeaderSalesReason>), typeof(SalesSalesOrderHeaderSalesReasonReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesOrderHeaderSalesReason>), typeof(SalesSalesOrderHeaderSalesReasonWriter));
-				ClassesToRegister.Add(typeof(SalesSalesOrderHeaderSalesReasonTableInfo), typeof(SalesSalesOrderHeaderSalesReasonTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesPerson>), typeof(SalesSalesPersonReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesPerson>), typeof(SalesSalesPersonWriter));
-				ClassesToRegister.Add(typeof(SalesSalesPersonTableInfo), typeof(SalesSalesPersonTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesPersonQuotaHistory>), typeof(SalesSalesPersonQuotaHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesPersonQuotaHistory>), typeof(SalesSalesPersonQuotaHistoryWriter));
-				ClassesToRegister.Add(typeof(SalesSalesPersonQuotaHistoryTableInfo), typeof(SalesSalesPersonQuotaHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesReason>), typeof(SalesSalesReasonReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesReason>), typeof(SalesSalesReasonWriter));
-				ClassesToRegister.Add(typeof(SalesSalesReasonTableInfo), typeof(SalesSalesReasonTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesTaxRate>), typeof(SalesSalesTaxRateReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesTaxRate>), typeof(SalesSalesTaxRateWriter));
-				ClassesToRegister.Add(typeof(SalesSalesTaxRateTableInfo), typeof(SalesSalesTaxRateTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesTerritory>), typeof(SalesSalesTerritoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesTerritory>), typeof(SalesSalesTerritoryWriter));
-				ClassesToRegister.Add(typeof(SalesSalesTerritoryTableInfo), typeof(SalesSalesTerritoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesTerritoryHistory>), typeof(SalesSalesTerritoryHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesTerritoryHistory>), typeof(SalesSalesTerritoryHistoryWriter));
-				ClassesToRegister.Add(typeof(SalesSalesTerritoryHistoryTableInfo), typeof(SalesSalesTerritoryHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<short, ProductionScrapReason>), typeof(ProductionScrapReasonReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<short, ProductionScrapReason>), typeof(ProductionScrapReasonWriter));
-				ClassesToRegister.Add(typeof(ProductionScrapReasonTableInfo), typeof(ProductionScrapReasonTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<byte, HumanResourcesShift>), typeof(HumanResourcesShiftReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<byte, HumanResourcesShift>), typeof(HumanResourcesShiftWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesShiftTableInfo), typeof(HumanResourcesShiftTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingShipMethod>), typeof(PurchasingShipMethodReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingShipMethod>), typeof(PurchasingShipMethodWriter));
-				ClassesToRegister.Add(typeof(PurchasingShipMethodTableInfo), typeof(PurchasingShipMethodTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesShoppingCartItem>), typeof(SalesShoppingCartItemReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesShoppingCartItem>), typeof(SalesShoppingCartItemWriter));
-				ClassesToRegister.Add(typeof(SalesShoppingCartItemTableInfo), typeof(SalesShoppingCartItemTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSpecialOffer>), typeof(SalesSpecialOfferReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSpecialOffer>), typeof(SalesSpecialOfferWriter));
-				ClassesToRegister.Add(typeof(SalesSpecialOfferTableInfo), typeof(SalesSpecialOfferTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesSpecialOfferProduct>), typeof(SalesSpecialOfferProductReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSpecialOfferProduct>), typeof(SalesSpecialOfferProductWriter));
-				ClassesToRegister.Add(typeof(SalesSpecialOfferProductTableInfo), typeof(SalesSpecialOfferProductTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonStateProvince>), typeof(PersonStateProvinceReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonStateProvince>), typeof(PersonStateProvinceWriter));
-				ClassesToRegister.Add(typeof(PersonStateProvinceTableInfo), typeof(PersonStateProvinceTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesStore>), typeof(SalesStoreReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesStore>), typeof(SalesStoreWriter));
-				ClassesToRegister.Add(typeof(SalesStoreTableInfo), typeof(SalesStoreTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionTransactionHistory>), typeof(ProductionTransactionHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionTransactionHistory>), typeof(ProductionTransactionHistoryWriter));
-				ClassesToRegister.Add(typeof(ProductionTransactionHistoryTableInfo), typeof(ProductionTransactionHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionTransactionHistoryArchive>), typeof(ProductionTransactionHistoryArchiveReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionTransactionHistoryArchive>), typeof(ProductionTransactionHistoryArchiveWriter));
-				ClassesToRegister.Add(typeof(ProductionTransactionHistoryArchiveTableInfo), typeof(ProductionTransactionHistoryArchiveTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<string, ProductionUnitMeasure>), typeof(ProductionUnitMeasureReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<string, ProductionUnitMeasure>), typeof(ProductionUnitMeasureWriter));
-				ClassesToRegister.Add(typeof(ProductionUnitMeasureTableInfo), typeof(ProductionUnitMeasureTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonvAdditionalContactInfo>), typeof(PersonvAdditionalContactInfoReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonvAdditionalContactInfo>), typeof(PersonvAdditionalContactInfoWriter));
-				ClassesToRegister.Add(typeof(PersonvAdditionalContactInfoTableInfo), typeof(PersonvAdditionalContactInfoTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvEmployee>), typeof(HumanResourcesvEmployeeReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesvEmployee>), typeof(HumanResourcesvEmployeeWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesvEmployeeTableInfo), typeof(HumanResourcesvEmployeeTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvEmployeeDepartment>), typeof(HumanResourcesvEmployeeDepartmentReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesvEmployeeDepartment>), typeof(HumanResourcesvEmployeeDepartmentWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesvEmployeeDepartmentTableInfo), typeof(HumanResourcesvEmployeeDepartmentTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvEmployeeDepartmentHistory>), typeof(HumanResourcesvEmployeeDepartmentHistoryReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesvEmployeeDepartmentHistory>), typeof(HumanResourcesvEmployeeDepartmentHistoryWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesvEmployeeDepartmentHistoryTableInfo), typeof(HumanResourcesvEmployeeDepartmentHistoryTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingVendor>), typeof(PurchasingVendorReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingVendor>), typeof(PurchasingVendorWriter));
-				ClassesToRegister.Add(typeof(PurchasingVendorTableInfo), typeof(PurchasingVendorTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvIndividualCustomer>), typeof(SalesvIndividualCustomerReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvIndividualCustomer>), typeof(SalesvIndividualCustomerWriter));
-				ClassesToRegister.Add(typeof(SalesvIndividualCustomerTableInfo), typeof(SalesvIndividualCustomerTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvJobCandidate>), typeof(HumanResourcesvJobCandidateReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesvJobCandidate>), typeof(HumanResourcesvJobCandidateWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesvJobCandidateTableInfo), typeof(HumanResourcesvJobCandidateTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvJobCandidateEducation>), typeof(HumanResourcesvJobCandidateEducationReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesvJobCandidateEducation>), typeof(HumanResourcesvJobCandidateEducationWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesvJobCandidateEducationTableInfo), typeof(HumanResourcesvJobCandidateEducationTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvJobCandidateEmployment>), typeof(HumanResourcesvJobCandidateEmploymentReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesvJobCandidateEmployment>), typeof(HumanResourcesvJobCandidateEmploymentWriter));
-				ClassesToRegister.Add(typeof(HumanResourcesvJobCandidateEmploymentTableInfo), typeof(HumanResourcesvJobCandidateEmploymentTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvPersonDemographic>), typeof(SalesvPersonDemographicReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvPersonDemographic>), typeof(SalesvPersonDemographicWriter));
-				ClassesToRegister.Add(typeof(SalesvPersonDemographicTableInfo), typeof(SalesvPersonDemographicTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionvProductAndDescription>), typeof(ProductionvProductAndDescriptionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionvProductAndDescription>), typeof(ProductionvProductAndDescriptionWriter));
-				ClassesToRegister.Add(typeof(ProductionvProductAndDescriptionTableInfo), typeof(ProductionvProductAndDescriptionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionvProductModelCatalogDescription>), typeof(ProductionvProductModelCatalogDescriptionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionvProductModelCatalogDescription>), typeof(ProductionvProductModelCatalogDescriptionWriter));
-				ClassesToRegister.Add(typeof(ProductionvProductModelCatalogDescriptionTableInfo), typeof(ProductionvProductModelCatalogDescriptionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionvProductModelInstruction>), typeof(ProductionvProductModelInstructionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionvProductModelInstruction>), typeof(ProductionvProductModelInstructionWriter));
-				ClassesToRegister.Add(typeof(ProductionvProductModelInstructionTableInfo), typeof(ProductionvProductModelInstructionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvSalesPerson>), typeof(SalesvSalesPersonReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvSalesPerson>), typeof(SalesvSalesPersonWriter));
-				ClassesToRegister.Add(typeof(SalesvSalesPersonTableInfo), typeof(SalesvSalesPersonTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvSalesPersonSalesByFiscalYear>), typeof(SalesvSalesPersonSalesByFiscalYearReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvSalesPersonSalesByFiscalYear>), typeof(SalesvSalesPersonSalesByFiscalYearWriter));
-				ClassesToRegister.Add(typeof(SalesvSalesPersonSalesByFiscalYearTableInfo), typeof(SalesvSalesPersonSalesByFiscalYearTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PersonvStateProvinceCountryRegion>), typeof(PersonvStateProvinceCountryRegionReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PersonvStateProvinceCountryRegion>), typeof(PersonvStateProvinceCountryRegionWriter));
-				ClassesToRegister.Add(typeof(PersonvStateProvinceCountryRegionTableInfo), typeof(PersonvStateProvinceCountryRegionTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvStoreWithAddress>), typeof(SalesvStoreWithAddressReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvStoreWithAddress>), typeof(SalesvStoreWithAddressWriter));
-				ClassesToRegister.Add(typeof(SalesvStoreWithAddressTableInfo), typeof(SalesvStoreWithAddressTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvStoreWithContact>), typeof(SalesvStoreWithContactReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvStoreWithContact>), typeof(SalesvStoreWithContactWriter));
-				ClassesToRegister.Add(typeof(SalesvStoreWithContactTableInfo), typeof(SalesvStoreWithContactTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, SalesvStoreWithDemographic>), typeof(SalesvStoreWithDemographicReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, SalesvStoreWithDemographic>), typeof(SalesvStoreWithDemographicWriter));
-				ClassesToRegister.Add(typeof(SalesvStoreWithDemographicTableInfo), typeof(SalesvStoreWithDemographicTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingvVendorWithAddress>), typeof(PurchasingvVendorWithAddressReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingvVendorWithAddress>), typeof(PurchasingvVendorWithAddressWriter));
-				ClassesToRegister.Add(typeof(PurchasingvVendorWithAddressTableInfo), typeof(PurchasingvVendorWithAddressTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingvVendorWithContact>), typeof(PurchasingvVendorWithContactReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingvVendorWithContact>), typeof(PurchasingvVendorWithContactWriter));
-				ClassesToRegister.Add(typeof(PurchasingvVendorWithContactTableInfo), typeof(PurchasingvVendorWithContactTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionWorkOrder>), typeof(ProductionWorkOrderReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionWorkOrder>), typeof(ProductionWorkOrderWriter));
-				ClassesToRegister.Add(typeof(ProductionWorkOrderTableInfo), typeof(ProductionWorkOrderTableInfo));
-				 ClassesToRegister.Add(typeof(IEntityReader<int, ProductionWorkOrderRouting>), typeof(ProductionWorkOrderRoutingReader));
-				ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionWorkOrderRouting>), typeof(ProductionWorkOrderRoutingWriter));
-				ClassesToRegister.Add(typeof(ProductionWorkOrderRoutingTableInfo), typeof(ProductionWorkOrderRoutingTableInfo));
+			ClassesToRegister.Add(typeof(IEntityReader<int, PersonAddress>), typeof(PersonAddressReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonAddress>), typeof(PersonAddressWriter)); 
+			ClassesToRegister.Add(typeof(PersonAddressTableInfo), typeof(PersonAddressTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonAddressType>), typeof(PersonAddressTypeReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonAddressType>), typeof(PersonAddressTypeWriter)); 
+			ClassesToRegister.Add(typeof(PersonAddressTypeTableInfo), typeof(PersonAddressTypeTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<byte, AWBuildVersion>), typeof(AWBuildVersionReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<byte, AWBuildVersion>), typeof(AWBuildVersionWriter)); 
+			ClassesToRegister.Add(typeof(AWBuildVersionTableInfo), typeof(AWBuildVersionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionBillOfMaterial>), typeof(ProductionBillOfMaterialReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionBillOfMaterial>), typeof(ProductionBillOfMaterialWriter)); 
+			ClassesToRegister.Add(typeof(ProductionBillOfMaterialTableInfo), typeof(ProductionBillOfMaterialTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonBusinessEntity>), typeof(PersonBusinessEntityReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonBusinessEntity>), typeof(PersonBusinessEntityWriter)); 
+			ClassesToRegister.Add(typeof(PersonBusinessEntityTableInfo), typeof(PersonBusinessEntityTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonBusinessEntityAddress>), typeof(PersonBusinessEntityAddressReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonBusinessEntityAddress>), typeof(PersonBusinessEntityAddressWriter)); 
+			ClassesToRegister.Add(typeof(PersonBusinessEntityAddressTableInfo), typeof(PersonBusinessEntityAddressTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonBusinessEntityContact>), typeof(PersonBusinessEntityContactReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonBusinessEntityContact>), typeof(PersonBusinessEntityContactWriter)); 
+			ClassesToRegister.Add(typeof(PersonBusinessEntityContactTableInfo), typeof(PersonBusinessEntityContactTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonContactType>), typeof(PersonContactTypeReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonContactType>), typeof(PersonContactTypeWriter)); 
+			ClassesToRegister.Add(typeof(PersonContactTypeTableInfo), typeof(PersonContactTypeTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<string, PersonCountryRegion>), typeof(PersonCountryRegionReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<string, PersonCountryRegion>), typeof(PersonCountryRegionWriter)); 
+			ClassesToRegister.Add(typeof(PersonCountryRegionTableInfo), typeof(PersonCountryRegionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<string, SalesCountryRegionCurrency>), typeof(SalesCountryRegionCurrencyReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<string, SalesCountryRegionCurrency>), typeof(SalesCountryRegionCurrencyWriter)); 
+			ClassesToRegister.Add(typeof(SalesCountryRegionCurrencyTableInfo), typeof(SalesCountryRegionCurrencyTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesCreditCard>), typeof(SalesCreditCardReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesCreditCard>), typeof(SalesCreditCardWriter)); 
+			ClassesToRegister.Add(typeof(SalesCreditCardTableInfo), typeof(SalesCreditCardTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<string, ProductionCulture>), typeof(ProductionCultureReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<string, ProductionCulture>), typeof(ProductionCultureWriter)); 
+			ClassesToRegister.Add(typeof(ProductionCultureTableInfo), typeof(ProductionCultureTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<string, SalesCurrency>), typeof(SalesCurrencyReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<string, SalesCurrency>), typeof(SalesCurrencyWriter)); 
+			ClassesToRegister.Add(typeof(SalesCurrencyTableInfo), typeof(SalesCurrencyTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesCurrencyRate>), typeof(SalesCurrencyRateReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesCurrencyRate>), typeof(SalesCurrencyRateWriter)); 
+			ClassesToRegister.Add(typeof(SalesCurrencyRateTableInfo), typeof(SalesCurrencyRateTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesCustomer>), typeof(SalesCustomerReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesCustomer>), typeof(SalesCustomerWriter)); 
+			ClassesToRegister.Add(typeof(SalesCustomerTableInfo), typeof(SalesCustomerTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, DatabaseLog>), typeof(DatabaseLogReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, DatabaseLog>), typeof(DatabaseLogWriter)); 
+			ClassesToRegister.Add(typeof(DatabaseLogTableInfo), typeof(DatabaseLogTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<short, HumanResourcesDepartment>), typeof(HumanResourcesDepartmentReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<short, HumanResourcesDepartment>), typeof(HumanResourcesDepartmentWriter)); 
+			ClassesToRegister.Add(typeof(HumanResourcesDepartmentTableInfo), typeof(HumanResourcesDepartmentTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument>), typeof(ProductionDocumentReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<Microsoft.SqlServer.Types.SqlHierarchyId, ProductionDocument>), typeof(ProductionDocumentWriter)); 
+			ClassesToRegister.Add(typeof(ProductionDocumentTableInfo), typeof(ProductionDocumentTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonEmailAddress>), typeof(PersonEmailAddressReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonEmailAddress>), typeof(PersonEmailAddressWriter)); 
+			ClassesToRegister.Add(typeof(PersonEmailAddressTableInfo), typeof(PersonEmailAddressTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesEmployee>), typeof(HumanResourcesEmployeeReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesEmployee>), typeof(HumanResourcesEmployeeWriter)); 
+			ClassesToRegister.Add(typeof(HumanResourcesEmployeeTableInfo), typeof(HumanResourcesEmployeeTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesEmployeeDepartmentHistory>), typeof(HumanResourcesEmployeeDepartmentHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesEmployeeDepartmentHistory>), typeof(HumanResourcesEmployeeDepartmentHistoryWriter)); 
+			ClassesToRegister.Add(typeof(HumanResourcesEmployeeDepartmentHistoryTableInfo), typeof(HumanResourcesEmployeeDepartmentHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesEmployeePayHistory>), typeof(HumanResourcesEmployeePayHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesEmployeePayHistory>), typeof(HumanResourcesEmployeePayHistoryWriter)); 
+			ClassesToRegister.Add(typeof(HumanResourcesEmployeePayHistoryTableInfo), typeof(HumanResourcesEmployeePayHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ErrorLog>), typeof(ErrorLogReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ErrorLog>), typeof(ErrorLogWriter)); 
+			ClassesToRegister.Add(typeof(ErrorLogTableInfo), typeof(ErrorLogTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionIllustration>), typeof(ProductionIllustrationReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionIllustration>), typeof(ProductionIllustrationWriter)); 
+			ClassesToRegister.Add(typeof(ProductionIllustrationTableInfo), typeof(ProductionIllustrationTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesJobCandidate>), typeof(HumanResourcesJobCandidateReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, HumanResourcesJobCandidate>), typeof(HumanResourcesJobCandidateWriter)); 
+			ClassesToRegister.Add(typeof(HumanResourcesJobCandidateTableInfo), typeof(HumanResourcesJobCandidateTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<short, ProductionLocation>), typeof(ProductionLocationReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<short, ProductionLocation>), typeof(ProductionLocationWriter)); 
+			ClassesToRegister.Add(typeof(ProductionLocationTableInfo), typeof(ProductionLocationTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonPassword>), typeof(PersonPasswordReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPassword>), typeof(PersonPasswordWriter)); 
+			ClassesToRegister.Add(typeof(PersonPasswordTableInfo), typeof(PersonPasswordTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonPerson>), typeof(PersonPersonReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPerson>), typeof(PersonPersonWriter)); 
+			ClassesToRegister.Add(typeof(PersonPersonTableInfo), typeof(PersonPersonTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesPersonCreditCard>), typeof(SalesPersonCreditCardReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesPersonCreditCard>), typeof(SalesPersonCreditCardWriter)); 
+			ClassesToRegister.Add(typeof(SalesPersonCreditCardTableInfo), typeof(SalesPersonCreditCardTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonPersonPhone>), typeof(PersonPersonPhoneReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPersonPhone>), typeof(PersonPersonPhoneWriter)); 
+			ClassesToRegister.Add(typeof(PersonPersonPhoneTableInfo), typeof(PersonPersonPhoneTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonPhoneNumberType>), typeof(PersonPhoneNumberTypeReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonPhoneNumberType>), typeof(PersonPhoneNumberTypeWriter)); 
+			ClassesToRegister.Add(typeof(PersonPhoneNumberTypeTableInfo), typeof(PersonPhoneNumberTypeTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProduct>), typeof(ProductionProductReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProduct>), typeof(ProductionProductWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductTableInfo), typeof(ProductionProductTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductCategory>), typeof(ProductionProductCategoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductCategory>), typeof(ProductionProductCategoryWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductCategoryTableInfo), typeof(ProductionProductCategoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductCostHistory>), typeof(ProductionProductCostHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductCostHistory>), typeof(ProductionProductCostHistoryWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductCostHistoryTableInfo), typeof(ProductionProductCostHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductDescription>), typeof(ProductionProductDescriptionReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductDescription>), typeof(ProductionProductDescriptionWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductDescriptionTableInfo), typeof(ProductionProductDescriptionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductDocument>), typeof(ProductionProductDocumentReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductDocument>), typeof(ProductionProductDocumentWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductDocumentTableInfo), typeof(ProductionProductDocumentTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductInventory>), typeof(ProductionProductInventoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductInventory>), typeof(ProductionProductInventoryWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductInventoryTableInfo), typeof(ProductionProductInventoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductListPriceHistory>), typeof(ProductionProductListPriceHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductListPriceHistory>), typeof(ProductionProductListPriceHistoryWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductListPriceHistoryTableInfo), typeof(ProductionProductListPriceHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductModel>), typeof(ProductionProductModelReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductModel>), typeof(ProductionProductModelWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductModelTableInfo), typeof(ProductionProductModelTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductModelIllustration>), typeof(ProductionProductModelIllustrationReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductModelIllustration>), typeof(ProductionProductModelIllustrationWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductModelIllustrationTableInfo), typeof(ProductionProductModelIllustrationTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductModelProductDescriptionCulture>), typeof(ProductionProductModelProductDescriptionCultureReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductModelProductDescriptionCulture>), typeof(ProductionProductModelProductDescriptionCultureWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductModelProductDescriptionCultureTableInfo), typeof(ProductionProductModelProductDescriptionCultureTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductPhoto>), typeof(ProductionProductPhotoReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductPhoto>), typeof(ProductionProductPhotoWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductPhotoTableInfo), typeof(ProductionProductPhotoTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductProductPhoto>), typeof(ProductionProductProductPhotoReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductProductPhoto>), typeof(ProductionProductProductPhotoWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductProductPhotoTableInfo), typeof(ProductionProductProductPhotoTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductReview>), typeof(ProductionProductReviewReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductReview>), typeof(ProductionProductReviewWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductReviewTableInfo), typeof(ProductionProductReviewTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionProductSubcategory>), typeof(ProductionProductSubcategoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionProductSubcategory>), typeof(ProductionProductSubcategoryWriter)); 
+			ClassesToRegister.Add(typeof(ProductionProductSubcategoryTableInfo), typeof(ProductionProductSubcategoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingProductVendor>), typeof(PurchasingProductVendorReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingProductVendor>), typeof(PurchasingProductVendorWriter)); 
+			ClassesToRegister.Add(typeof(PurchasingProductVendorTableInfo), typeof(PurchasingProductVendorTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingPurchaseOrderDetail>), typeof(PurchasingPurchaseOrderDetailReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingPurchaseOrderDetail>), typeof(PurchasingPurchaseOrderDetailWriter)); 
+			ClassesToRegister.Add(typeof(PurchasingPurchaseOrderDetailTableInfo), typeof(PurchasingPurchaseOrderDetailTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingPurchaseOrderHeader>), typeof(PurchasingPurchaseOrderHeaderReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingPurchaseOrderHeader>), typeof(PurchasingPurchaseOrderHeaderWriter)); 
+			ClassesToRegister.Add(typeof(PurchasingPurchaseOrderHeaderTableInfo), typeof(PurchasingPurchaseOrderHeaderTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesOrderDetail>), typeof(SalesSalesOrderDetailReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesOrderDetail>), typeof(SalesSalesOrderDetailWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesOrderDetailTableInfo), typeof(SalesSalesOrderDetailTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesOrderHeader>), typeof(SalesSalesOrderHeaderReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesOrderHeader>), typeof(SalesSalesOrderHeaderWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesOrderHeaderTableInfo), typeof(SalesSalesOrderHeaderTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesOrderHeaderSalesReason>), typeof(SalesSalesOrderHeaderSalesReasonReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesOrderHeaderSalesReason>), typeof(SalesSalesOrderHeaderSalesReasonWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesOrderHeaderSalesReasonTableInfo), typeof(SalesSalesOrderHeaderSalesReasonTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesPerson>), typeof(SalesSalesPersonReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesPerson>), typeof(SalesSalesPersonWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesPersonTableInfo), typeof(SalesSalesPersonTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesPersonQuotaHistory>), typeof(SalesSalesPersonQuotaHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesPersonQuotaHistory>), typeof(SalesSalesPersonQuotaHistoryWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesPersonQuotaHistoryTableInfo), typeof(SalesSalesPersonQuotaHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesReason>), typeof(SalesSalesReasonReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesReason>), typeof(SalesSalesReasonWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesReasonTableInfo), typeof(SalesSalesReasonTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesTaxRate>), typeof(SalesSalesTaxRateReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesTaxRate>), typeof(SalesSalesTaxRateWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesTaxRateTableInfo), typeof(SalesSalesTaxRateTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesTerritory>), typeof(SalesSalesTerritoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesTerritory>), typeof(SalesSalesTerritoryWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesTerritoryTableInfo), typeof(SalesSalesTerritoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSalesTerritoryHistory>), typeof(SalesSalesTerritoryHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSalesTerritoryHistory>), typeof(SalesSalesTerritoryHistoryWriter)); 
+			ClassesToRegister.Add(typeof(SalesSalesTerritoryHistoryTableInfo), typeof(SalesSalesTerritoryHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<short, ProductionScrapReason>), typeof(ProductionScrapReasonReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<short, ProductionScrapReason>), typeof(ProductionScrapReasonWriter)); 
+			ClassesToRegister.Add(typeof(ProductionScrapReasonTableInfo), typeof(ProductionScrapReasonTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<byte, HumanResourcesShift>), typeof(HumanResourcesShiftReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<byte, HumanResourcesShift>), typeof(HumanResourcesShiftWriter)); 
+			ClassesToRegister.Add(typeof(HumanResourcesShiftTableInfo), typeof(HumanResourcesShiftTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingShipMethod>), typeof(PurchasingShipMethodReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingShipMethod>), typeof(PurchasingShipMethodWriter)); 
+			ClassesToRegister.Add(typeof(PurchasingShipMethodTableInfo), typeof(PurchasingShipMethodTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesShoppingCartItem>), typeof(SalesShoppingCartItemReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesShoppingCartItem>), typeof(SalesShoppingCartItemWriter)); 
+			ClassesToRegister.Add(typeof(SalesShoppingCartItemTableInfo), typeof(SalesShoppingCartItemTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSpecialOffer>), typeof(SalesSpecialOfferReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSpecialOffer>), typeof(SalesSpecialOfferWriter)); 
+			ClassesToRegister.Add(typeof(SalesSpecialOfferTableInfo), typeof(SalesSpecialOfferTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesSpecialOfferProduct>), typeof(SalesSpecialOfferProductReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesSpecialOfferProduct>), typeof(SalesSpecialOfferProductWriter)); 
+			ClassesToRegister.Add(typeof(SalesSpecialOfferProductTableInfo), typeof(SalesSpecialOfferProductTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonStateProvince>), typeof(PersonStateProvinceReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PersonStateProvince>), typeof(PersonStateProvinceWriter)); 
+			ClassesToRegister.Add(typeof(PersonStateProvinceTableInfo), typeof(PersonStateProvinceTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesStore>), typeof(SalesStoreReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, SalesStore>), typeof(SalesStoreWriter)); 
+			ClassesToRegister.Add(typeof(SalesStoreTableInfo), typeof(SalesStoreTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionTransactionHistory>), typeof(ProductionTransactionHistoryReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionTransactionHistory>), typeof(ProductionTransactionHistoryWriter)); 
+			ClassesToRegister.Add(typeof(ProductionTransactionHistoryTableInfo), typeof(ProductionTransactionHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionTransactionHistoryArchive>), typeof(ProductionTransactionHistoryArchiveReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionTransactionHistoryArchive>), typeof(ProductionTransactionHistoryArchiveWriter)); 
+			ClassesToRegister.Add(typeof(ProductionTransactionHistoryArchiveTableInfo), typeof(ProductionTransactionHistoryArchiveTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<string, ProductionUnitMeasure>), typeof(ProductionUnitMeasureReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<string, ProductionUnitMeasure>), typeof(ProductionUnitMeasureWriter)); 
+			ClassesToRegister.Add(typeof(ProductionUnitMeasureTableInfo), typeof(ProductionUnitMeasureTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonvAdditionalContactInfo>), typeof(PersonvAdditionalContactInfoReader));
+
+			ClassesToRegister.Add(typeof(PersonvAdditionalContactInfoTableInfo), typeof(PersonvAdditionalContactInfoTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvEmployee>), typeof(HumanResourcesvEmployeeReader));
+
+			ClassesToRegister.Add(typeof(HumanResourcesvEmployeeTableInfo), typeof(HumanResourcesvEmployeeTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvEmployeeDepartment>), typeof(HumanResourcesvEmployeeDepartmentReader));
+
+			ClassesToRegister.Add(typeof(HumanResourcesvEmployeeDepartmentTableInfo), typeof(HumanResourcesvEmployeeDepartmentTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvEmployeeDepartmentHistory>), typeof(HumanResourcesvEmployeeDepartmentHistoryReader));
+
+			ClassesToRegister.Add(typeof(HumanResourcesvEmployeeDepartmentHistoryTableInfo), typeof(HumanResourcesvEmployeeDepartmentHistoryTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingVendor>), typeof(PurchasingVendorReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, PurchasingVendor>), typeof(PurchasingVendorWriter)); 
+			ClassesToRegister.Add(typeof(PurchasingVendorTableInfo), typeof(PurchasingVendorTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvIndividualCustomer>), typeof(SalesvIndividualCustomerReader));
+
+			ClassesToRegister.Add(typeof(SalesvIndividualCustomerTableInfo), typeof(SalesvIndividualCustomerTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvJobCandidate>), typeof(HumanResourcesvJobCandidateReader));
+
+			ClassesToRegister.Add(typeof(HumanResourcesvJobCandidateTableInfo), typeof(HumanResourcesvJobCandidateTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvJobCandidateEducation>), typeof(HumanResourcesvJobCandidateEducationReader));
+
+			ClassesToRegister.Add(typeof(HumanResourcesvJobCandidateEducationTableInfo), typeof(HumanResourcesvJobCandidateEducationTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, HumanResourcesvJobCandidateEmployment>), typeof(HumanResourcesvJobCandidateEmploymentReader));
+
+			ClassesToRegister.Add(typeof(HumanResourcesvJobCandidateEmploymentTableInfo), typeof(HumanResourcesvJobCandidateEmploymentTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvPersonDemographic>), typeof(SalesvPersonDemographicReader));
+
+			ClassesToRegister.Add(typeof(SalesvPersonDemographicTableInfo), typeof(SalesvPersonDemographicTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionvProductAndDescription>), typeof(ProductionvProductAndDescriptionReader));
+
+			ClassesToRegister.Add(typeof(ProductionvProductAndDescriptionTableInfo), typeof(ProductionvProductAndDescriptionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionvProductModelCatalogDescription>), typeof(ProductionvProductModelCatalogDescriptionReader));
+
+			ClassesToRegister.Add(typeof(ProductionvProductModelCatalogDescriptionTableInfo), typeof(ProductionvProductModelCatalogDescriptionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionvProductModelInstruction>), typeof(ProductionvProductModelInstructionReader));
+
+			ClassesToRegister.Add(typeof(ProductionvProductModelInstructionTableInfo), typeof(ProductionvProductModelInstructionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvSalesPerson>), typeof(SalesvSalesPersonReader));
+
+			ClassesToRegister.Add(typeof(SalesvSalesPersonTableInfo), typeof(SalesvSalesPersonTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvSalesPersonSalesByFiscalYear>), typeof(SalesvSalesPersonSalesByFiscalYearReader));
+
+			ClassesToRegister.Add(typeof(SalesvSalesPersonSalesByFiscalYearTableInfo), typeof(SalesvSalesPersonSalesByFiscalYearTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PersonvStateProvinceCountryRegion>), typeof(PersonvStateProvinceCountryRegionReader));
+
+			ClassesToRegister.Add(typeof(PersonvStateProvinceCountryRegionTableInfo), typeof(PersonvStateProvinceCountryRegionTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvStoreWithAddress>), typeof(SalesvStoreWithAddressReader));
+
+			ClassesToRegister.Add(typeof(SalesvStoreWithAddressTableInfo), typeof(SalesvStoreWithAddressTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvStoreWithContact>), typeof(SalesvStoreWithContactReader));
+
+			ClassesToRegister.Add(typeof(SalesvStoreWithContactTableInfo), typeof(SalesvStoreWithContactTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, SalesvStoreWithDemographic>), typeof(SalesvStoreWithDemographicReader));
+
+			ClassesToRegister.Add(typeof(SalesvStoreWithDemographicTableInfo), typeof(SalesvStoreWithDemographicTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingvVendorWithAddress>), typeof(PurchasingvVendorWithAddressReader));
+
+			ClassesToRegister.Add(typeof(PurchasingvVendorWithAddressTableInfo), typeof(PurchasingvVendorWithAddressTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, PurchasingvVendorWithContact>), typeof(PurchasingvVendorWithContactReader));
+
+			ClassesToRegister.Add(typeof(PurchasingvVendorWithContactTableInfo), typeof(PurchasingvVendorWithContactTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionWorkOrder>), typeof(ProductionWorkOrderReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionWorkOrder>), typeof(ProductionWorkOrderWriter)); 
+			ClassesToRegister.Add(typeof(ProductionWorkOrderTableInfo), typeof(ProductionWorkOrderTableInfo));
+				ClassesToRegister.Add(typeof(IEntityReader<int, ProductionWorkOrderRouting>), typeof(ProductionWorkOrderRoutingReader));
+			ClassesToRegister.Add(typeof(IEntityWriter<int, ProductionWorkOrderRouting>), typeof(ProductionWorkOrderRoutingWriter)); 
+			ClassesToRegister.Add(typeof(ProductionWorkOrderRoutingTableInfo), typeof(ProductionWorkOrderRoutingTableInfo));
 				
 			 _readers.Add("PersonAddress", new Func<IEntityReader>(() => new PersonAddressReader
 				(

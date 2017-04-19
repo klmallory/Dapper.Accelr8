@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , HumanResourcesEmployeeDepartmentHistory> _humanResourcesEmployeeDepartmentHistoryReader;
-		protected static IEntityReader<int , HumanResourcesEmployeeDepartmentHistory> GetHumanResourcesEmployeeDepartmentHistoryReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , HumanResourcesEmployeeDepartmentHistory> GetHumanResourcesEmployeeDepartmentHistoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , HumanResourcesEmployeeDepartmentHistory>>();
+			return s_loc8r.GetReader<CompoundKey , HumanResourcesEmployeeDepartmentHistory>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenHumanResourcesEmployeeDepartmentHistories(IList<HumanResourcesShift> results, IList<object> children)
 		{
-			//Child Id Type: byte
+			//Child Id Type: CompoundKey
 			//Child Type: HumanResourcesEmployeeDepartmentHistory
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.HumanResourcesEmployeeDepartmentHistories = typedChildren.Where(b => b.HumanResourcesEmployeeDepartmentHistory == r.Id).ToList();
+				
+
+				r.HumanResourcesEmployeeDepartmentHistories = typedChildren.Where(b =>  b.ShiftID == r.Id ).ToList();
 				r.HumanResourcesEmployeeDepartmentHistories.ToList().ForEach(b => { b.Loaded = false; b.HumanResourcesShift = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new HumanResourcesShift();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<byte>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<byte>(dataRow, "ShiftID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.StartTime = GetRowData<TimeSpan>(dataRow, "StartTime"); 
       		domain.EndTime = GetRowData<TimeSpan>(dataRow, "EndTime"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
@@ -92,15 +100,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<byte, HumanResourcesShift></param>
 		/// <param name="id">byte</param>
-        public override IEntityReader<byte, HumanResourcesShift> WithAllChildrenForId(byte id)
+        public override IEntityReader<byte, HumanResourcesShift> WithAllChildrenForExisting(HumanResourcesShift existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetHumanResourcesEmployeeDepartmentHistoryReader(), id, IdColumn, SetChildrenHumanResourcesEmployeeDepartmentHistories);
+						WithChildForParentValues(GetHumanResourcesEmployeeDepartmentHistoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ShiftID",  }
+				, SetChildrenHumanResourcesEmployeeDepartmentHistories);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(HumanResourcesShift entity)
         {
@@ -109,11 +118,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetHumanResourcesEmployeeDepartmentHistoryReader(), entity.Id
-				, HumanResourcesEmployeeDepartmentHistoryColumnNames.ShiftID.ToString()
+						WithChildForParentValues(GetHumanResourcesEmployeeDepartmentHistoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ShiftID",  }
 				, SetChildrenHumanResourcesEmployeeDepartmentHistories);
 
-			QueryResultForChildrenOnly(new List<HumanResourcesShift>() { entity });
+			
+QueryResultForChildrenOnly(new List<HumanResourcesShift>() { entity });
 			entity.Loaded = false;
 			GetHumanResourcesEmployeeDepartmentHistoryReader().SetAllChildrenForExisting(entity.HumanResourcesEmployeeDepartmentHistories);
 				
@@ -124,15 +135,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetHumanResourcesEmployeeDepartmentHistoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), HumanResourcesEmployeeDepartmentHistoryColumnNames.ShiftID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetHumanResourcesEmployeeDepartmentHistoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ShiftID",  }
 				, SetChildrenHumanResourcesEmployeeDepartmentHistories);
 
 					

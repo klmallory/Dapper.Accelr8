@@ -42,25 +42,12 @@
 
 		Debug.WriteLine("Starting Entity domain for Table {0} ", t.Key);
 
-		var name = Accelr8or.Inflector.MakeSingular(table.ClassName ?? table.TableName);
+		var name = table.ClassName;
 
 		className = name;
 
-		if (table.CompoundPrimaryKey)
-		{
-			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
-			idField = SchemaHelper.defaultIdField;
-		}
-		else if (table.Columns.Any(c => c.IsPrimaryKey && !c.Ignore))
-		{
-			idType = table.Columns.First(c => c.IsPrimaryKey).CSharpType;
-			idField = table.Columns.First(c => c.IsPrimaryKey).ColumnName;
-		}
-		else
-		{
-			idType = table.Columns.First().CSharpType;
-			idField = table.Columns.First().ColumnName;
-		}
+		idType = table.CSharpIdType;
+		idField = table.IdField;
 
 		manager.StartNewFile(Path.Combine(SchemaHelper.DAODirectory, name + ".cs")); #>
 
@@ -73,16 +60,17 @@ using System.Text;
 
 using <#= SchemaHelper.DAONamespace #>;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace <#= SchemaHelper.DAONamespace #>
 {
-	public partial class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>
+	public class <#= className #> : <#= SchemaHelper.BaseDomainEntity #><<#= idType #>>
 	{
 			public <#= className #>()
 		{
-		<# if (table.CompoundPrimaryKey)
+		<# if (table.UseCompoundKey)
 		{ #>
 			<#= SchemaHelper.defaultIdField #> = new CompoundKey();
 		<# } #>
@@ -93,11 +81,11 @@ namespace <#= SchemaHelper.DAONamespace #>
 			<# }
 				foreach (var child in table.Children.Where(c => !c.Ignore && !c.OneToOne))
 		{ if (SchemaHelper.UseDirtyProperties) { 
-			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassName)).Replace("_num_", "");#>
+			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassFieldName);#>
 <#= backing #> = new List<<#= child.ChildClassName #>>();
 		<# } else { #>
 
-	<#= Accelr8or.Inflector.MakePlural(child.ChildClassName) #> = new List<<#= child.ChildClassName #>>();
+	<#= child.ChildClassFieldName #> = new List<<#= child.ChildClassName #>>();
 		<# } }
 		
 		foreach (var col in table.Columns.Where(c => !c.IsPrimaryKey && !c.Ignore 
@@ -121,7 +109,7 @@ namespace <#= SchemaHelper.DAONamespace #>
 		<# } } #>}
 
 
-	<# if (table.CompoundPrimaryKey)
+	<# if (table.UseCompoundKey)
 	{
 		#> 
 		public static CompoundKey GetCompoundKeyFor(<#= className #> dao)
@@ -131,7 +119,7 @@ namespace <#= SchemaHelper.DAONamespace #>
 				Keys = new IComparable[]
 				{ <# foreach (var col in table.Columns.Where(c => c.IsPrimaryKey && !c.Ignore))
 					{ #>
-						<#= col.ColumnFieldName #>,
+		dao.<#= col.ColumnFieldName #>,
 					<# } #>	
 				}
 			};
@@ -140,14 +128,14 @@ namespace <#= SchemaHelper.DAONamespace #>
 		<# foreach (var col in table.Columns.Where(c => c.IsPrimaryKey && !c.Ignore))
 		{ 
 			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(col.ColumnFieldName);#>	
-			
+			protected <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= backing #>;
 		public <#= Accelr8or.GetNullableType(col.IsNullable, col.CastType ?? col.CSharpType) #> <#= col.ColumnFieldName #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
 			{ 
 				<#= backing #> = value;
-				dao.<#= SchemaHelper.defaultIdField #> = GetCompoundKey(this);
+				this.<#= SchemaHelper.defaultIdField #> = GetCompoundKeyFor(this);
 
 				<# if (SchemaHelper.UseDirtyProperties) { #>
 				IsDirty = true;
@@ -181,7 +169,7 @@ namespace <#= SchemaHelper.DAONamespace #>
 	//From Foreign Key <#= parent.Name #><#
 		if (SchemaHelper.UseDirtyProperties)
 		{
-		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(Accelr8or.Inflector.MakeSingular(parent.ParentClassFieldName)).Replace("_num_", "");#>	
+		var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(parent.ParentClassFieldName);#>	
 		protected <#= parent.ParentClassName #> <#= backing #>;
 		public virtual <#= parent.ParentClassName #> <#= parent.ParentClassFieldName #> 
 		{ 
@@ -221,9 +209,9 @@ namespace <#= SchemaHelper.DAONamespace #>
 	//From Foreign Key <#= child.Name #><#
 			if (SchemaHelper.UseDirtyProperties)
 			{
-			var backing = "_" + Accelr8or.Inflector.MakePlural(Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassFieldName)).Replace("_num_", "");#>	
+			var backing = "_" + Accelr8or.Inflector.MakeInitialLowerCase(child.ChildClassFieldName);#>	
 		protected IList<<#= child.ChildClassName #>> <#= backing #>;
-		public virtual IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassFieldName) #> 
+		public virtual IList<<#= child.ChildClassName #>> <#= child.ChildClassFieldName #> 
 		{ 
 			get { return <#= backing #>; }
 			set 
@@ -234,12 +222,12 @@ namespace <#= SchemaHelper.DAONamespace #>
 		} 
 			<#} else
 				{ #>
-		public virtual IList<<#= child.ChildClassName #>> <#= Accelr8or.Inflector.MakePlural(child.ChildClassFieldName) #> { get; set; }
+		public virtual IList<<#= child.ChildClassName #>> <#= child.ChildClassFieldName #> { get; set; }
 			<# } } #>
 		}
 }
 
-		<# manager.EndBlock();
+		<#  manager.EndBlock();
 	}
 	manager.Process(true);
 #>

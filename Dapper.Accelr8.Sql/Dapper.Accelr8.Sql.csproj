@@ -43,6 +43,7 @@
       <HintPath>..\Solutions\packages\HashFoo.SqlServer.SpatialTypes.10.0.0.0\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -450,6 +451,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataAccessObjects.tt.txt</DependentUpon>
     </Content>
+    <Content Include="Templates\DynamicMapper.tt.txt" />
     <Content Include="Templates\EntityReader.tt.txt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>EntityReader.tt1.txt</LastGenOutput>
@@ -496,6 +498,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="AW2008Mappers\" />
     <Folder Include="NW2008DAO\" />
     <Folder Include="NW2008Readers\" />
     <Folder Include="NW2008TableInfos\" />

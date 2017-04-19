@@ -4,13 +4,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Transactions;
-using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.PInvoke;
 
 namespace Dapper.Accelr8.Repo
 {
-    public struct IdKey : IComparable<IdKey>
+    public struct IdKey : IComparable<IdKey>, IComparable
     {
         static int ByteArrayCompare(byte[] b1, byte[] b2)
         {
@@ -34,6 +33,11 @@ namespace Dapper.Accelr8.Repo
         public int CompareTo(IdKey other)
         {
             return ByteArrayCompare(Key, other.Key);
+        }
+
+        public int CompareTo(object obj)
+        {
+            return this.CompareTo((IdKey)obj);
         }
     }
 }

@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 2
-		static IEntityReader<int , SalesSalesOrderHeader> _salesSalesOrderHeaderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesSalesOrderHeader> GetSalesSalesOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesOrderHeader>>();
+			return s_loc8r.GetReader<int , SalesSalesOrderHeader>();
 		}
 
 		
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaders = typedChildren.Where(b => b.SalesSalesOrderHeader == r.Id).ToList();
+				
+
+				r.SalesSalesOrderHeaders = typedChildren.Where(b =>  b.CurrencyRateID == r.Id ).ToList();
 				r.SalesSalesOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.SalesCurrencyRate = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesCurrencyRate();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.CurrencyRateDate = GetRowData<DateTime>(dataRow, "CurrencyRateDate"); 
+			domain.Id = GetRowData<int>(dataRow, "CurrencyRateID"); 
+      		domain.CurrencyRateDate = GetRowData<DateTime>(dataRow, "CurrencyRateDate"); 
       		domain.FromCurrencyCode = GetRowData<string>(dataRow, "FromCurrencyCode"); 
       		domain.ToCurrencyCode = GetRowData<string>(dataRow, "ToCurrencyCode"); 
       		domain.AverageRate = GetRowData<decimal>(dataRow, "AverageRate"); 
@@ -94,15 +102,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesCurrencyRate></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesCurrencyRate> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesCurrencyRate> WithAllChildrenForExisting(SalesCurrencyRate existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaders);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CurrencyRateID",  }
+				, SetChildrenSalesSalesOrderHeaders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesCurrencyRate entity)
         {
@@ -111,11 +120,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), entity.Id
-				, SalesSalesOrderHeaderColumnNames.CurrencyRateID.ToString()
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CurrencyRateID",  }
 				, SetChildrenSalesSalesOrderHeaders);
 
-			QueryResultForChildrenOnly(new List<SalesCurrencyRate>() { entity });
+			
+QueryResultForChildrenOnly(new List<SalesCurrencyRate>() { entity });
 			entity.Loaded = false;
 			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaders);
 				
@@ -126,15 +137,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderColumnNames.CurrencyRateID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesSalesOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CurrencyRateID",  }
 				, SetChildrenSalesSalesOrderHeaders);
 
 					

@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSpecialOffer : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSpecialOffer : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesSpecialOffer()
-		{			
+		{
+							
 			IsDirty = false; 
 			_salesSpecialOfferProducts = new List<SalesSpecialOfferProduct>();
 		_startDate = (DateTime)SqlDateTime.MinValue;
@@ -25,6 +27,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected string _description;
 		public string Description 

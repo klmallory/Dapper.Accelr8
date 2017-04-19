@@ -18,32 +18,48 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonBusinessEntityColumnNames
+	public enum PersonBusinessEntityFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		rowguid, 	
 		ModifiedDate, 	
 	}
 
 	public enum PersonBusinessEntityCascadeNames
 	{	
-		salesstore, 	
-		personbusinessentityaddress, 	
-		personbusinessentitycontact, 	
-		purchasingvendor, 	
-		personperson, 	
+		salesstores, 	
+		personbusinessentityaddresses, 	
+		personbusinessentitycontacts, 	
+		purchasingvendors, 	
+		personpeople, 	
 		}
 
 	public class PersonBusinessEntityTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonBusinessEntityColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonBusinessEntityFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)PersonBusinessEntityFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonBusinessEntityFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonBusinessEntityIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonBusinessEntityFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public PersonBusinessEntityTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonBusinessEntityColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.BusinessEntity";
+			Schema = "Person";
 			TableName = "Person.BusinessEntity";
 			TableAlias = "personbusinessentity";
-			ColumnNames = typeof(PersonBusinessEntityColumnNames).ToDataList<Type, int>();
+			Columns = PersonBusinessEntityColumnNames;
+			IdColumns = PersonBusinessEntityIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

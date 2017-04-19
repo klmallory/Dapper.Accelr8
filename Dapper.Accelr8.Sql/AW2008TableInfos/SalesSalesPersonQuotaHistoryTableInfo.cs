@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesPersonQuotaHistoryColumnNames
+	public enum SalesSalesPersonQuotaHistoryFieldNames
 	{	
 		BusinessEntityID, 	
 		QuotaDate, 	
@@ -33,15 +33,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		salessalesperson_p, 	}
 
 	public class SalesSalesPersonQuotaHistoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesPersonQuotaHistoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesPersonQuotaHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesSalesPersonQuotaHistoryFieldNames.QuotaDate, "QuotaDate" }, 
+						{ (int)SalesSalesPersonQuotaHistoryFieldNames.SalesQuota, "SalesQuota" }, 
+						{ (int)SalesSalesPersonQuotaHistoryFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesPersonQuotaHistoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesPersonQuotaHistoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesPersonQuotaHistoryFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesSalesPersonQuotaHistoryFieldNames.QuotaDate, "QuotaDate" }, 
+				};
+
 		public SalesSalesPersonQuotaHistoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesPersonQuotaHistoryColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.SalesPersonQuotaHistory";
+			Schema = "Sales";
 			TableName = "Sales.SalesPersonQuotaHistory";
 			TableAlias = "salessalespersonquotahistory";
-			ColumnNames = typeof(SalesSalesPersonQuotaHistoryColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesPersonQuotaHistoryColumnNames;
+			IdColumns = SalesSalesPersonQuotaHistoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID

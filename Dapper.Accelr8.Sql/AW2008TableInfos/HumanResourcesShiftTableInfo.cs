@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesShiftColumnNames
+	public enum HumanResourcesShiftFieldNames
 	{	
-		ShiftID, 	
+		Id, 	
 		Name, 	
 		StartTime, 	
 		EndTime, 	
@@ -29,19 +29,37 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum HumanResourcesShiftCascadeNames
 	{	
-		humanresourcesemployeedepartmenthistory, 	
+		humanresourcesemployeedepartmenthistories, 	
 		}
 
 	public class HumanResourcesShiftTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesShiftColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesShiftFieldNames.Id, "ShiftID" }, 
+						{ (int)HumanResourcesShiftFieldNames.Name, "Name" }, 
+						{ (int)HumanResourcesShiftFieldNames.StartTime, "StartTime" }, 
+						{ (int)HumanResourcesShiftFieldNames.EndTime, "EndTime" }, 
+						{ (int)HumanResourcesShiftFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesShiftIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesShiftFieldNames.Id, "ShiftID" }, 
+				};
+
 		public HumanResourcesShiftTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = HumanResourcesShiftColumnNames.ShiftID.ToString();
-			//Schema = "HumanResources.Shift";
+			Schema = "HumanResources";
 			TableName = "HumanResources.Shift";
 			TableAlias = "humanresourcesshift";
-			ColumnNames = typeof(HumanResourcesShiftColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesShiftColumnNames;
+			IdColumns = HumanResourcesShiftIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

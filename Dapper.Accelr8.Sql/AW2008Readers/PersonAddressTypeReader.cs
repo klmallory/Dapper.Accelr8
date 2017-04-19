@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , PersonBusinessEntityAddress> _personBusinessEntityAddressReader;
-		protected static IEntityReader<int , PersonBusinessEntityAddress> GetPersonBusinessEntityAddressReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonBusinessEntityAddress> GetPersonBusinessEntityAddressReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonBusinessEntityAddress>>();
+			return s_loc8r.GetReader<CompoundKey , PersonBusinessEntityAddress>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonBusinessEntityAddresses(IList<PersonAddressType> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonBusinessEntityAddress
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonBusinessEntityAddresses = typedChildren.Where(b => b.PersonBusinessEntityAddress == r.Id).ToList();
+				
+
+				r.PersonBusinessEntityAddresses = typedChildren.Where(b =>  b.AddressTypeID == r.Id ).ToList();
 				r.PersonBusinessEntityAddresses.ToList().ForEach(b => { b.Loaded = false; b.PersonAddressType = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonAddressType();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "AddressTypeID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
@@ -91,15 +99,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonAddressType></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonAddressType> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonAddressType> WithAllChildrenForExisting(PersonAddressType existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonBusinessEntityAddressReader(), id, IdColumn, SetChildrenPersonBusinessEntityAddresses);
+						WithChildForParentValues(GetPersonBusinessEntityAddressReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "AddressTypeID",  }
+				, SetChildrenPersonBusinessEntityAddresses);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonAddressType entity)
         {
@@ -108,11 +117,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonBusinessEntityAddressReader(), entity.Id
-				, PersonBusinessEntityAddressColumnNames.AddressTypeID.ToString()
+						WithChildForParentValues(GetPersonBusinessEntityAddressReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "AddressTypeID",  }
 				, SetChildrenPersonBusinessEntityAddresses);
 
-			QueryResultForChildrenOnly(new List<PersonAddressType>() { entity });
+			
+QueryResultForChildrenOnly(new List<PersonAddressType>() { entity });
 			entity.Loaded = false;
 			GetPersonBusinessEntityAddressReader().SetAllChildrenForExisting(entity.PersonBusinessEntityAddresses);
 				
@@ -123,15 +134,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonBusinessEntityAddressReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonBusinessEntityAddressColumnNames.AddressTypeID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPersonBusinessEntityAddressReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "AddressTypeID",  }
 				, SetChildrenPersonBusinessEntityAddresses);
 
 					

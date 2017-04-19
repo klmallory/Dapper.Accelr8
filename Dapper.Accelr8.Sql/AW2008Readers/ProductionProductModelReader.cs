@@ -27,83 +27,34 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 3
 		//Parent Count 0
-		static IEntityReader<int , ProductionProductModelIllustration> _productionProductModelIllustrationReader;
-		protected static IEntityReader<int , ProductionProductModelIllustration> GetProductionProductModelIllustrationReader()
-		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductModelIllustration>>();
-		}
-
-		static IEntityReader<int , ProductionProductModelProductDescriptionCulture> _productionProductModelProductDescriptionCultureReader;
-		protected static IEntityReader<int , ProductionProductModelProductDescriptionCulture> GetProductionProductModelProductDescriptionCultureReader()
-		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductModelProductDescriptionCulture>>();
-		}
-
-		static IEntityReader<int , ProductionProduct> _productionProductReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , ProductionProduct> GetProductionProductReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProduct>>();
+			return s_loc8r.GetReader<int , ProductionProduct>();
+		}
+
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductModelIllustration> GetProductionProductModelIllustrationReader()
+		{
+			return s_loc8r.GetReader<CompoundKey , ProductionProductModelIllustration>();
+		}
+
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductModelProductDescriptionCulture> GetProductionProductModelProductDescriptionCultureReader()
+		{
+			return s_loc8r.GetReader<CompoundKey , ProductionProductModelProductDescriptionCulture>();
 		}
 
 		
-		/// <summary>
-		/// Sets the children of type ProductionProductModelIllustration on the parent on ProductionProductModelIllustrations.
-		/// From foriegn key FK_ProductModelIllustration_ProductModel_ProductModelID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenProductionProductModelIllustrations(IList<ProductionProductModel> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: ProductionProductModelIllustration
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<ProductionProductModelIllustration>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.ProductionProductModelIllustrations = typedChildren.Where(b => b.ProductionProductModelIllustration == r.Id).ToList();
-				r.ProductionProductModelIllustrations.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductModel = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type ProductionProductModelProductDescriptionCulture on the parent on ProductionProductModelProductDescriptionCultures.
-		/// From foriegn key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenProductionProductModelProductDescriptionCultures(IList<ProductionProductModel> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: ProductionProductModelProductDescriptionCulture
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<ProductionProductModelProductDescriptionCulture>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.ProductionProductModelProductDescriptionCultures = typedChildren.Where(b => b.ProductionProductModelProductDescriptionCulture == r.Id).ToList();
-				r.ProductionProductModelProductDescriptionCultures.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductModel = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
 		/// <summary>
 		/// Sets the children of type ProductionProduct on the parent on ProductionProducts.
 		/// From foriegn key FK_Product_ProductModel_ProductModelID
@@ -125,8 +76,71 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProducts = typedChildren.Where(b => b.ProductionProduct == r.Id).ToList();
+				
+
+				r.ProductionProducts = typedChildren.Where(b =>  b.ProductModelID == r.Id ).ToList();
 				r.ProductionProducts.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductModel = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionProductModelIllustration on the parent on ProductionProductModelIllustrations.
+		/// From foriegn key FK_ProductModelIllustration_ProductModel_ProductModelID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionProductModelIllustrations(IList<ProductionProductModel> results, IList<object> children)
+		{
+			//Child Id Type: CompoundKey
+			//Child Type: ProductionProductModelIllustration
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionProductModelIllustration>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionProductModelIllustrations = typedChildren.Where(b =>  b.ProductModelID == r.Id ).ToList();
+				r.ProductionProductModelIllustrations.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductModel = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the children of type ProductionProductModelProductDescriptionCulture on the parent on ProductionProductModelProductDescriptionCultures.
+		/// From foriegn key FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenProductionProductModelProductDescriptionCultures(IList<ProductionProductModel> results, IList<object> children)
+		{
+			//Child Id Type: CompoundKey
+			//Child Type: ProductionProductModelProductDescriptionCulture
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<ProductionProductModelProductDescriptionCulture>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.ProductionProductModelProductDescriptionCultures = typedChildren.Where(b =>  b.ProductModelID == r.Id ).ToList();
+				r.ProductionProductModelProductDescriptionCultures.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductModel = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -142,8 +156,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProductModel();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "ProductModelID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.CatalogDescription = GetRowData<string>(dataRow, "CatalogDescription"); 
       		domain.Instructions = GetRowData<string>(dataRow, "Instructions"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
@@ -159,19 +173,24 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionProductModel></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProductModel> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionProductModel> WithAllChildrenForExisting(ProductionProductModel existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductModelIllustrationReader(), id, IdColumn, SetChildrenProductionProductModelIllustrations);
-			
-			WithChildForParentId(GetProductionProductModelProductDescriptionCultureReader(), id, IdColumn, SetChildrenProductionProductModelProductDescriptionCultures);
-			
-			WithChildForParentId(GetProductionProductReader(), id, IdColumn, SetChildrenProductionProducts);
+						WithChildForParentValues(GetProductionProductReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductModelID",  }
+				, SetChildrenProductionProducts);
+						WithChildForParentValues(GetProductionProductModelIllustrationReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductModelID",  }
+				, SetChildrenProductionProductModelIllustrations);
+						WithChildForParentValues(GetProductionProductModelProductDescriptionCultureReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductModelID",  }
+				, SetChildrenProductionProductModelProductDescriptionCultures);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProductModel entity)
         {
@@ -180,23 +199,27 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductModelIllustrationReader(), entity.Id
-				, ProductionProductModelIllustrationColumnNames.ProductModelID.ToString()
-				, SetChildrenProductionProductModelIllustrations);
-
-			WithChildForParentId(GetProductionProductModelProductDescriptionCultureReader(), entity.Id
-				, ProductionProductModelProductDescriptionCultureColumnNames.ProductModelID.ToString()
-				, SetChildrenProductionProductModelProductDescriptionCultures);
-
-			WithChildForParentId(GetProductionProductReader(), entity.Id
-				, ProductionProductColumnNames.ProductModelID.ToString()
+						WithChildForParentValues(GetProductionProductReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductModelID",  }
 				, SetChildrenProductionProducts);
 
-			QueryResultForChildrenOnly(new List<ProductionProductModel>() { entity });
+						WithChildForParentValues(GetProductionProductModelIllustrationReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductModelID",  }
+				, SetChildrenProductionProductModelIllustrations);
+
+						WithChildForParentValues(GetProductionProductModelProductDescriptionCultureReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductModelID",  }
+				, SetChildrenProductionProductModelProductDescriptionCultures);
+
+			
+QueryResultForChildrenOnly(new List<ProductionProductModel>() { entity });
 			entity.Loaded = false;
+			GetProductionProductReader().SetAllChildrenForExisting(entity.ProductionProducts);
 			GetProductionProductModelIllustrationReader().SetAllChildrenForExisting(entity.ProductionProductModelIllustrations);
 			GetProductionProductModelProductDescriptionCultureReader().SetAllChildrenForExisting(entity.ProductionProductModelProductDescriptionCultures);
-			GetProductionProductReader().SetAllChildrenForExisting(entity.ProductionProducts);
 				
 			entity.Loaded = true;
 		}
@@ -205,35 +228,35 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductModelIllustrationReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductModelIllustrationColumnNames.ProductModelID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionProductReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductModelID",  }
+				, SetChildrenProductionProducts);
+
+			WithChildForParentsValues(GetProductionProductModelIllustrationReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductModelID",  }
 				, SetChildrenProductionProductModelIllustrations);
 
-			WithChildForParentIds(GetProductionProductModelProductDescriptionCultureReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductModelProductDescriptionCultureColumnNames.ProductModelID.ToString()
+			WithChildForParentsValues(GetProductionProductModelProductDescriptionCultureReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductModelID",  }
 				, SetChildrenProductionProductModelProductDescriptionCultures);
-
-			WithChildForParentIds(GetProductionProductReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductColumnNames.ProductModelID.ToString()
-				, SetChildrenProductionProducts);
 
 					
 			QueryResultForChildrenOnly(entities);
 
+			GetProductionProductReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProducts).ToList());
 			GetProductionProductModelIllustrationReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductModelIllustrations).ToList());
 			GetProductionProductModelProductDescriptionCultureReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProductModelProductDescriptionCultures).ToList());
-			GetProductionProductReader().SetAllChildrenForExisting(entities.SelectMany(e => e.ProductionProducts).ToList());
 					
 		}
     }

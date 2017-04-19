@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesCurrencyRateColumnNames
+	public enum SalesCurrencyRateFieldNames
 	{	
-		CurrencyRateID, 	
+		Id, 	
 		CurrencyRateDate, 	
 		FromCurrencyCode, 	
 		ToCurrencyCode, 	
@@ -31,27 +31,48 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesCurrencyRateCascadeNames
 	{	
-		salessalesorderheader, 	
+		salessalesorderheaders, 	
 		
-		salescurrency_p, 	}
+		salescurrency1_p, 	
+		salescurrency2_p, 	}
 
 	public class SalesCurrencyRateTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesCurrencyRateColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCurrencyRateFieldNames.Id, "CurrencyRateID" }, 
+						{ (int)SalesCurrencyRateFieldNames.CurrencyRateDate, "CurrencyRateDate" }, 
+						{ (int)SalesCurrencyRateFieldNames.FromCurrencyCode, "FromCurrencyCode" }, 
+						{ (int)SalesCurrencyRateFieldNames.ToCurrencyCode, "ToCurrencyCode" }, 
+						{ (int)SalesCurrencyRateFieldNames.AverageRate, "AverageRate" }, 
+						{ (int)SalesCurrencyRateFieldNames.EndOfDayRate, "EndOfDayRate" }, 
+						{ (int)SalesCurrencyRateFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesCurrencyRateIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCurrencyRateFieldNames.Id, "CurrencyRateID" }, 
+				};
+
 		public SalesCurrencyRateTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesCurrencyRateColumnNames.CurrencyRateID.ToString();
-			//Schema = "Sales.CurrencyRate";
+			Schema = "Sales";
 			TableName = "Sales.CurrencyRate";
 			TableAlias = "salescurrencyrate";
-			ColumnNames = typeof(SalesCurrencyRateColumnNames).ToDataList<Type, int>();
+			Columns = SalesCurrencyRateColumnNames;
+			IdColumns = SalesCurrencyRateIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_CurrencyRate_Currency_FromCurrencyCode
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<string, SalesCurrency>("SalesCurrency")),
 			TableName = "Sales.Currency",
-			Alias = TableAlias + "_" + "SalesCurrency",
+			Alias = TableAlias + "_" + "SalesCurrency1",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -64,7 +85,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.CurrencyCode == null || row.CurrencyCode == default(string))
 						return st;
 
-					st.SalesCurrency = reader.LoadEntityObject(row);
+					st.SalesCurrency1 = reader.LoadEntityObject(row);
 
 					return st;
 				},
@@ -84,7 +105,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<string, SalesCurrency>("SalesCurrency")),
 			TableName = "Sales.Currency",
-			Alias = TableAlias + "_" + "SalesCurrency",
+			Alias = TableAlias + "_" + "SalesCurrency2",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -97,7 +118,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.CurrencyCode == null || row.CurrencyCode == default(string))
 						return st;
 
-					st.SalesCurrency = reader.LoadEntityObject(row);
+					st.SalesCurrency2 = reader.LoadEntityObject(row);
 
 					return st;
 				},

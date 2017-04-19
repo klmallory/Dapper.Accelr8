@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class SalesSalesTerritoryHistoryWriter : EntityWriter<int, SalesSalesTerritoryHistory>
+    public class SalesSalesTerritoryHistoryWriter : EntityWriter<CompoundKey, SalesSalesTerritoryHistory>
     {
         public SalesSalesTerritoryHistoryWriter
 			(SalesSalesTerritoryHistoryTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, SalesSalesPerson> GetSalesSalesPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesPerson>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesPerson>(); }
 		static IEntityWriter<int, SalesSalesTerritory> GetSalesSalesTerritoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesTerritory>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesTerritory>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,16 +51,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSalesTerritoryHistoryColumnNames)f.Key)
+                switch ((SalesSalesTerritoryHistoryFieldNames)f.Key)
                 {
                     
-					case SalesSalesTerritoryHistoryColumnNames.EndDate:
+					case SalesSalesTerritoryHistoryFieldNames.EndDate:
 						parms.Add(GetParamName("EndDate", actionType, taskIndex, ref count), entity.EndDate);
 						break;
-					case SalesSalesTerritoryHistoryColumnNames.rowguid:
+					case SalesSalesTerritoryHistoryFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSalesTerritoryHistoryColumnNames.ModifiedDate:
+					case SalesSalesTerritoryHistoryFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -76,13 +79,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID
 			var salesSalesPerson364 = GetSalesSalesPersonWriter();
-		if ((_cascades.Contains(SalesSalesTerritoryHistoryCascadeNames.salessalesperson.ToString()) || _cascades.Contains("all")) && entity.SalesSalesPerson != null)
+		if ((_cascades.Contains(SalesSalesTerritoryHistoryCascadeNames.salessalesperson_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesPerson != null)
 			if (Cascade(salesSalesPerson364, entity.SalesSalesPerson, context))
 				WithParent(salesSalesPerson364, entity);
 
 			//From Foreign Key FK_SalesTerritoryHistory_SalesTerritory_TerritoryID
 			var salesSalesTerritory365 = GetSalesSalesTerritoryWriter();
-		if ((_cascades.Contains(SalesSalesTerritoryHistoryCascadeNames.salessalesterritory.ToString()) || _cascades.Contains("all")) && entity.SalesSalesTerritory != null)
+		if ((_cascades.Contains(SalesSalesTerritoryHistoryCascadeNames.salessalesterritory_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesTerritory != null)
 			if (Cascade(salesSalesTerritory365, entity.SalesSalesTerritory, context))
 				WithParent(salesSalesTerritory365, entity);
 
@@ -96,11 +99,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID
 			if (entity.SalesSalesPerson != null)
-				entity.SalesSalesTerritoryHistory = entity.SalesSalesPerson.Id;
+				entity.BusinessEntityID = entity.SalesSalesPerson.Id;
 
 			//From Foreign Key FK_SalesTerritoryHistory_SalesTerritory_TerritoryID
 			if (entity.SalesSalesTerritory != null)
-				entity.SalesSalesTerritoryHistory = entity.SalesSalesTerritory.Id;
+				entity.TerritoryID = entity.SalesSalesTerritory.Id;
 
 		}
 

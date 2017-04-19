@@ -8,15 +8,17 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesOrderHeader : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesOrderHeader : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesSalesOrderHeader()
-		{			
+		{
+							
 			IsDirty = false; 
 			_salesSalesOrderDetails = new List<SalesSalesOrderDetail>();
 		_salesSalesOrderHeaderSalesReasons = new List<SalesSalesOrderHeaderSalesReason>();
@@ -26,6 +28,7 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		}
 
 
+	
 		
 		protected byte _revisionNumber;
 		public byte RevisionNumber 
@@ -303,25 +306,25 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		} 
 		 
 	//From Foreign Key FK_SalesOrderHeader_Address_BillToAddressID	
-		protected PersonAddress _personAddress;
-		public virtual PersonAddress PersonAddress 
+		protected PersonAddress _personAddress1;
+		public virtual PersonAddress PersonAddress1 
 		{ 
-			get { return _personAddress; }
+			get { return _personAddress1; }
 			set 
 			{ 
-				_personAddress = value;  
+				_personAddress1 = value;  
 				IsDirty = true;
 			}
 		} 
 		 
 	//From Foreign Key FK_SalesOrderHeader_Address_ShipToAddressID	
-		protected PersonAddress _personAddress;
-		public virtual PersonAddress PersonAddress 
+		protected PersonAddress _personAddress2;
+		public virtual PersonAddress PersonAddress2 
 		{ 
-			get { return _personAddress; }
+			get { return _personAddress2; }
 			set 
 			{ 
-				_personAddress = value;  
+				_personAddress2 = value;  
 				IsDirty = true;
 			}
 		} 

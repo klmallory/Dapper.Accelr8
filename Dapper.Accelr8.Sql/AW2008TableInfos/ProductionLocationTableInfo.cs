@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionLocationColumnNames
+	public enum ProductionLocationFieldNames
 	{	
-		LocationID, 	
+		Id, 	
 		Name, 	
 		CostRate, 	
 		Availability, 	
@@ -29,20 +29,38 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum ProductionLocationCascadeNames
 	{	
-		productionproductinventory, 	
-		productionworkorderrouting, 	
+		productionproductinventories, 	
+		productionworkorderroutings, 	
 		}
 
 	public class ProductionLocationTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionLocationColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionLocationFieldNames.Id, "LocationID" }, 
+						{ (int)ProductionLocationFieldNames.Name, "Name" }, 
+						{ (int)ProductionLocationFieldNames.CostRate, "CostRate" }, 
+						{ (int)ProductionLocationFieldNames.Availability, "Availability" }, 
+						{ (int)ProductionLocationFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionLocationIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionLocationFieldNames.Id, "LocationID" }, 
+				};
+
 		public ProductionLocationTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionLocationColumnNames.LocationID.ToString();
-			//Schema = "Production.Location";
+			Schema = "Production";
 			TableName = "Production.Location";
 			TableAlias = "productionlocation";
-			ColumnNames = typeof(ProductionLocationColumnNames).ToDataList<Type, int>();
+			Columns = ProductionLocationColumnNames;
+			IdColumns = ProductionLocationIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

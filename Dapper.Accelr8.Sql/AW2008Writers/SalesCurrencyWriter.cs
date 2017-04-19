@@ -28,13 +28,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<string, SalesCountryRegionCurrency> GetSalesCountryRegionCurrencyWriter()
-		{ return _locator.Resolve<IEntityWriter<string, SalesCountryRegionCurrency>>(); }
+		{ return s_loc8r.GetWriter<string, SalesCountryRegionCurrency>(); }
 		static IEntityWriter<int, SalesCurrencyRate> GetSalesCurrencyRateWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesCurrencyRate>>(); }
+		{ return s_loc8r.GetWriter<int, SalesCurrencyRate>(); }
 		
 		
 		/// <summary>
@@ -48,13 +51,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesCurrencyColumnNames)f.Key)
+                switch ((SalesCurrencyFieldNames)f.Key)
                 {
                     
-					case SalesCurrencyColumnNames.Name:
+					case SalesCurrencyFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case SalesCurrencyColumnNames.ModifiedDate:
+					case SalesCurrencyFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -71,7 +74,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_CountryRegionCurrency_Currency_CurrencyCode
 			var salesCountryRegionCurrency73 = GetSalesCountryRegionCurrencyWriter();
-			if (_cascades.Contains(SalesCurrencyCascadeNames.sales.countryregioncurrency.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCurrencyCascadeNames.salescountryregioncurrencies.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesCountryRegionCurrencies)
 					Cascade(salesCountryRegionCurrency73, item, context);
 
@@ -80,8 +83,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_CurrencyRate_Currency_FromCurrencyCode
 			var salesCurrencyRate74 = GetSalesCurrencyRateWriter();
-			if (_cascades.Contains(SalesCurrencyCascadeNames.sales.currencyrate.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.SalesCurrencyRates)
+			if (_cascades.Contains(SalesCurrencyCascadeNames.salescurrencyrates1.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.SalesCurrencyRates1s)
 					Cascade(salesCurrencyRate74, item, context);
 
 			if (salesCurrencyRate74.Count > 0)
@@ -89,8 +92,8 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_CurrencyRate_Currency_ToCurrencyCode
 			var salesCurrencyRate75 = GetSalesCurrencyRateWriter();
-			if (_cascades.Contains(SalesCurrencyCascadeNames.sales.currencyrate.ToString()) || _cascades.Contains("all"))
-				foreach (var item in entity.SalesCurrencyRates)
+			if (_cascades.Contains(SalesCurrencyCascadeNames.salescurrencyrates2.ToString()) || _cascades.Contains("all"))
+				foreach (var item in entity.SalesCurrencyRates2s)
 					Cascade(salesCurrencyRate75, item, context);
 
 			if (salesCurrencyRate75.Count > 0)
@@ -108,17 +111,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_CountryRegionCurrency_Currency_CurrencyCode
 			if (entity.SalesCountryRegionCurrencies != null && entity.SalesCountryRegionCurrencies.Count > 0)
 				foreach (var rel in entity.SalesCountryRegionCurrencies)
-					rel.SalesCountryRegionCurrency = entity.Id;
+					rel.CurrencyCode = entity.Id;
 
 			//From Foreign Key FK_CurrencyRate_Currency_FromCurrencyCode
 			if (entity.SalesCurrencyRates != null && entity.SalesCurrencyRates.Count > 0)
 				foreach (var rel in entity.SalesCurrencyRates)
-					rel.SalesCurrencyRate = entity.Id;
+					rel.FromCurrencyCode = entity.Id;
 
 			//From Foreign Key FK_CurrencyRate_Currency_ToCurrencyCode
 			if (entity.SalesCurrencyRates != null && entity.SalesCurrencyRates.Count > 0)
 				foreach (var rel in entity.SalesCurrencyRates)
-					rel.SalesCurrencyRate = entity.Id;
+					rel.ToCurrencyCode = entity.Id;
 
 				
 		}
@@ -127,7 +130,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_CountryRegionCurrency_Currency_CurrencyCode
 			var salesCountryRegionCurrency79 = GetSalesCountryRegionCurrencyWriter();
-			if (_cascades.Contains(SalesCurrencyCascadeNames.sales.countryregioncurrency.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCurrencyCascadeNames.salescountryregioncurrency.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesCountryRegionCurrencies)
 					CascadeDelete(salesCountryRegionCurrency79, item, context);
 
@@ -136,7 +139,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_CurrencyRate_Currency_FromCurrencyCode
 			var salesCurrencyRate80 = GetSalesCurrencyRateWriter();
-			if (_cascades.Contains(SalesCurrencyCascadeNames.sales.currencyrate.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCurrencyCascadeNames.salescurrencyrate.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesCurrencyRates)
 					CascadeDelete(salesCurrencyRate80, item, context);
 
@@ -145,7 +148,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_CurrencyRate_Currency_ToCurrencyCode
 			var salesCurrencyRate81 = GetSalesCurrencyRateWriter();
-			if (_cascades.Contains(SalesCurrencyCascadeNames.sales.currencyrate.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCurrencyCascadeNames.salescurrencyrate.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesCurrencyRates)
 					CascadeDelete(salesCurrencyRate81, item, context);
 

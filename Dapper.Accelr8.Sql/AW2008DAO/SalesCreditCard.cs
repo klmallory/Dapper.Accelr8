@@ -8,22 +8,25 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesCreditCard : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesCreditCard : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesCreditCard()
-		{			
+		{
+							
 			IsDirty = false; 
-			_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
-		_salesPersonCreditCards = new List<SalesPersonCreditCard>();
+			_salesPersonCreditCards = new List<SalesPersonCreditCard>();
+		_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected string _cardType;
 		public string CardType 
@@ -80,18 +83,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
-	//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID	
-		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders;
-		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders 
-		{ 
-			get { return _salesSalesOrderHeaders; }
-			set 
-			{ 
-				_salesSalesOrderHeaders = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_PersonCreditCard_CreditCard_CreditCardID	
 		protected IList<SalesPersonCreditCard> _salesPersonCreditCards;
 		public virtual IList<SalesPersonCreditCard> SalesPersonCreditCards 
@@ -100,6 +91,18 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_salesPersonCreditCards = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID	
+		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders;
+		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders 
+		{ 
+			get { return _salesSalesOrderHeaders; }
+			set 
+			{ 
+				_salesSalesOrderHeaders = value;  
 				IsDirty = true;
 			}
 		} 

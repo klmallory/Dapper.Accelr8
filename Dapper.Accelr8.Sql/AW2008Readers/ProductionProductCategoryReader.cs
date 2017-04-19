@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , ProductionProductSubcategory> _productionProductSubcategoryReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , ProductionProductSubcategory> GetProductionProductSubcategoryReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductSubcategory>>();
+			return s_loc8r.GetReader<int , ProductionProductSubcategory>();
 		}
 
 		
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductSubcategories = typedChildren.Where(b => b.ProductionProductSubcategory == r.Id).ToList();
+				
+
+				r.ProductionProductSubcategories = typedChildren.Where(b =>  b.ProductCategoryID == r.Id ).ToList();
 				r.ProductionProductSubcategories.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductCategory = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProductCategory();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "ProductCategoryID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
@@ -91,15 +99,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionProductCategory></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProductCategory> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionProductCategory> WithAllChildrenForExisting(ProductionProductCategory existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductSubcategoryReader(), id, IdColumn, SetChildrenProductionProductSubcategories);
+						WithChildForParentValues(GetProductionProductSubcategoryReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductCategoryID",  }
+				, SetChildrenProductionProductSubcategories);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProductCategory entity)
         {
@@ -108,11 +117,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductSubcategoryReader(), entity.Id
-				, ProductionProductSubcategoryColumnNames.ProductCategoryID.ToString()
+						WithChildForParentValues(GetProductionProductSubcategoryReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductCategoryID",  }
 				, SetChildrenProductionProductSubcategories);
 
-			QueryResultForChildrenOnly(new List<ProductionProductCategory>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionProductCategory>() { entity });
 			entity.Loaded = false;
 			GetProductionProductSubcategoryReader().SetAllChildrenForExisting(entity.ProductionProductSubcategories);
 				
@@ -123,15 +134,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductSubcategoryReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductSubcategoryColumnNames.ProductCategoryID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionProductSubcategoryReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductCategoryID",  }
 				, SetChildrenProductionProductSubcategories);
 
 					

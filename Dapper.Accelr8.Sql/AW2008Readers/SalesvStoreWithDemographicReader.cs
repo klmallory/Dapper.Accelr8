@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,7 +48,7 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesvStoreWithDemographic();
 			domain.Loaded = false;
 
-				domain.BusinessEntityID = GetRowData<int>(dataRow, "BusinessEntityID"); 
+			domain.BusinessEntityID = GetRowData<int>(dataRow, "BusinessEntityID"); 
       		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.AnnualSales = GetRowData<decimal?>(dataRow, "AnnualSales"); 
       		domain.AnnualRevenue = GetRowData<decimal?>(dataRow, "AnnualRevenue"); 
@@ -66,13 +71,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesvStoreWithDemographic></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesvStoreWithDemographic> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesvStoreWithDemographic> WithAllChildrenForExisting(SalesvStoreWithDemographic existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesvStoreWithDemographic entity)
         {

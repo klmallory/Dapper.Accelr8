@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesvStoreWithContactColumnNames
+	public enum SalesvStoreWithContactFieldNames
 	{	
 		BusinessEntityID, 	
 		Name, 	
@@ -39,15 +39,40 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class SalesvStoreWithContactTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesvStoreWithContactColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesvStoreWithContactFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)SalesvStoreWithContactFieldNames.Name, "Name" }, 
+						{ (int)SalesvStoreWithContactFieldNames.ContactType, "ContactType" }, 
+						{ (int)SalesvStoreWithContactFieldNames.Title, "Title" }, 
+						{ (int)SalesvStoreWithContactFieldNames.FirstName, "FirstName" }, 
+						{ (int)SalesvStoreWithContactFieldNames.MiddleName, "MiddleName" }, 
+						{ (int)SalesvStoreWithContactFieldNames.LastName, "LastName" }, 
+						{ (int)SalesvStoreWithContactFieldNames.Suffix, "Suffix" }, 
+						{ (int)SalesvStoreWithContactFieldNames.PhoneNumber, "PhoneNumber" }, 
+						{ (int)SalesvStoreWithContactFieldNames.PhoneNumberType, "PhoneNumberType" }, 
+						{ (int)SalesvStoreWithContactFieldNames.EmailAddress, "EmailAddress" }, 
+						{ (int)SalesvStoreWithContactFieldNames.EmailPromotion, "EmailPromotion" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesvStoreWithContactIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)SalesvStoreWithContactFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public SalesvStoreWithContactTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = SalesvStoreWithContactColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.vStoreWithContacts";
+			Schema = "Sales";
 			TableName = "Sales.vStoreWithContacts";
 			TableAlias = "salesvstorewithcontact";
-			ColumnNames = typeof(SalesvStoreWithContactColumnNames).ToDataList<Type, int>();
+			Columns = SalesvStoreWithContactColumnNames;
+			IdColumns = SalesvStoreWithContactIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

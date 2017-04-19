@@ -28,13 +28,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingPurchaseOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingPurchaseOrderHeader>(); }
 		static IEntityWriter<int, SalesSalesOrderHeader> GetSalesSalesOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderHeader>(); }
 		
 		
 		/// <summary>
@@ -48,22 +51,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PurchasingShipMethodColumnNames)f.Key)
+                switch ((PurchasingShipMethodFieldNames)f.Key)
                 {
                     
-					case PurchasingShipMethodColumnNames.Name:
+					case PurchasingShipMethodFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case PurchasingShipMethodColumnNames.ShipBase:
+					case PurchasingShipMethodFieldNames.ShipBase:
 						parms.Add(GetParamName("ShipBase", actionType, taskIndex, ref count), entity.ShipBase);
 						break;
-					case PurchasingShipMethodColumnNames.ShipRate:
+					case PurchasingShipMethodFieldNames.ShipRate:
 						parms.Add(GetParamName("ShipRate", actionType, taskIndex, ref count), entity.ShipRate);
 						break;
-					case PurchasingShipMethodColumnNames.rowguid:
+					case PurchasingShipMethodFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case PurchasingShipMethodColumnNames.ModifiedDate:
+					case PurchasingShipMethodFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -80,7 +83,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_PurchaseOrderHeader_ShipMethod_ShipMethodID
 			var purchasingPurchaseOrderHeader374 = GetPurchasingPurchaseOrderHeaderWriter();
-			if (_cascades.Contains(PurchasingShipMethodCascadeNames.purchasing.purchaseorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingShipMethodCascadeNames.purchasingpurchaseorderheaders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingPurchaseOrderHeaders)
 					Cascade(purchasingPurchaseOrderHeader374, item, context);
 
@@ -89,7 +92,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderHeader_ShipMethod_ShipMethodID
 			var salesSalesOrderHeader375 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(PurchasingShipMethodCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingShipMethodCascadeNames.salessalesorderheaders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					Cascade(salesSalesOrderHeader375, item, context);
 
@@ -108,12 +111,12 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_PurchaseOrderHeader_ShipMethod_ShipMethodID
 			if (entity.PurchasingPurchaseOrderHeaders != null && entity.PurchasingPurchaseOrderHeaders.Count > 0)
 				foreach (var rel in entity.PurchasingPurchaseOrderHeaders)
-					rel.PurchasingPurchaseOrderHeader = entity.Id;
+					rel.ShipMethodID = entity.Id;
 
 			//From Foreign Key FK_SalesOrderHeader_ShipMethod_ShipMethodID
 			if (entity.SalesSalesOrderHeaders != null && entity.SalesSalesOrderHeaders.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderHeaders)
-					rel.SalesSalesOrderHeader = entity.Id;
+					rel.ShipMethodID = entity.Id;
 
 				
 		}
@@ -122,7 +125,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_PurchaseOrderHeader_ShipMethod_ShipMethodID
 			var purchasingPurchaseOrderHeader378 = GetPurchasingPurchaseOrderHeaderWriter();
-			if (_cascades.Contains(PurchasingShipMethodCascadeNames.purchasing.purchaseorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingShipMethodCascadeNames.purchasingpurchaseorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PurchasingPurchaseOrderHeaders)
 					CascadeDelete(purchasingPurchaseOrderHeader378, item, context);
 
@@ -131,7 +134,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_SalesOrderHeader_ShipMethod_ShipMethodID
 			var salesSalesOrderHeader379 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(PurchasingShipMethodCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PurchasingShipMethodCascadeNames.salessalesorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					CascadeDelete(salesSalesOrderHeader379, item, context);
 

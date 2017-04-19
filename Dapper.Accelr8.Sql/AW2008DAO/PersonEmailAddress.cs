@@ -8,20 +8,63 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class PersonEmailAddress : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class PersonEmailAddress : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public PersonEmailAddress()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(PersonEmailAddress dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.BusinessEntityID,
+							dao.EmailAddressID,
+						
+				}
+			};
+		}
+
+			
+			protected int _businessEntityID;
+		public int BusinessEntityID 
+		{ 
+			get { return _businessEntityID; }
+			set 
+			{ 
+				_businessEntityID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _emailAddressID;
+		public int EmailAddressID 
+		{ 
+			get { return _emailAddressID; }
+			set 
+			{ 
+				_emailAddressID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected string _emailAddress;
 		public string EmailAddress 

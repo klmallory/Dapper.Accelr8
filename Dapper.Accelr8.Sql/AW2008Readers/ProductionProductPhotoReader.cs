@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , ProductionProductProductPhoto> _productionProductProductPhotoReader;
-		protected static IEntityReader<int , ProductionProductProductPhoto> GetProductionProductProductPhotoReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductProductPhoto> GetProductionProductProductPhotoReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductProductPhoto>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductProductPhoto>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductProductPhotos(IList<ProductionProductPhoto> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductProductPhoto
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductProductPhotos = typedChildren.Where(b => b.ProductionProductProductPhoto == r.Id).ToList();
+				
+
+				r.ProductionProductProductPhotos = typedChildren.Where(b =>  b.ProductPhotoID == r.Id ).ToList();
 				r.ProductionProductProductPhotos.ToList().ForEach(b => { b.Loaded = false; b.ProductionProductPhoto = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionProductPhoto();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ThumbNailPhoto = GetRowData<byte[]>(dataRow, "ThumbNailPhoto"); 
+			domain.Id = GetRowData<int>(dataRow, "ProductPhotoID"); 
+      		domain.ThumbNailPhoto = GetRowData<byte[]>(dataRow, "ThumbNailPhoto"); 
       		domain.ThumbnailPhotoFileName = GetRowData<string>(dataRow, "ThumbnailPhotoFileName"); 
       		domain.LargePhoto = GetRowData<byte[]>(dataRow, "LargePhoto"); 
       		domain.LargePhotoFileName = GetRowData<string>(dataRow, "LargePhotoFileName"); 
@@ -93,15 +101,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionProductPhoto></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionProductPhoto> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionProductPhoto> WithAllChildrenForExisting(ProductionProductPhoto existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductProductPhotoReader(), id, IdColumn, SetChildrenProductionProductProductPhotos);
+						WithChildForParentValues(GetProductionProductProductPhotoReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ProductPhotoID",  }
+				, SetChildrenProductionProductProductPhotos);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionProductPhoto entity)
         {
@@ -110,11 +119,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductProductPhotoReader(), entity.Id
-				, ProductionProductProductPhotoColumnNames.ProductPhotoID.ToString()
+						WithChildForParentValues(GetProductionProductProductPhotoReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ProductPhotoID",  }
 				, SetChildrenProductionProductProductPhotos);
 
-			QueryResultForChildrenOnly(new List<ProductionProductPhoto>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionProductPhoto>() { entity });
 			entity.Loaded = false;
 			GetProductionProductProductPhotoReader().SetAllChildrenForExisting(entity.ProductionProductProductPhotos);
 				
@@ -125,15 +136,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductProductPhotoReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductProductPhotoColumnNames.ProductPhotoID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionProductProductPhotoReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ProductPhotoID",  }
 				, SetChildrenProductionProductProductPhotos);
 
 					

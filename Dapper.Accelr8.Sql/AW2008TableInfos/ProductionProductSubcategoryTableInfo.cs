@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductSubcategoryColumnNames
+	public enum ProductionProductSubcategoryFieldNames
 	{	
-		ProductSubcategoryID, 	
+		Id, 	
 		ProductCategoryID, 	
 		Name, 	
 		rowguid, 	
@@ -29,20 +29,38 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum ProductionProductSubcategoryCascadeNames
 	{	
-		productionproduct, 	
+		productionproducts, 	
 		
 		productionproductcategory_p, 	}
 
 	public class ProductionProductSubcategoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductSubcategoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductSubcategoryFieldNames.Id, "ProductSubcategoryID" }, 
+						{ (int)ProductionProductSubcategoryFieldNames.ProductCategoryID, "ProductCategoryID" }, 
+						{ (int)ProductionProductSubcategoryFieldNames.Name, "Name" }, 
+						{ (int)ProductionProductSubcategoryFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionProductSubcategoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductSubcategoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductSubcategoryFieldNames.Id, "ProductSubcategoryID" }, 
+				};
+
 		public ProductionProductSubcategoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductSubcategoryColumnNames.ProductSubcategoryID.ToString();
-			//Schema = "Production.ProductSubcategory";
+			Schema = "Production";
 			TableName = "Production.ProductSubcategory";
 			TableAlias = "productionproductsubcategory";
-			ColumnNames = typeof(ProductionProductSubcategoryColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductSubcategoryColumnNames;
+			IdColumns = ProductionProductSubcategoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductSubcategory_ProductCategory_ProductCategoryID

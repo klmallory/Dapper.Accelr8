@@ -27,20 +27,25 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 3
 		//Parent Count 0
-		static IEntityReader<string , SalesCountryRegionCurrency> _salesCountryRegionCurrencyReader;
-		protected static IEntityReader<string , SalesCountryRegionCurrency> GetSalesCountryRegionCurrencyReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesCountryRegionCurrency> GetSalesCountryRegionCurrencyReader()
 		{
-			return _locator.Resolve<IEntityReader<string , SalesCountryRegionCurrency>>();
+			return s_loc8r.GetReader<CompoundKey , SalesCountryRegionCurrency>();
 		}
 
-		static IEntityReader<int , SalesCurrencyRate> _salesCurrencyRateReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesCurrencyRate> GetSalesCurrencyRateReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesCurrencyRate>>();
+			return s_loc8r.GetReader<int , SalesCurrencyRate>();
 		}
 
 		
@@ -52,7 +57,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenSalesCountryRegionCurrencies(IList<SalesCurrency> results, IList<object> children)
 		{
-			//Child Id Type: string
+			//Child Id Type: CompoundKey
 			//Child Type: SalesCountryRegionCurrency
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -65,8 +70,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesCountryRegionCurrencies = typedChildren.Where(b => b.SalesCountryRegionCurrency == r.Id).ToList();
+				
+
+				r.SalesCountryRegionCurrencies = typedChildren.Where(b =>  b.CurrencyCode == r.Id ).ToList();
 				r.SalesCountryRegionCurrencies.ToList().ForEach(b => { b.Loaded = false; b.SalesCurrency = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -77,9 +85,9 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results"></param>
 		/// <param name="children"></param>
-		public void SetChildrenSalesCurrencyRates(IList<SalesCurrency> results, IList<object> children)
+		public void SetChildrenSalesCurrencyRates1(IList<SalesCurrency> results, IList<object> children)
 		{
-			//Child Id Type: string
+			//Child Id Type: int
 			//Child Type: SalesCurrencyRate
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -92,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesCurrencyRates = typedChildren.Where(b => b.SalesCurrencyRate == r.Id).ToList();
-				r.SalesCurrencyRates.ToList().ForEach(b => { b.Loaded = false; b.SalesCurrency = r; b.Loaded = true; });
+				
+
+				r.SalesCurrencyRates1 = typedChildren.Where(b =>  b.FromCurrencyCode == r.Id ).ToList();
+				r.SalesCurrencyRates1.ToList().ForEach(b => { b.Loaded = false; b.SalesCurrency1 = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -104,9 +115,9 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results"></param>
 		/// <param name="children"></param>
-		public void SetChildrenSalesCurrencyRates(IList<SalesCurrency> results, IList<object> children)
+		public void SetChildrenSalesCurrencyRates2(IList<SalesCurrency> results, IList<object> children)
 		{
-			//Child Id Type: string
+			//Child Id Type: int
 			//Child Type: SalesCurrencyRate
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -119,8 +130,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesCurrencyRates = typedChildren.Where(b => b.SalesCurrencyRate == r.Id).ToList();
-				r.SalesCurrencyRates.ToList().ForEach(b => { b.Loaded = false; b.SalesCurrency = r; b.Loaded = true; });
+				
+
+				r.SalesCurrencyRates2 = typedChildren.Where(b =>  b.ToCurrencyCode == r.Id ).ToList();
+				r.SalesCurrencyRates2.ToList().ForEach(b => { b.Loaded = false; b.SalesCurrency2 = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -136,8 +150,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesCurrency();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<string>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<string>(dataRow, "CurrencyCode"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -150,19 +164,24 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<string, SalesCurrency></param>
 		/// <param name="id">string</param>
-        public override IEntityReader<string, SalesCurrency> WithAllChildrenForId(string id)
+        public override IEntityReader<string, SalesCurrency> WithAllChildrenForExisting(SalesCurrency existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesCountryRegionCurrencyReader(), id, IdColumn, SetChildrenSalesCountryRegionCurrencies);
-			
-			WithChildForParentId(GetSalesCurrencyRateReader(), id, IdColumn, SetChildrenSalesCurrencyRates);
-			
-			WithChildForParentId(GetSalesCurrencyRateReader(), id, IdColumn, SetChildrenSalesCurrencyRates);
+						WithChildForParentValues(GetSalesCountryRegionCurrencyReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CurrencyCode",  }
+				, SetChildrenSalesCountryRegionCurrencies);
+						WithChildForParentValues(GetSalesCurrencyRateReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "FromCurrencyCode",  }
+				, SetChildrenSalesCurrencyRates1);
+						WithChildForParentValues(GetSalesCurrencyRateReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ToCurrencyCode",  }
+				, SetChildrenSalesCurrencyRates2);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesCurrency entity)
         {
@@ -171,19 +190,23 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesCountryRegionCurrencyReader(), entity.Id
-				, SalesCountryRegionCurrencyColumnNames.CurrencyCode.ToString()
+						WithChildForParentValues(GetSalesCountryRegionCurrencyReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CurrencyCode",  }
 				, SetChildrenSalesCountryRegionCurrencies);
 
-			WithChildForParentId(GetSalesCurrencyRateReader(), entity.Id
-				, SalesCurrencyRateColumnNames.FromCurrencyCode.ToString()
-				, SetChildrenSalesCurrencyRates);
+						WithChildForParentValues(GetSalesCurrencyRateReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "FromCurrencyCode",  }
+				, SetChildrenSalesCurrencyRates1);
 
-			WithChildForParentId(GetSalesCurrencyRateReader(), entity.Id
-				, SalesCurrencyRateColumnNames.ToCurrencyCode.ToString()
-				, SetChildrenSalesCurrencyRates);
+						WithChildForParentValues(GetSalesCurrencyRateReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ToCurrencyCode",  }
+				, SetChildrenSalesCurrencyRates2);
 
-			QueryResultForChildrenOnly(new List<SalesCurrency>() { entity });
+			
+QueryResultForChildrenOnly(new List<SalesCurrency>() { entity });
 			entity.Loaded = false;
 			GetSalesCountryRegionCurrencyReader().SetAllChildrenForExisting(entity.SalesCountryRegionCurrencies);
 			GetSalesCurrencyRateReader().SetAllChildrenForExisting(entity.SalesCurrencyRates);
@@ -196,35 +219,35 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesCountryRegionCurrencyReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesCountryRegionCurrencyColumnNames.CurrencyCode.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesCountryRegionCurrencyReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CurrencyCode",  }
 				, SetChildrenSalesCountryRegionCurrencies);
 
-			WithChildForParentIds(GetSalesCurrencyRateReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesCurrencyRateColumnNames.FromCurrencyCode.ToString()
-				, SetChildrenSalesCurrencyRates);
+			WithChildForParentsValues(GetSalesCurrencyRateReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "FromCurrencyCode",  }
+				, SetChildrenSalesCurrencyRates1);
 
-			WithChildForParentIds(GetSalesCurrencyRateReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesCurrencyRateColumnNames.ToCurrencyCode.ToString()
-				, SetChildrenSalesCurrencyRates);
+			WithChildForParentsValues(GetSalesCurrencyRateReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ToCurrencyCode",  }
+				, SetChildrenSalesCurrencyRates2);
 
 					
 			QueryResultForChildrenOnly(entities);
 
 			GetSalesCountryRegionCurrencyReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesCountryRegionCurrencies).ToList());
-			GetSalesCurrencyRateReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesCurrencyRates).ToList());
-			GetSalesCurrencyRateReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesCurrencyRates).ToList());
+			GetSalesCurrencyRateReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesCurrencyRates1).ToList());
+			GetSalesCurrencyRateReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesCurrencyRates2).ToList());
 					
 		}
     }

@@ -18,28 +18,44 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonPhoneNumberTypeColumnNames
+	public enum PersonPhoneNumberTypeFieldNames
 	{	
-		PhoneNumberTypeID, 	
+		Id, 	
 		Name, 	
 		ModifiedDate, 	
 	}
 
 	public enum PersonPhoneNumberTypeCascadeNames
 	{	
-		personpersonphone, 	
+		personpersonphones, 	
 		}
 
 	public class PersonPhoneNumberTypeTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonPhoneNumberTypeColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPhoneNumberTypeFieldNames.Id, "PhoneNumberTypeID" }, 
+						{ (int)PersonPhoneNumberTypeFieldNames.Name, "Name" }, 
+						{ (int)PersonPhoneNumberTypeFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonPhoneNumberTypeIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPhoneNumberTypeFieldNames.Id, "PhoneNumberTypeID" }, 
+				};
+
 		public PersonPhoneNumberTypeTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonPhoneNumberTypeColumnNames.PhoneNumberTypeID.ToString();
-			//Schema = "Person.PhoneNumberType";
+			Schema = "Person";
 			TableName = "Person.PhoneNumberType";
 			TableAlias = "personphonenumbertype";
-			ColumnNames = typeof(PersonPhoneNumberTypeColumnNames).ToDataList<Type, int>();
+			Columns = PersonPhoneNumberTypeColumnNames;
+			IdColumns = PersonPhoneNumberTypeIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

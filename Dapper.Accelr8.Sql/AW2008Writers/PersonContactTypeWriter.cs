@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, PersonBusinessEntityContact> GetPersonBusinessEntityContactWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonBusinessEntityContact>>(); }
+		{ return s_loc8r.GetWriter<int, PersonBusinessEntityContact>(); }
 		
 		
 		/// <summary>
@@ -46,13 +49,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonContactTypeColumnNames)f.Key)
+                switch ((PersonContactTypeFieldNames)f.Key)
                 {
                     
-					case PersonContactTypeColumnNames.Name:
+					case PersonContactTypeFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case PersonContactTypeColumnNames.ModifiedDate:
+					case PersonContactTypeFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -69,7 +72,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_BusinessEntityContact_ContactType_ContactTypeID
 			var personBusinessEntityContact48 = GetPersonBusinessEntityContactWriter();
-			if (_cascades.Contains(PersonContactTypeCascadeNames.person.businessentitycontact.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonContactTypeCascadeNames.personbusinessentitycontacts.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityContacts)
 					Cascade(personBusinessEntityContact48, item, context);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_BusinessEntityContact_ContactType_ContactTypeID
 			if (entity.PersonBusinessEntityContacts != null && entity.PersonBusinessEntityContacts.Count > 0)
 				foreach (var rel in entity.PersonBusinessEntityContacts)
-					rel.PersonBusinessEntityContact = entity.Id;
+					rel.ContactTypeID = entity.Id;
 
 				
 		}
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_BusinessEntityContact_ContactType_ContactTypeID
 			var personBusinessEntityContact50 = GetPersonBusinessEntityContactWriter();
-			if (_cascades.Contains(PersonContactTypeCascadeNames.person.businessentitycontact.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(PersonContactTypeCascadeNames.personbusinessentitycontact.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.PersonBusinessEntityContacts)
 					CascadeDelete(personBusinessEntityContact50, item, context);
 

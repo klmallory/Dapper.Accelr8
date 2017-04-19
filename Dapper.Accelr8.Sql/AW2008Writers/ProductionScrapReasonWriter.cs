@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, ProductionWorkOrder> GetProductionWorkOrderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionWorkOrder>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionWorkOrder>(); }
 		
 		
 		/// <summary>
@@ -46,13 +49,13 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionScrapReasonColumnNames)f.Key)
+                switch ((ProductionScrapReasonFieldNames)f.Key)
                 {
                     
-					case ProductionScrapReasonColumnNames.Name:
+					case ProductionScrapReasonFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case ProductionScrapReasonColumnNames.ModifiedDate:
+					case ProductionScrapReasonFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -69,7 +72,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_WorkOrder_ScrapReason_ScrapReasonID
 			var productionWorkOrder368 = GetProductionWorkOrderWriter();
-			if (_cascades.Contains(ProductionScrapReasonCascadeNames.production.workorder.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionScrapReasonCascadeNames.productionworkorders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionWorkOrders)
 					Cascade(productionWorkOrder368, item, context);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_WorkOrder_ScrapReason_ScrapReasonID
 			if (entity.ProductionWorkOrders != null && entity.ProductionWorkOrders.Count > 0)
 				foreach (var rel in entity.ProductionWorkOrders)
-					rel.ProductionWorkOrder = entity.Id;
+					rel.ScrapReasonID = entity.Id;
 
 				
 		}
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_WorkOrder_ScrapReason_ScrapReasonID
 			var productionWorkOrder370 = GetProductionWorkOrderWriter();
-			if (_cascades.Contains(ProductionScrapReasonCascadeNames.production.workorder.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionScrapReasonCascadeNames.productionworkorder.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionWorkOrders)
 					CascadeDelete(productionWorkOrder370, item, context);
 

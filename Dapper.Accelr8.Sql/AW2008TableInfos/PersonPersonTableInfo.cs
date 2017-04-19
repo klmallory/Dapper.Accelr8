@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonPersonColumnNames
+	public enum PersonPersonFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		PersonType, 	
 		NameStyle, 	
 		Title, 	
@@ -37,26 +37,52 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum PersonPersonCascadeNames
 	{	
-		personbusinessentitycontact, 	
-		salescustomer, 	
-		personemailaddress, 	
-		humanresourcesemployee, 	
-		personpassword, 	
-		salespersoncreditcard, 	
-		personpersonphone, 	
+		personbusinessentitycontacts, 	
+		salescustomers, 	
+		personemailaddresses, 	
+		humanresourcesemployees, 	
+		personpasswords, 	
+		salespersoncreditcards, 	
+		personpersonphones, 	
 		
 		personbusinessentity_p, 	}
 
 	public class PersonPersonTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonPersonColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPersonFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)PersonPersonFieldNames.PersonType, "PersonType" }, 
+						{ (int)PersonPersonFieldNames.NameStyle, "NameStyle" }, 
+						{ (int)PersonPersonFieldNames.Title, "Title" }, 
+						{ (int)PersonPersonFieldNames.FirstName, "FirstName" }, 
+						{ (int)PersonPersonFieldNames.MiddleName, "MiddleName" }, 
+						{ (int)PersonPersonFieldNames.LastName, "LastName" }, 
+						{ (int)PersonPersonFieldNames.Suffix, "Suffix" }, 
+						{ (int)PersonPersonFieldNames.EmailPromotion, "EmailPromotion" }, 
+						{ (int)PersonPersonFieldNames.AdditionalContactInfo, "AdditionalContactInfo" }, 
+						{ (int)PersonPersonFieldNames.Demographics, "Demographics" }, 
+						{ (int)PersonPersonFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonPersonFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonPersonIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPersonFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public PersonPersonTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonPersonColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.Person";
+			Schema = "Person";
 			TableName = "Person.Person";
 			TableAlias = "personperson";
-			ColumnNames = typeof(PersonPersonColumnNames).ToDataList<Type, int>();
+			Columns = PersonPersonColumnNames;
+			IdColumns = PersonPersonIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Person_BusinessEntity_BusinessEntityID

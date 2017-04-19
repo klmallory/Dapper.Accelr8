@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesTerritoryColumnNames
+	public enum SalesSalesTerritoryFieldNames
 	{	
-		TerritoryID, 	
+		Id, 	
 		Name, 	
 		CountryRegionCode, 	
 		Group, 	
@@ -34,24 +34,47 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesSalesTerritoryCascadeNames
 	{	
-		personstateprovince, 	
-		salescustomer, 	
-		salessalesorderheader, 	
-		salessalesperson, 	
-		salessalesterritoryhistory, 	
+		personstateprovinces, 	
+		salescustomers, 	
+		salessalesorderheaders, 	
+		salessalespeople, 	
+		salessalesterritoryhistories, 	
 		
 		personcountryregion_p, 	}
 
 	public class SalesSalesTerritoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesTerritoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesTerritoryFieldNames.Id, "TerritoryID" }, 
+						{ (int)SalesSalesTerritoryFieldNames.Name, "Name" }, 
+						{ (int)SalesSalesTerritoryFieldNames.CountryRegionCode, "CountryRegionCode" }, 
+						{ (int)SalesSalesTerritoryFieldNames.Group, "Group" }, 
+						{ (int)SalesSalesTerritoryFieldNames.SalesYTD, "SalesYTD" }, 
+						{ (int)SalesSalesTerritoryFieldNames.SalesLastYear, "SalesLastYear" }, 
+						{ (int)SalesSalesTerritoryFieldNames.CostYTD, "CostYTD" }, 
+						{ (int)SalesSalesTerritoryFieldNames.CostLastYear, "CostLastYear" }, 
+						{ (int)SalesSalesTerritoryFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesTerritoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesTerritoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesTerritoryFieldNames.Id, "TerritoryID" }, 
+				};
+
 		public SalesSalesTerritoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesTerritoryColumnNames.TerritoryID.ToString();
-			//Schema = "Sales.SalesTerritory";
+			Schema = "Sales";
 			TableName = "Sales.SalesTerritory";
 			TableAlias = "salessalesterritory";
-			ColumnNames = typeof(SalesSalesTerritoryColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesTerritoryColumnNames;
+			IdColumns = SalesSalesTerritoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesTerritory_CountryRegion_CountryRegionCode

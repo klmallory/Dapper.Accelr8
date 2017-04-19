@@ -27,50 +27,55 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 7
 		//Parent Count 1
-		static IEntityReader<int , PersonBusinessEntityContact> _personBusinessEntityContactReader;
-		protected static IEntityReader<int , PersonBusinessEntityContact> GetPersonBusinessEntityContactReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonBusinessEntityContact> GetPersonBusinessEntityContactReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonBusinessEntityContact>>();
+			return s_loc8r.GetReader<CompoundKey , PersonBusinessEntityContact>();
 		}
 
-		static IEntityReader<int , SalesCustomer> _salesCustomerReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesCustomer> GetSalesCustomerReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesCustomer>>();
+			return s_loc8r.GetReader<int , SalesCustomer>();
 		}
 
-		static IEntityReader<int , PersonEmailAddress> _personEmailAddressReader;
-		protected static IEntityReader<int , PersonEmailAddress> GetPersonEmailAddressReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonEmailAddress> GetPersonEmailAddressReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonEmailAddress>>();
+			return s_loc8r.GetReader<CompoundKey , PersonEmailAddress>();
 		}
 
-		static IEntityReader<int , HumanResourcesEmployee> _humanResourcesEmployeeReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , HumanResourcesEmployee> GetHumanResourcesEmployeeReader()
 		{
-			return _locator.Resolve<IEntityReader<int , HumanResourcesEmployee>>();
+			return s_loc8r.GetReader<int , HumanResourcesEmployee>();
 		}
 
-		static IEntityReader<int , PersonPassword> _personPasswordReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , PersonPassword> GetPersonPasswordReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonPassword>>();
+			return s_loc8r.GetReader<int , PersonPassword>();
 		}
 
-		static IEntityReader<int , SalesPersonCreditCard> _salesPersonCreditCardReader;
-		protected static IEntityReader<int , SalesPersonCreditCard> GetSalesPersonCreditCardReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesPersonCreditCard> GetSalesPersonCreditCardReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesPersonCreditCard>>();
+			return s_loc8r.GetReader<CompoundKey , SalesPersonCreditCard>();
 		}
 
-		static IEntityReader<int , PersonPersonPhone> _personPersonPhoneReader;
-		protected static IEntityReader<int , PersonPersonPhone> GetPersonPersonPhoneReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PersonPersonPhone> GetPersonPersonPhoneReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PersonPersonPhone>>();
+			return s_loc8r.GetReader<CompoundKey , PersonPersonPhone>();
 		}
 
 		
@@ -82,7 +87,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonBusinessEntityContacts(IList<PersonPerson> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonBusinessEntityContact
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -95,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonBusinessEntityContacts = typedChildren.Where(b => b.PersonBusinessEntityContact == r.Id).ToList();
+				
+
+				r.PersonBusinessEntityContacts = typedChildren.Where(b =>  b.PersonID == r.Id ).ToList();
 				r.PersonBusinessEntityContacts.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -122,8 +130,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesCustomers = typedChildren.Where(b => b.SalesCustomer == r.Id).ToList();
+				
+
+				r.SalesCustomers = typedChildren.Where(b =>  b.PersonID == r.Id ).ToList();
 				r.SalesCustomers.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -136,7 +147,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonEmailAddresses(IList<PersonPerson> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonEmailAddress
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -149,8 +160,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonEmailAddresses = typedChildren.Where(b => b.PersonEmailAddress == r.Id).ToList();
+				
+
+				r.PersonEmailAddresses = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.PersonEmailAddresses.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -176,8 +190,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.HumanResourcesEmployees = typedChildren.Where(b => b.HumanResourcesEmployee == r.Id).ToList();
+				
+
+				r.HumanResourcesEmployees = typedChildren.Where(b =>  b.Id == r.Id ).ToList();
 				r.HumanResourcesEmployees.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -203,8 +220,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonPasswords = typedChildren.Where(b => b.PersonPassword == r.Id).ToList();
+				
+
+				r.PersonPasswords = typedChildren.Where(b =>  b.Id == r.Id ).ToList();
 				r.PersonPasswords.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -217,7 +237,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenSalesPersonCreditCards(IList<PersonPerson> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: SalesPersonCreditCard
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -230,8 +250,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesPersonCreditCards = typedChildren.Where(b => b.SalesPersonCreditCard == r.Id).ToList();
+				
+
+				r.SalesPersonCreditCards = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.SalesPersonCreditCards.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -244,7 +267,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPersonPersonPhones(IList<PersonPerson> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PersonPersonPhone
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -257,8 +280,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PersonPersonPhones = typedChildren.Where(b => b.PersonPersonPhone == r.Id).ToList();
+				
+
+				r.PersonPersonPhones = typedChildren.Where(b =>  b.BusinessEntityID == r.Id ).ToList();
 				r.PersonPersonPhones.ToList().ForEach(b => { b.Loaded = false; b.PersonPerson = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -274,8 +300,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PersonPerson();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.PersonType = GetRowData<string>(dataRow, "PersonType"); 
+			domain.Id = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.PersonType = GetRowData<string>(dataRow, "PersonType"); 
       		domain.NameStyle = GetRowData<object>(dataRow, "NameStyle"); 
       		domain.Title = GetRowData<string>(dataRow, "Title"); 
       		domain.FirstName = GetRowData<object>(dataRow, "FirstName"); 
@@ -298,27 +324,40 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PersonPerson></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PersonPerson> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PersonPerson> WithAllChildrenForExisting(PersonPerson existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPersonBusinessEntityContactReader(), id, IdColumn, SetChildrenPersonBusinessEntityContacts);
-			
-			WithChildForParentId(GetSalesCustomerReader(), id, IdColumn, SetChildrenSalesCustomers);
-			
-			WithChildForParentId(GetPersonEmailAddressReader(), id, IdColumn, SetChildrenPersonEmailAddresses);
-			
-			WithChildForParentId(GetHumanResourcesEmployeeReader(), id, IdColumn, SetChildrenHumanResourcesEmployees);
-			
-			WithChildForParentId(GetPersonPasswordReader(), id, IdColumn, SetChildrenPersonPasswords);
-			
-			WithChildForParentId(GetSalesPersonCreditCardReader(), id, IdColumn, SetChildrenSalesPersonCreditCards);
-			
-			WithChildForParentId(GetPersonPersonPhoneReader(), id, IdColumn, SetChildrenPersonPersonPhones);
+						WithChildForParentValues(GetPersonBusinessEntityContactReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "PersonID",  }
+				, SetChildrenPersonBusinessEntityContacts);
+						WithChildForParentValues(GetSalesCustomerReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "PersonID",  }
+				, SetChildrenSalesCustomers);
+						WithChildForParentValues(GetPersonEmailAddressReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenPersonEmailAddresses);
+						WithChildForParentValues(GetHumanResourcesEmployeeReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "Id",  }
+				, SetChildrenHumanResourcesEmployees);
+						WithChildForParentValues(GetPersonPasswordReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "Id",  }
+				, SetChildrenPersonPasswords);
+						WithChildForParentValues(GetSalesPersonCreditCardReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenSalesPersonCreditCards);
+						WithChildForParentValues(GetPersonPersonPhoneReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
+				, SetChildrenPersonPersonPhones);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PersonPerson entity)
         {
@@ -327,35 +366,43 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPersonBusinessEntityContactReader(), entity.Id
-				, PersonBusinessEntityContactColumnNames.PersonID.ToString()
+						WithChildForParentValues(GetPersonBusinessEntityContactReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "PersonID",  }
 				, SetChildrenPersonBusinessEntityContacts);
 
-			WithChildForParentId(GetSalesCustomerReader(), entity.Id
-				, SalesCustomerColumnNames.PersonID.ToString()
+						WithChildForParentValues(GetSalesCustomerReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "PersonID",  }
 				, SetChildrenSalesCustomers);
 
-			WithChildForParentId(GetPersonEmailAddressReader(), entity.Id
-				, PersonEmailAddressColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetPersonEmailAddressReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenPersonEmailAddresses);
 
-			WithChildForParentId(GetHumanResourcesEmployeeReader(), entity.Id
-				, HumanResourcesEmployeeColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetHumanResourcesEmployeeReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "Id",  }
 				, SetChildrenHumanResourcesEmployees);
 
-			WithChildForParentId(GetPersonPasswordReader(), entity.Id
-				, PersonPasswordColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetPersonPasswordReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "Id",  }
 				, SetChildrenPersonPasswords);
 
-			WithChildForParentId(GetSalesPersonCreditCardReader(), entity.Id
-				, SalesPersonCreditCardColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetSalesPersonCreditCardReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenSalesPersonCreditCards);
 
-			WithChildForParentId(GetPersonPersonPhoneReader(), entity.Id
-				, PersonPersonPhoneColumnNames.BusinessEntityID.ToString()
+						WithChildForParentValues(GetPersonPersonPhoneReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenPersonPersonPhones);
 
-			QueryResultForChildrenOnly(new List<PersonPerson>() { entity });
+			
+QueryResultForChildrenOnly(new List<PersonPerson>() { entity });
 			entity.Loaded = false;
 			GetPersonBusinessEntityContactReader().SetAllChildrenForExisting(entity.PersonBusinessEntityContacts);
 			GetSalesCustomerReader().SetAllChildrenForExisting(entity.SalesCustomers);
@@ -372,51 +419,47 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPersonBusinessEntityContactReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonBusinessEntityContactColumnNames.PersonID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPersonBusinessEntityContactReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "PersonID",  }
 				, SetChildrenPersonBusinessEntityContacts);
 
-			WithChildForParentIds(GetSalesCustomerReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesCustomerColumnNames.PersonID.ToString()
+			WithChildForParentsValues(GetSalesCustomerReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "PersonID",  }
 				, SetChildrenSalesCustomers);
 
-			WithChildForParentIds(GetPersonEmailAddressReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonEmailAddressColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetPersonEmailAddressReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenPersonEmailAddresses);
 
-			WithChildForParentIds(GetHumanResourcesEmployeeReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), HumanResourcesEmployeeColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetHumanResourcesEmployeeReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "Id",  }
 				, SetChildrenHumanResourcesEmployees);
 
-			WithChildForParentIds(GetPersonPasswordReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonPasswordColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetPersonPasswordReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "Id",  }
 				, SetChildrenPersonPasswords);
 
-			WithChildForParentIds(GetSalesPersonCreditCardReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesPersonCreditCardColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetSalesPersonCreditCardReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenSalesPersonCreditCards);
 
-			WithChildForParentIds(GetPersonPersonPhoneReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PersonPersonPhoneColumnNames.BusinessEntityID.ToString()
+			WithChildForParentsValues(GetPersonPersonPhoneReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "BusinessEntityID",  }
 				, SetChildrenPersonPersonPhones);
 
 					

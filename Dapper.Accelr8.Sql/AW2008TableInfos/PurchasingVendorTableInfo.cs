@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PurchasingVendorColumnNames
+	public enum PurchasingVendorFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		AccountNumber, 	
 		Name, 	
 		CreditRating, 	
@@ -32,21 +32,42 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum PurchasingVendorCascadeNames
 	{	
-		purchasingproductvendor, 	
-		purchasingpurchaseorderheader, 	
+		purchasingproductvendors, 	
+		purchasingpurchaseorderheaders, 	
 		
 		personbusinessentity_p, 	}
 
 	public class PurchasingVendorTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PurchasingVendorColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingVendorFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)PurchasingVendorFieldNames.AccountNumber, "AccountNumber" }, 
+						{ (int)PurchasingVendorFieldNames.Name, "Name" }, 
+						{ (int)PurchasingVendorFieldNames.CreditRating, "CreditRating" }, 
+						{ (int)PurchasingVendorFieldNames.PreferredVendorStatus, "PreferredVendorStatus" }, 
+						{ (int)PurchasingVendorFieldNames.ActiveFlag, "ActiveFlag" }, 
+						{ (int)PurchasingVendorFieldNames.PurchasingWebServiceURL, "PurchasingWebServiceURL" }, 
+						{ (int)PurchasingVendorFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PurchasingVendorIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingVendorFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public PurchasingVendorTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PurchasingVendorColumnNames.BusinessEntityID.ToString();
-			//Schema = "Purchasing.Vendor";
+			Schema = "Purchasing";
 			TableName = "Purchasing.Vendor";
 			TableAlias = "purchasingvendor";
-			ColumnNames = typeof(PurchasingVendorColumnNames).ToDataList<Type, int>();
+			Columns = PurchasingVendorColumnNames;
+			IdColumns = PurchasingVendorIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Vendor_BusinessEntity_BusinessEntityID

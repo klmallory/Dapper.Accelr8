@@ -28,11 +28,14 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, HumanResourcesEmployeeDepartmentHistory> GetHumanResourcesEmployeeDepartmentHistoryWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployeeDepartmentHistory>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployeeDepartmentHistory>(); }
 		
 		
 		/// <summary>
@@ -46,19 +49,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((HumanResourcesShiftColumnNames)f.Key)
+                switch ((HumanResourcesShiftFieldNames)f.Key)
                 {
                     
-					case HumanResourcesShiftColumnNames.Name:
+					case HumanResourcesShiftFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case HumanResourcesShiftColumnNames.StartTime:
+					case HumanResourcesShiftFieldNames.StartTime:
 						parms.Add(GetParamName("StartTime", actionType, taskIndex, ref count), entity.StartTime);
 						break;
-					case HumanResourcesShiftColumnNames.EndTime:
+					case HumanResourcesShiftFieldNames.EndTime:
 						parms.Add(GetParamName("EndTime", actionType, taskIndex, ref count), entity.EndTime);
 						break;
-					case HumanResourcesShiftColumnNames.ModifiedDate:
+					case HumanResourcesShiftFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -75,7 +78,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_EmployeeDepartmentHistory_Shift_ShiftID
 			var humanResourcesEmployeeDepartmentHistory371 = GetHumanResourcesEmployeeDepartmentHistoryWriter();
-			if (_cascades.Contains(HumanResourcesShiftCascadeNames.humanresources.employeedepartmenthistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesShiftCascadeNames.humanresourcesemployeedepartmenthistories.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesEmployeeDepartmentHistories)
 					Cascade(humanResourcesEmployeeDepartmentHistory371, item, context);
 
@@ -94,7 +97,7 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_EmployeeDepartmentHistory_Shift_ShiftID
 			if (entity.HumanResourcesEmployeeDepartmentHistories != null && entity.HumanResourcesEmployeeDepartmentHistories.Count > 0)
 				foreach (var rel in entity.HumanResourcesEmployeeDepartmentHistories)
-					rel.HumanResourcesEmployeeDepartmentHistory = entity.Id;
+					rel.ShiftID = entity.Id;
 
 				
 		}
@@ -103,7 +106,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_EmployeeDepartmentHistory_Shift_ShiftID
 			var humanResourcesEmployeeDepartmentHistory373 = GetHumanResourcesEmployeeDepartmentHistoryWriter();
-			if (_cascades.Contains(HumanResourcesShiftCascadeNames.humanresources.employeedepartmenthistory.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(HumanResourcesShiftCascadeNames.humanresourcesemployeedepartmenthistory.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.HumanResourcesEmployeeDepartmentHistories)
 					CascadeDelete(humanResourcesEmployeeDepartmentHistory373, item, context);
 

@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 1
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesSalesTaxRate();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.StateProvinceID = GetRowData<int>(dataRow, "StateProvinceID"); 
+			domain.Id = GetRowData<int>(dataRow, "SalesTaxRateID"); 
+      		domain.StateProvinceID = GetRowData<int>(dataRow, "StateProvinceID"); 
       		domain.TaxType = GetRowData<byte>(dataRow, "TaxType"); 
       		domain.TaxRate = GetRowData<decimal>(dataRow, "TaxRate"); 
       		domain.Name = GetRowData<object>(dataRow, "Name"); 
@@ -61,13 +66,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesSalesTaxRate></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesSalesTaxRate> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesSalesTaxRate> WithAllChildrenForExisting(SalesSalesTaxRate existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesSalesTaxRate entity)
         {

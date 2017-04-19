@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesOrderDetailColumnNames
+	public enum SalesSalesOrderDetailFieldNames
 	{	
 		SalesOrderID, 	
 		SalesOrderDetailID, 	
@@ -36,26 +36,52 @@ namespace Dapper.Accelr8.AW2008TableInfos
 	public enum SalesSalesOrderDetailCascadeNames
 	{	
 		
-		salesspecialofferproduct_p, 	
+		salesspecialofferproduct1_p, 	
+		salesspecialofferproduct2_p, 	
 		salessalesorderheader_p, 	}
 
 	public class SalesSalesOrderDetailTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesOrderDetailColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesOrderDetailFieldNames.SalesOrderID, "SalesOrderID" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.SalesOrderDetailID, "SalesOrderDetailID" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.CarrierTrackingNumber, "CarrierTrackingNumber" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.OrderQty, "OrderQty" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.ProductID, "ProductID" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.SpecialOfferID, "SpecialOfferID" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.UnitPrice, "UnitPrice" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.UnitPriceDiscount, "UnitPriceDiscount" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.LineTotal, "LineTotal" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesOrderDetailIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesOrderDetailFieldNames.SalesOrderID, "SalesOrderID" }, 
+						{ (int)SalesSalesOrderDetailFieldNames.SalesOrderDetailID, "SalesOrderDetailID" }, 
+				};
+
 		public SalesSalesOrderDetailTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesOrderDetailColumnNames.SalesOrderID.ToString();
-			//Schema = "Sales.SalesOrderDetail";
+			Schema = "Sales";
 			TableName = "Sales.SalesOrderDetail";
 			TableAlias = "salessalesorderdetail";
-			ColumnNames = typeof(SalesSalesOrderDetailColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesOrderDetailColumnNames;
+			IdColumns = SalesSalesOrderDetailIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<int, SalesSpecialOfferProduct>("SalesSpecialOfferProduct")),
 			TableName = "Sales.SpecialOfferProduct",
-			Alias = TableAlias + "_" + "SalesSpecialOfferProduct",
+			Alias = TableAlias + "_" + "SalesSpecialOfferProduct1",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -68,7 +94,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.SpecialOfferID == null || row.SpecialOfferID == default(int))
 						return st;
 
-					st.SalesSpecialOfferProduct = reader.LoadEntityObject(row);
+					st.SalesSpecialOfferProduct1 = reader.LoadEntityObject(row);
 
 					return st;
 				},
@@ -88,7 +114,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<int, SalesSpecialOfferProduct>("SalesSpecialOfferProduct")),
 			TableName = "Sales.SpecialOfferProduct",
-			Alias = TableAlias + "_" + "SalesSpecialOfferProduct",
+			Alias = TableAlias + "_" + "SalesSpecialOfferProduct2",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -101,7 +127,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.ProductID == null || row.ProductID == default(int))
 						return st;
 
-					st.SalesSpecialOfferProduct = reader.LoadEntityObject(row);
+					st.SalesSpecialOfferProduct2 = reader.LoadEntityObject(row);
 
 					return st;
 				},

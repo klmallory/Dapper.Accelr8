@@ -8,20 +8,23 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesTaxRate : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesTaxRate : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesSalesTaxRate()
-		{			
+		{
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected int _stateProvinceID;
 		public int StateProvinceID 

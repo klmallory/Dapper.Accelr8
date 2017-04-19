@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum HumanResourcesvJobCandidateEmploymentColumnNames
+	public enum HumanResourcesvJobCandidateEmploymentFieldNames
 	{	
 		JobCandidateID, 	
 		Emp__StartDate, 	
@@ -38,15 +38,39 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class HumanResourcesvJobCandidateEmploymentTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> HumanResourcesvJobCandidateEmploymentColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.JobCandidateID, "JobCandidateID" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__StartDate, "Emp.StartDate" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__EndDate, "Emp.EndDate" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__OrgName, "Emp.OrgName" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__JobTitle, "Emp.JobTitle" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__Responsibility, "Emp.Responsibility" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__FunctionCategory, "Emp.FunctionCategory" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__IndustryCategory, "Emp.IndustryCategory" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__Loc__CountryRegion, "Emp.Loc.CountryRegion" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__Loc__State, "Emp.Loc.State" }, 
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.Emp__Loc__City, "Emp.Loc.City" }, 
+				};	
+
+		public static readonly IDictionary<int, string> HumanResourcesvJobCandidateEmploymentIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)HumanResourcesvJobCandidateEmploymentFieldNames.JobCandidateID, "JobCandidateID" }, 
+				};
+
 		public HumanResourcesvJobCandidateEmploymentTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = HumanResourcesvJobCandidateEmploymentColumnNames.JobCandidateID.ToString();
-			//Schema = "HumanResources.vJobCandidateEmployment";
+			Schema = "HumanResources";
 			TableName = "HumanResources.vJobCandidateEmployment";
 			TableAlias = "humanresourcesvjobcandidateemployment";
-			ColumnNames = typeof(HumanResourcesvJobCandidateEmploymentColumnNames).ToDataList<Type, int>();
+			Columns = HumanResourcesvJobCandidateEmploymentColumnNames;
+			IdColumns = HumanResourcesvJobCandidateEmploymentIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

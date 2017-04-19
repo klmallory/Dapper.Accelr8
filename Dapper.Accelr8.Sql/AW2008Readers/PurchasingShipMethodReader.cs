@@ -27,20 +27,25 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 2
 		//Parent Count 0
-		static IEntityReader<int , PurchasingPurchaseOrderHeader> _purchasingPurchaseOrderHeaderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PurchasingPurchaseOrderHeader>>();
+			return s_loc8r.GetReader<int , PurchasingPurchaseOrderHeader>();
 		}
 
-		static IEntityReader<int , SalesSalesOrderHeader> _salesSalesOrderHeaderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesSalesOrderHeader> GetSalesSalesOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesOrderHeader>>();
+			return s_loc8r.GetReader<int , SalesSalesOrderHeader>();
 		}
 
 		
@@ -65,8 +70,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PurchasingPurchaseOrderHeaders = typedChildren.Where(b => b.PurchasingPurchaseOrderHeader == r.Id).ToList();
+				
+
+				r.PurchasingPurchaseOrderHeaders = typedChildren.Where(b =>  b.ShipMethodID == r.Id ).ToList();
 				r.PurchasingPurchaseOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.PurchasingShipMethod = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -92,8 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaders = typedChildren.Where(b => b.SalesSalesOrderHeader == r.Id).ToList();
+				
+
+				r.SalesSalesOrderHeaders = typedChildren.Where(b =>  b.ShipMethodID == r.Id ).ToList();
 				r.SalesSalesOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.PurchasingShipMethod = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -109,8 +120,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PurchasingShipMethod();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "ShipMethodID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ShipBase = GetRowData<decimal>(dataRow, "ShipBase"); 
       		domain.ShipRate = GetRowData<decimal>(dataRow, "ShipRate"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
@@ -126,17 +137,20 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PurchasingShipMethod></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PurchasingShipMethod> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PurchasingShipMethod> WithAllChildrenForExisting(PurchasingShipMethod existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPurchasingPurchaseOrderHeaderReader(), id, IdColumn, SetChildrenPurchasingPurchaseOrderHeaders);
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaders);
+						WithChildForParentValues(GetPurchasingPurchaseOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ShipMethodID",  }
+				, SetChildrenPurchasingPurchaseOrderHeaders);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ShipMethodID",  }
+				, SetChildrenSalesSalesOrderHeaders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PurchasingShipMethod entity)
         {
@@ -145,15 +159,18 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPurchasingPurchaseOrderHeaderReader(), entity.Id
-				, PurchasingPurchaseOrderHeaderColumnNames.ShipMethodID.ToString()
+						WithChildForParentValues(GetPurchasingPurchaseOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ShipMethodID",  }
 				, SetChildrenPurchasingPurchaseOrderHeaders);
 
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), entity.Id
-				, SalesSalesOrderHeaderColumnNames.ShipMethodID.ToString()
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ShipMethodID",  }
 				, SetChildrenSalesSalesOrderHeaders);
 
-			QueryResultForChildrenOnly(new List<PurchasingShipMethod>() { entity });
+			
+QueryResultForChildrenOnly(new List<PurchasingShipMethod>() { entity });
 			entity.Loaded = false;
 			GetPurchasingPurchaseOrderHeaderReader().SetAllChildrenForExisting(entity.PurchasingPurchaseOrderHeaders);
 			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaders);
@@ -165,21 +182,22 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPurchasingPurchaseOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingPurchaseOrderHeaderColumnNames.ShipMethodID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPurchasingPurchaseOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ShipMethodID",  }
 				, SetChildrenPurchasingPurchaseOrderHeaders);
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderColumnNames.ShipMethodID.ToString()
+			WithChildForParentsValues(GetSalesSalesOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ShipMethodID",  }
 				, SetChildrenSalesSalesOrderHeaders);
 
 					

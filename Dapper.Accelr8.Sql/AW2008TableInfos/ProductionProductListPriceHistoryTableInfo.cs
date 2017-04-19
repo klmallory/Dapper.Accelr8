@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductListPriceHistoryColumnNames
+	public enum ProductionProductListPriceHistoryFieldNames
 	{	
 		ProductID, 	
 		StartDate, 	
@@ -33,15 +33,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class ProductionProductListPriceHistoryTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductListPriceHistoryColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductListPriceHistoryFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductListPriceHistoryFieldNames.StartDate, "StartDate" }, 
+						{ (int)ProductionProductListPriceHistoryFieldNames.EndDate, "EndDate" }, 
+						{ (int)ProductionProductListPriceHistoryFieldNames.ListPrice, "ListPrice" }, 
+						{ (int)ProductionProductListPriceHistoryFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductListPriceHistoryIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductListPriceHistoryFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductListPriceHistoryFieldNames.StartDate, "StartDate" }, 
+				};
+
 		public ProductionProductListPriceHistoryTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductListPriceHistoryColumnNames.ProductID.ToString();
-			//Schema = "Production.ProductListPriceHistory";
+			Schema = "Production";
 			TableName = "Production.ProductListPriceHistory";
 			TableAlias = "productionproductlistpricehistory";
-			ColumnNames = typeof(ProductionProductListPriceHistoryColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductListPriceHistoryColumnNames;
+			IdColumns = ProductionProductListPriceHistoryIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductListPriceHistory_Product_ProductID

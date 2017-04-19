@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonEmailAddressColumnNames
+	public enum PersonEmailAddressFieldNames
 	{	
 		BusinessEntityID, 	
 		EmailAddressID, 	
@@ -33,15 +33,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		personperson_p, 	}
 
 	public class PersonEmailAddressTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonEmailAddressColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonEmailAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonEmailAddressFieldNames.EmailAddressID, "EmailAddressID" }, 
+						{ (int)PersonEmailAddressFieldNames.EmailAddress, "EmailAddress" }, 
+						{ (int)PersonEmailAddressFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonEmailAddressFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonEmailAddressIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonEmailAddressFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonEmailAddressFieldNames.EmailAddressID, "EmailAddressID" }, 
+				};
+
 		public PersonEmailAddressTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonEmailAddressColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.EmailAddress";
+			Schema = "Person";
 			TableName = "Person.EmailAddress";
 			TableAlias = "personemailaddress";
-			ColumnNames = typeof(PersonEmailAddressColumnNames).ToDataList<Type, int>();
+			Columns = PersonEmailAddressColumnNames;
+			IdColumns = PersonEmailAddressIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_EmailAddress_Person_BusinessEntityID

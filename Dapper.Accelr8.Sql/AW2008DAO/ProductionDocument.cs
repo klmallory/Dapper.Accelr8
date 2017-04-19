@@ -8,21 +8,24 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionDocument : Dapper.Accelr8.Repo.Domain.BaseEntity<Microsoft.SqlServer.Types.SqlHierarchyId>
+	public class ProductionDocument : Dapper.Accelr8.Repo.Domain.BaseEntity<Microsoft.SqlServer.Types.SqlHierarchyId>
 	{
 			public ProductionDocument()
-		{			
+		{
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		_document = new byte[0];
 		}
 
 
+	
 		
 		protected short? _documentLevel;
 		public short? DocumentLevel 

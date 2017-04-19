@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonBusinessEntityContactColumnNames
+	public enum PersonBusinessEntityContactFieldNames
 	{	
 		BusinessEntityID, 	
 		PersonID, 	
@@ -35,15 +35,35 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		personperson_p, 	}
 
 	public class PersonBusinessEntityContactTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonBusinessEntityContactColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonBusinessEntityContactFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonBusinessEntityContactFieldNames.PersonID, "PersonID" }, 
+						{ (int)PersonBusinessEntityContactFieldNames.ContactTypeID, "ContactTypeID" }, 
+						{ (int)PersonBusinessEntityContactFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonBusinessEntityContactFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonBusinessEntityContactIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonBusinessEntityContactFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonBusinessEntityContactFieldNames.PersonID, "PersonID" }, 
+						{ (int)PersonBusinessEntityContactFieldNames.ContactTypeID, "ContactTypeID" }, 
+				};
+
 		public PersonBusinessEntityContactTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonBusinessEntityContactColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.BusinessEntityContact";
+			Schema = "Person";
 			TableName = "Person.BusinessEntityContact";
 			TableAlias = "personbusinessentitycontact";
-			ColumnNames = typeof(PersonBusinessEntityContactColumnNames).ToDataList<Type, int>();
+			Columns = PersonBusinessEntityContactColumnNames;
+			IdColumns = PersonBusinessEntityContactIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_BusinessEntityContact_BusinessEntity_BusinessEntityID

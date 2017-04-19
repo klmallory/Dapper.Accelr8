@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductReviewColumnNames
+	public enum ProductionProductReviewFieldNames
 	{	
-		ProductReviewID, 	
+		Id, 	
 		ProductID, 	
 		ReviewerName, 	
 		ReviewDate, 	
@@ -36,15 +36,36 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class ProductionProductReviewTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductReviewColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductReviewFieldNames.Id, "ProductReviewID" }, 
+						{ (int)ProductionProductReviewFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionProductReviewFieldNames.ReviewerName, "ReviewerName" }, 
+						{ (int)ProductionProductReviewFieldNames.ReviewDate, "ReviewDate" }, 
+						{ (int)ProductionProductReviewFieldNames.EmailAddress, "EmailAddress" }, 
+						{ (int)ProductionProductReviewFieldNames.Rating, "Rating" }, 
+						{ (int)ProductionProductReviewFieldNames.Comments, "Comments" }, 
+						{ (int)ProductionProductReviewFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductReviewIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductReviewFieldNames.Id, "ProductReviewID" }, 
+				};
+
 		public ProductionProductReviewTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductReviewColumnNames.ProductReviewID.ToString();
-			//Schema = "Production.ProductReview";
+			Schema = "Production";
 			TableName = "Production.ProductReview";
 			TableAlias = "productionproductreview";
-			ColumnNames = typeof(ProductionProductReviewColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductReviewColumnNames;
+			IdColumns = ProductionProductReviewIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductReview_Product_ProductID

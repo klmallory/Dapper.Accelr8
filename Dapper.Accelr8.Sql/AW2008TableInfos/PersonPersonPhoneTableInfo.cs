@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonPersonPhoneColumnNames
+	public enum PersonPersonPhoneFieldNames
 	{	
 		BusinessEntityID, 	
 		PhoneNumber, 	
@@ -33,15 +33,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		personphonenumbertype_p, 	}
 
 	public class PersonPersonPhoneTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonPersonPhoneColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPersonPhoneFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonPersonPhoneFieldNames.PhoneNumber, "PhoneNumber" }, 
+						{ (int)PersonPersonPhoneFieldNames.PhoneNumberTypeID, "PhoneNumberTypeID" }, 
+						{ (int)PersonPersonPhoneFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonPersonPhoneIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPersonPhoneFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonPersonPhoneFieldNames.PhoneNumber, "PhoneNumber" }, 
+						{ (int)PersonPersonPhoneFieldNames.PhoneNumberTypeID, "PhoneNumberTypeID" }, 
+				};
+
 		public PersonPersonPhoneTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonPersonPhoneColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.PersonPhone";
+			Schema = "Person";
 			TableName = "Person.PersonPhone";
 			TableAlias = "personpersonphone";
-			ColumnNames = typeof(PersonPersonPhoneColumnNames).ToDataList<Type, int>();
+			Columns = PersonPersonPhoneColumnNames;
+			IdColumns = PersonPersonPhoneIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_PersonPhone_Person_BusinessEntityID

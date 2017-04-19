@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesOrderHeaderSalesReasonColumnNames
+	public enum SalesSalesOrderHeaderSalesReasonFieldNames
 	{	
 		SalesOrderID, 	
 		SalesReasonID, 	
@@ -32,15 +32,32 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		salessalesreason_p, 	}
 
 	public class SalesSalesOrderHeaderSalesReasonTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesOrderHeaderSalesReasonColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesOrderHeaderSalesReasonFieldNames.SalesOrderID, "SalesOrderID" }, 
+						{ (int)SalesSalesOrderHeaderSalesReasonFieldNames.SalesReasonID, "SalesReasonID" }, 
+						{ (int)SalesSalesOrderHeaderSalesReasonFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesOrderHeaderSalesReasonIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesOrderHeaderSalesReasonFieldNames.SalesOrderID, "SalesOrderID" }, 
+						{ (int)SalesSalesOrderHeaderSalesReasonFieldNames.SalesReasonID, "SalesReasonID" }, 
+				};
+
 		public SalesSalesOrderHeaderSalesReasonTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesOrderHeaderSalesReasonColumnNames.SalesOrderID.ToString();
-			//Schema = "Sales.SalesOrderHeaderSalesReason";
+			Schema = "Sales";
 			TableName = "Sales.SalesOrderHeaderSalesReason";
 			TableAlias = "salessalesorderheadersalesreason";
-			ColumnNames = typeof(SalesSalesOrderHeaderSalesReasonColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesOrderHeaderSalesReasonColumnNames;
+			IdColumns = SalesSalesOrderHeaderSalesReasonIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID

@@ -8,20 +8,63 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesCountryRegionCurrency : Dapper.Accelr8.Repo.Domain.BaseEntity<string>
+	public class SalesCountryRegionCurrency : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public SalesCountryRegionCurrency()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(SalesCountryRegionCurrency dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.CountryRegionCode,
+							dao.CurrencyCode,
+						
+				}
+			};
+		}
+
+			
+			protected string _countryRegionCode;
+		public string CountryRegionCode 
+		{ 
+			get { return _countryRegionCode; }
+			set 
+			{ 
+				_countryRegionCode = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected string _currencyCode;
+		public string CurrencyCode 
+		{ 
+			get { return _currencyCode; }
+			set 
+			{ 
+				_currencyCode = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected DateTime _modifiedDate;
 		public DateTime ModifiedDate 

@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class ProductionWorkOrderRoutingWriter : EntityWriter<int, ProductionWorkOrderRouting>
+    public class ProductionWorkOrderRoutingWriter : EntityWriter<CompoundKey, ProductionWorkOrderRouting>
     {
         public ProductionWorkOrderRoutingWriter
 			(ProductionWorkOrderRoutingTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionWorkOrder> GetProductionWorkOrderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionWorkOrder>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionWorkOrder>(); }
 		static IEntityWriter<short, ProductionLocation> GetProductionLocationWriter()
-		{ return _locator.Resolve<IEntityWriter<short, ProductionLocation>>(); }
+		{ return s_loc8r.GetWriter<short, ProductionLocation>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,34 +51,34 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionWorkOrderRoutingColumnNames)f.Key)
+                switch ((ProductionWorkOrderRoutingFieldNames)f.Key)
                 {
                     
-					case ProductionWorkOrderRoutingColumnNames.LocationID:
+					case ProductionWorkOrderRoutingFieldNames.LocationID:
 						parms.Add(GetParamName("LocationID", actionType, taskIndex, ref count), entity.LocationID);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ScheduledStartDate:
+					case ProductionWorkOrderRoutingFieldNames.ScheduledStartDate:
 						parms.Add(GetParamName("ScheduledStartDate", actionType, taskIndex, ref count), entity.ScheduledStartDate);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ScheduledEndDate:
+					case ProductionWorkOrderRoutingFieldNames.ScheduledEndDate:
 						parms.Add(GetParamName("ScheduledEndDate", actionType, taskIndex, ref count), entity.ScheduledEndDate);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ActualStartDate:
+					case ProductionWorkOrderRoutingFieldNames.ActualStartDate:
 						parms.Add(GetParamName("ActualStartDate", actionType, taskIndex, ref count), entity.ActualStartDate);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ActualEndDate:
+					case ProductionWorkOrderRoutingFieldNames.ActualEndDate:
 						parms.Add(GetParamName("ActualEndDate", actionType, taskIndex, ref count), entity.ActualEndDate);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ActualResourceHrs:
+					case ProductionWorkOrderRoutingFieldNames.ActualResourceHrs:
 						parms.Add(GetParamName("ActualResourceHrs", actionType, taskIndex, ref count), entity.ActualResourceHrs);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.PlannedCost:
+					case ProductionWorkOrderRoutingFieldNames.PlannedCost:
 						parms.Add(GetParamName("PlannedCost", actionType, taskIndex, ref count), entity.PlannedCost);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ActualCost:
+					case ProductionWorkOrderRoutingFieldNames.ActualCost:
 						parms.Add(GetParamName("ActualCost", actionType, taskIndex, ref count), entity.ActualCost);
 						break;
-					case ProductionWorkOrderRoutingColumnNames.ModifiedDate:
+					case ProductionWorkOrderRoutingFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -94,13 +97,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_WorkOrderRouting_WorkOrder_WorkOrderID
 			var productionWorkOrder438 = GetProductionWorkOrderWriter();
-		if ((_cascades.Contains(ProductionWorkOrderRoutingCascadeNames.productionworkorder.ToString()) || _cascades.Contains("all")) && entity.ProductionWorkOrder != null)
+		if ((_cascades.Contains(ProductionWorkOrderRoutingCascadeNames.productionworkorder_p.ToString()) || _cascades.Contains("all")) && entity.ProductionWorkOrder != null)
 			if (Cascade(productionWorkOrder438, entity.ProductionWorkOrder, context))
 				WithParent(productionWorkOrder438, entity);
 
 			//From Foreign Key FK_WorkOrderRouting_Location_LocationID
 			var productionLocation439 = GetProductionLocationWriter();
-		if ((_cascades.Contains(ProductionWorkOrderRoutingCascadeNames.productionlocation.ToString()) || _cascades.Contains("all")) && entity.ProductionLocation != null)
+		if ((_cascades.Contains(ProductionWorkOrderRoutingCascadeNames.productionlocation_p.ToString()) || _cascades.Contains("all")) && entity.ProductionLocation != null)
 			if (Cascade(productionLocation439, entity.ProductionLocation, context))
 				WithParent(productionLocation439, entity);
 
@@ -114,11 +117,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_WorkOrderRouting_WorkOrder_WorkOrderID
 			if (entity.ProductionWorkOrder != null)
-				entity.ProductionWorkOrderRouting = entity.ProductionWorkOrder.Id;
+				entity.WorkOrderID = entity.ProductionWorkOrder.Id;
 
 			//From Foreign Key FK_WorkOrderRouting_Location_LocationID
 			if (entity.ProductionLocation != null)
-				entity.ProductionWorkOrderRouting = entity.ProductionLocation.Id;
+				entity.LocationID = entity.ProductionLocation.Id;
 
 		}
 

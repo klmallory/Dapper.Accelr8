@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionProductModelColumnNames
+	public enum ProductionProductModelFieldNames
 	{	
-		ProductModelID, 	
+		Id, 	
 		Name, 	
 		CatalogDescription, 	
 		Instructions, 	
@@ -30,21 +30,40 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum ProductionProductModelCascadeNames
 	{	
-		productionproductmodelillustration, 	
-		productionproductmodelproductdescriptionculture, 	
-		productionproduct, 	
+		productionproductmodelillustrations, 	
+		productionproductmodelproductdescriptioncultures, 	
+		productionproducts, 	
 		}
 
 	public class ProductionProductModelTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionProductModelColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductModelFieldNames.Id, "ProductModelID" }, 
+						{ (int)ProductionProductModelFieldNames.Name, "Name" }, 
+						{ (int)ProductionProductModelFieldNames.CatalogDescription, "CatalogDescription" }, 
+						{ (int)ProductionProductModelFieldNames.Instructions, "Instructions" }, 
+						{ (int)ProductionProductModelFieldNames.rowguid, "rowguid" }, 
+						{ (int)ProductionProductModelFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionProductModelIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionProductModelFieldNames.Id, "ProductModelID" }, 
+				};
+
 		public ProductionProductModelTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = ProductionProductModelColumnNames.ProductModelID.ToString();
-			//Schema = "Production.ProductModel";
+			Schema = "Production";
 			TableName = "Production.ProductModel";
 			TableAlias = "productionproductmodel";
-			ColumnNames = typeof(ProductionProductModelColumnNames).ToDataList<Type, int>();
+			Columns = ProductionProductModelColumnNames;
+			IdColumns = ProductionProductModelIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

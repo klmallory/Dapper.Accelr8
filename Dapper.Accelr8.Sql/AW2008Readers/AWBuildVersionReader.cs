@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 0
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new AWBuildVersion();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<byte>(dataRow, IdColumn);
-				domain.Database_spc_Version = GetRowData<string>(dataRow, "Database Version"); 
+			domain.Id = GetRowData<byte>(dataRow, "SystemInformationID"); 
+      		domain.Database_Spc_Version = GetRowData<string>(dataRow, "Database Version"); 
       		domain.VersionDate = GetRowData<DateTime>(dataRow, "VersionDate"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
@@ -58,13 +63,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<byte, AWBuildVersion></param>
 		/// <param name="id">byte</param>
-        public override IEntityReader<byte, AWBuildVersion> WithAllChildrenForId(byte id)
+        public override IEntityReader<byte, AWBuildVersion> WithAllChildrenForExisting(AWBuildVersion existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(AWBuildVersion entity)
         {

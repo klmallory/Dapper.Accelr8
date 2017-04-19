@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 3
@@ -43,8 +48,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionBillOfMaterial();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ProductAssemblyID = GetRowData<int?>(dataRow, "ProductAssemblyID"); 
+			domain.Id = GetRowData<int>(dataRow, "BillOfMaterialsID"); 
+      		domain.ProductAssemblyID = GetRowData<int?>(dataRow, "ProductAssemblyID"); 
       		domain.ComponentID = GetRowData<int>(dataRow, "ComponentID"); 
       		domain.StartDate = GetRowData<DateTime>(dataRow, "StartDate"); 
       		domain.EndDate = GetRowData<DateTime?>(dataRow, "EndDate"); 
@@ -63,13 +68,12 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionBillOfMaterial></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionBillOfMaterial> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionBillOfMaterial> WithAllChildrenForExisting(ProductionBillOfMaterial existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionBillOfMaterial entity)
         {

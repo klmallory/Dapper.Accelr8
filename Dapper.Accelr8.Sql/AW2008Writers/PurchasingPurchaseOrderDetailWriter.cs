@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class PurchasingPurchaseOrderDetailWriter : EntityWriter<int, PurchasingPurchaseOrderDetail>
+    public class PurchasingPurchaseOrderDetailWriter : EntityWriter<CompoundKey, PurchasingPurchaseOrderDetail>
     {
         public PurchasingPurchaseOrderDetailWriter
 			(PurchasingPurchaseOrderDetailTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, PurchasingPurchaseOrderHeader> GetPurchasingPurchaseOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PurchasingPurchaseOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, PurchasingPurchaseOrderHeader>(); }
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,34 +51,34 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PurchasingPurchaseOrderDetailColumnNames)f.Key)
+                switch ((PurchasingPurchaseOrderDetailFieldNames)f.Key)
                 {
                     
-					case PurchasingPurchaseOrderDetailColumnNames.DueDate:
+					case PurchasingPurchaseOrderDetailFieldNames.DueDate:
 						parms.Add(GetParamName("DueDate", actionType, taskIndex, ref count), entity.DueDate);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.OrderQty:
+					case PurchasingPurchaseOrderDetailFieldNames.OrderQty:
 						parms.Add(GetParamName("OrderQty", actionType, taskIndex, ref count), entity.OrderQty);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.ProductID:
+					case PurchasingPurchaseOrderDetailFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.UnitPrice:
+					case PurchasingPurchaseOrderDetailFieldNames.UnitPrice:
 						parms.Add(GetParamName("UnitPrice", actionType, taskIndex, ref count), entity.UnitPrice);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.LineTotal:
+					case PurchasingPurchaseOrderDetailFieldNames.LineTotal:
 						parms.Add(GetParamName("LineTotal", actionType, taskIndex, ref count), entity.LineTotal);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.ReceivedQty:
+					case PurchasingPurchaseOrderDetailFieldNames.ReceivedQty:
 						parms.Add(GetParamName("ReceivedQty", actionType, taskIndex, ref count), entity.ReceivedQty);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.RejectedQty:
+					case PurchasingPurchaseOrderDetailFieldNames.RejectedQty:
 						parms.Add(GetParamName("RejectedQty", actionType, taskIndex, ref count), entity.RejectedQty);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.StockedQty:
+					case PurchasingPurchaseOrderDetailFieldNames.StockedQty:
 						parms.Add(GetParamName("StockedQty", actionType, taskIndex, ref count), entity.StockedQty);
 						break;
-					case PurchasingPurchaseOrderDetailColumnNames.ModifiedDate:
+					case PurchasingPurchaseOrderDetailFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -94,13 +97,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID
 			var purchasingPurchaseOrderHeader279 = GetPurchasingPurchaseOrderHeaderWriter();
-		if ((_cascades.Contains(PurchasingPurchaseOrderDetailCascadeNames.purchasingpurchaseorderheader.ToString()) || _cascades.Contains("all")) && entity.PurchasingPurchaseOrderHeader != null)
+		if ((_cascades.Contains(PurchasingPurchaseOrderDetailCascadeNames.purchasingpurchaseorderheader_p.ToString()) || _cascades.Contains("all")) && entity.PurchasingPurchaseOrderHeader != null)
 			if (Cascade(purchasingPurchaseOrderHeader279, entity.PurchasingPurchaseOrderHeader, context))
 				WithParent(purchasingPurchaseOrderHeader279, entity);
 
 			//From Foreign Key FK_PurchaseOrderDetail_Product_ProductID
 			var productionProduct280 = GetProductionProductWriter();
-		if ((_cascades.Contains(PurchasingPurchaseOrderDetailCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(PurchasingPurchaseOrderDetailCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct280, entity.ProductionProduct, context))
 				WithParent(productionProduct280, entity);
 
@@ -114,11 +117,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID
 			if (entity.PurchasingPurchaseOrderHeader != null)
-				entity.PurchasingPurchaseOrderDetail = entity.PurchasingPurchaseOrderHeader.Id;
+				entity.PurchaseOrderID = entity.PurchasingPurchaseOrderHeader.Id;
 
 			//From Foreign Key FK_PurchaseOrderDetail_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.PurchasingPurchaseOrderDetail = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

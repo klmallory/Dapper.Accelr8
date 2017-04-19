@@ -8,19 +8,22 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesvSalesPersonSalesByFiscalYear : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesvSalesPersonSalesByFiscalYear : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesvSalesPersonSalesByFiscalYear()
-		{			
+		{
+							
 			IsDirty = false; 
 			}
 
 
+	
 		
 		protected int? _salesPersonID;
 		public int? SalesPersonID 
@@ -66,35 +69,35 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 			
-		protected decimal? __n_2002;
-		public decimal? _n_2002 
+		protected decimal? __N_2002;
+		public decimal? _N_2002 
 		{ 
-			get { return __n_2002; }
+			get { return __N_2002; }
 			set 
 			{ 
-				__n_2002 = value;  
+				__N_2002 = value;  
 				IsDirty = true;
 			}
 		} 
 			
-		protected decimal? __n_2003;
-		public decimal? _n_2003 
+		protected decimal? __N_2003;
+		public decimal? _N_2003 
 		{ 
-			get { return __n_2003; }
+			get { return __N_2003; }
 			set 
 			{ 
-				__n_2003 = value;  
+				__N_2003 = value;  
 				IsDirty = true;
 			}
 		} 
 			
-		protected decimal? __n_2004;
-		public decimal? _n_2004 
+		protected decimal? __N_2004;
+		public decimal? _N_2004 
 		{ 
-			get { return __n_2004; }
+			get { return __N_2004; }
 			set 
 			{ 
-				__n_2004 = value;  
+				__N_2004 = value;  
 				IsDirty = true;
 			}
 		} 

@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesShoppingCartItemColumnNames
+	public enum SalesShoppingCartItemFieldNames
 	{	
-		ShoppingCartItemID, 	
+		Id, 	
 		ShoppingCartID, 	
 		Quantity, 	
 		ProductID, 	
@@ -34,15 +34,34 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class SalesShoppingCartItemTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesShoppingCartItemColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesShoppingCartItemFieldNames.Id, "ShoppingCartItemID" }, 
+						{ (int)SalesShoppingCartItemFieldNames.ShoppingCartID, "ShoppingCartID" }, 
+						{ (int)SalesShoppingCartItemFieldNames.Quantity, "Quantity" }, 
+						{ (int)SalesShoppingCartItemFieldNames.ProductID, "ProductID" }, 
+						{ (int)SalesShoppingCartItemFieldNames.DateCreated, "DateCreated" }, 
+						{ (int)SalesShoppingCartItemFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesShoppingCartItemIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesShoppingCartItemFieldNames.Id, "ShoppingCartItemID" }, 
+				};
+
 		public SalesShoppingCartItemTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesShoppingCartItemColumnNames.ShoppingCartItemID.ToString();
-			//Schema = "Sales.ShoppingCartItem";
+			Schema = "Sales";
 			TableName = "Sales.ShoppingCartItem";
 			TableAlias = "salesshoppingcartitem";
-			ColumnNames = typeof(SalesShoppingCartItemColumnNames).ToDataList<Type, int>();
+			Columns = SalesShoppingCartItemColumnNames;
+			IdColumns = SalesShoppingCartItemIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ShoppingCartItem_Product_ProductID

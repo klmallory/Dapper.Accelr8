@@ -8,21 +8,24 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionProductSubcategory : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionProductSubcategory : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public ProductionProductSubcategory()
-		{			
+		{
+							
 			IsDirty = false; 
 			_productionProducts = new List<ProductionProduct>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected int _productCategoryID;
 		public int ProductCategoryID 

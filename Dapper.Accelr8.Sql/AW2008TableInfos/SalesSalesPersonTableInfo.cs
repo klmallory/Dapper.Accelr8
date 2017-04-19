@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesPersonColumnNames
+	public enum SalesSalesPersonFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		TerritoryID, 	
 		SalesQuota, 	
 		Bonus, 	
@@ -33,24 +33,46 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesSalesPersonCascadeNames
 	{	
-		salesstore, 	
-		salessalesorderheader, 	
-		salessalespersonquotahistory, 	
-		salessalesterritoryhistory, 	
+		salesstores, 	
+		salessalesorderheaders, 	
+		salessalespersonquotahistories, 	
+		salessalesterritoryhistories, 	
 		
 		humanresourcesemployee_p, 	
 		salessalesterritory_p, 	}
 
 	public class SalesSalesPersonTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesPersonColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesPersonFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)SalesSalesPersonFieldNames.TerritoryID, "TerritoryID" }, 
+						{ (int)SalesSalesPersonFieldNames.SalesQuota, "SalesQuota" }, 
+						{ (int)SalesSalesPersonFieldNames.Bonus, "Bonus" }, 
+						{ (int)SalesSalesPersonFieldNames.CommissionPct, "CommissionPct" }, 
+						{ (int)SalesSalesPersonFieldNames.SalesYTD, "SalesYTD" }, 
+						{ (int)SalesSalesPersonFieldNames.SalesLastYear, "SalesLastYear" }, 
+						{ (int)SalesSalesPersonFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesPersonFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesPersonIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesPersonFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public SalesSalesPersonTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesPersonColumnNames.BusinessEntityID.ToString();
-			//Schema = "Sales.SalesPerson";
+			Schema = "Sales";
 			TableName = "Sales.SalesPerson";
 			TableAlias = "salessalesperson";
-			ColumnNames = typeof(SalesSalesPersonColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesPersonColumnNames;
+			IdColumns = SalesSalesPersonIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesPerson_Employee_BusinessEntityID

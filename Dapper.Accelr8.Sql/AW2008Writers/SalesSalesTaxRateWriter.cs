@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, PersonStateProvince> GetPersonStateProvinceWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonStateProvince>>(); }
+		{ return s_loc8r.GetWriter<int, PersonStateProvince>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,25 +49,25 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSalesTaxRateColumnNames)f.Key)
+                switch ((SalesSalesTaxRateFieldNames)f.Key)
                 {
                     
-					case SalesSalesTaxRateColumnNames.StateProvinceID:
+					case SalesSalesTaxRateFieldNames.StateProvinceID:
 						parms.Add(GetParamName("StateProvinceID", actionType, taskIndex, ref count), entity.StateProvinceID);
 						break;
-					case SalesSalesTaxRateColumnNames.TaxType:
+					case SalesSalesTaxRateFieldNames.TaxType:
 						parms.Add(GetParamName("TaxType", actionType, taskIndex, ref count), entity.TaxType);
 						break;
-					case SalesSalesTaxRateColumnNames.TaxRate:
+					case SalesSalesTaxRateFieldNames.TaxRate:
 						parms.Add(GetParamName("TaxRate", actionType, taskIndex, ref count), entity.TaxRate);
 						break;
-					case SalesSalesTaxRateColumnNames.Name:
+					case SalesSalesTaxRateFieldNames.Name:
 						parms.Add(GetParamName("Name", actionType, taskIndex, ref count), entity.Name);
 						break;
-					case SalesSalesTaxRateColumnNames.rowguid:
+					case SalesSalesTaxRateFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSalesTaxRateColumnNames.ModifiedDate:
+					case SalesSalesTaxRateFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -83,7 +86,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_SalesTaxRate_StateProvince_StateProvinceID
 			var personStateProvince345 = GetPersonStateProvinceWriter();
-		if ((_cascades.Contains(SalesSalesTaxRateCascadeNames.personstateprovince.ToString()) || _cascades.Contains("all")) && entity.PersonStateProvince != null)
+		if ((_cascades.Contains(SalesSalesTaxRateCascadeNames.personstateprovince_p.ToString()) || _cascades.Contains("all")) && entity.PersonStateProvince != null)
 			if (Cascade(personStateProvince345, entity.PersonStateProvince, context))
 				WithParent(personStateProvince345, entity);
 
@@ -97,7 +100,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_SalesTaxRate_StateProvince_StateProvinceID
 			if (entity.PersonStateProvince != null)
-				entity.SalesSalesTaxRate = entity.PersonStateProvince.Id;
+				entity.StateProvinceID = entity.PersonStateProvince.Id;
 
 		}
 

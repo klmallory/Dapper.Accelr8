@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonvAdditionalContactInfoColumnNames
+	public enum PersonvAdditionalContactInfoFieldNames
 	{	
 		BusinessEntityID, 	
 		FirstName, 	
@@ -44,15 +44,45 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class PersonvAdditionalContactInfoTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonvAdditionalContactInfoColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonvAdditionalContactInfoFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.FirstName, "FirstName" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.MiddleName, "MiddleName" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.LastName, "LastName" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.TelephoneNumber, "TelephoneNumber" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.TelephoneSpecialInstructions, "TelephoneSpecialInstructions" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.Street, "Street" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.City, "City" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.StateProvince, "StateProvince" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.PostalCode, "PostalCode" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.CountryRegion, "CountryRegion" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.HomeAddressSpecialInstructions, "HomeAddressSpecialInstructions" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.EMailAddress, "EMailAddress" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.EMailSpecialInstructions, "EMailSpecialInstructions" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.EMailTelephoneNumber, "EMailTelephoneNumber" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonvAdditionalContactInfoFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonvAdditionalContactInfoIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)PersonvAdditionalContactInfoFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public PersonvAdditionalContactInfoTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = PersonvAdditionalContactInfoColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.vAdditionalContactInfo";
+			Schema = "Person";
 			TableName = "Person.vAdditionalContactInfo";
 			TableAlias = "personvadditionalcontactinfo";
-			ColumnNames = typeof(PersonvAdditionalContactInfoColumnNames).ToDataList<Type, int>();
+			Columns = PersonvAdditionalContactInfoColumnNames;
+			IdColumns = PersonvAdditionalContactInfoIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

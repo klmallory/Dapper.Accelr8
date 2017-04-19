@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class PersonPersonPhoneWriter : EntityWriter<int, PersonPersonPhone>
+    public class PersonPersonPhoneWriter : EntityWriter<CompoundKey, PersonPersonPhone>
     {
         public PersonPersonPhoneWriter
 			(PersonPersonPhoneTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, PersonPerson> GetPersonPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPerson>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPerson>(); }
 		static IEntityWriter<int, PersonPhoneNumberType> GetPersonPhoneNumberTypeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPhoneNumberType>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPhoneNumberType>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,10 +51,10 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonPersonPhoneColumnNames)f.Key)
+                switch ((PersonPersonPhoneFieldNames)f.Key)
                 {
                     
-					case PersonPersonPhoneColumnNames.ModifiedDate:
+					case PersonPersonPhoneFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -70,13 +73,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_PersonPhone_Person_BusinessEntityID
 			var personPerson173 = GetPersonPersonWriter();
-		if ((_cascades.Contains(PersonPersonPhoneCascadeNames.personperson.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
+		if ((_cascades.Contains(PersonPersonPhoneCascadeNames.personperson_p.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
 			if (Cascade(personPerson173, entity.PersonPerson, context))
 				WithParent(personPerson173, entity);
 
 			//From Foreign Key FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID
 			var personPhoneNumberType174 = GetPersonPhoneNumberTypeWriter();
-		if ((_cascades.Contains(PersonPersonPhoneCascadeNames.personphonenumbertype.ToString()) || _cascades.Contains("all")) && entity.PersonPhoneNumberType != null)
+		if ((_cascades.Contains(PersonPersonPhoneCascadeNames.personphonenumbertype_p.ToString()) || _cascades.Contains("all")) && entity.PersonPhoneNumberType != null)
 			if (Cascade(personPhoneNumberType174, entity.PersonPhoneNumberType, context))
 				WithParent(personPhoneNumberType174, entity);
 
@@ -90,11 +93,11 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_PersonPhone_Person_BusinessEntityID
 			if (entity.PersonPerson != null)
-				entity.PersonPersonPhone = entity.PersonPerson.Id;
+				entity.BusinessEntityID = entity.PersonPerson.Id;
 
 			//From Foreign Key FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID
 			if (entity.PersonPhoneNumberType != null)
-				entity.PersonPersonPhone = entity.PersonPhoneNumberType.Id;
+				entity.PhoneNumberTypeID = entity.PersonPhoneNumberType.Id;
 
 		}
 

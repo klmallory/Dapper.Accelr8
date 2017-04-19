@@ -18,10 +18,10 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum AWBuildVersionColumnNames
+	public enum AWBuildVersionFieldNames
 	{	
-		SystemInformationID, 	
-		Database_spc_Version, 	
+		Id, 	
+		Database_Spc_Version, 	
 		VersionDate, 	
 		ModifiedDate, 	
 	}
@@ -31,15 +31,32 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class AWBuildVersionTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> AWBuildVersionColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)AWBuildVersionFieldNames.Id, "SystemInformationID" }, 
+						{ (int)AWBuildVersionFieldNames.Database_Spc_Version, "Database Version" }, 
+						{ (int)AWBuildVersionFieldNames.VersionDate, "VersionDate" }, 
+						{ (int)AWBuildVersionFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> AWBuildVersionIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)AWBuildVersionFieldNames.Id, "SystemInformationID" }, 
+				};
+
 		public AWBuildVersionTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = AWBuildVersionColumnNames.SystemInformationID.ToString();
-			//Schema = "AWBuildVersion";
+			Schema = "dbo";
 			TableName = "AWBuildVersion";
 			TableAlias = "awbuildversion";
-			ColumnNames = typeof(AWBuildVersionColumnNames).ToDataList<Type, int>();
+			Columns = AWBuildVersionColumnNames;
+			IdColumns = AWBuildVersionIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

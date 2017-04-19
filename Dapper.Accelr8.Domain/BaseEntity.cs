@@ -8,7 +8,7 @@ using Dapper.Accelr8.Domain;
 namespace Dapper.Accelr8.Repo.Domain
 {
     public abstract class BaseEntity<IdType> : IEntity, IHaveId<IdType>
-        where IdType : IComparable<IdType>
+        where IdType : IComparable
     {
         public BaseEntity()
         {
@@ -19,6 +19,8 @@ namespace Dapper.Accelr8.Repo.Domain
         public bool IsDirty { get; set; }
 
         public IdType Id { get; set; }
+
+        public object GenericId { get { return Id; } }
 
         internal static int? TypeHashCode;
         public int GetTypeHashCode()

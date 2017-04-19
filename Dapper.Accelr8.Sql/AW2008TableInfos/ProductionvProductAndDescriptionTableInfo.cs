@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum ProductionvProductAndDescriptionColumnNames
+	public enum ProductionvProductAndDescriptionFieldNames
 	{	
 		ProductID, 	
 		Name, 	
@@ -32,15 +32,33 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		}
 
 	public class ProductionvProductAndDescriptionTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> ProductionvProductAndDescriptionColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)ProductionvProductAndDescriptionFieldNames.ProductID, "ProductID" }, 
+						{ (int)ProductionvProductAndDescriptionFieldNames.Name, "Name" }, 
+						{ (int)ProductionvProductAndDescriptionFieldNames.ProductModel, "ProductModel" }, 
+						{ (int)ProductionvProductAndDescriptionFieldNames.CultureID, "CultureID" }, 
+						{ (int)ProductionvProductAndDescriptionFieldNames.Description, "Description" }, 
+				};	
+
+		public static readonly IDictionary<int, string> ProductionvProductAndDescriptionIdColumnNames
+		= new Dictionary<int, string>()
+		{
+						{ (int)ProductionvProductAndDescriptionFieldNames.ProductID, "ProductID" }, 
+				};
+
 		public ProductionvProductAndDescriptionTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = false;
-			IdColumn = ProductionvProductAndDescriptionColumnNames.ProductID.ToString();
-			//Schema = "Production.vProductAndDescription";
+			Schema = "Production";
 			TableName = "Production.vProductAndDescription";
 			TableAlias = "productionvproductanddescription";
-			ColumnNames = typeof(ProductionvProductAndDescriptionColumnNames).ToDataList<Type, int>();
+			Columns = ProductionvProductAndDescriptionColumnNames;
+			IdColumns = ProductionvProductAndDescriptionIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

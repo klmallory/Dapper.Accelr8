@@ -12,6 +12,7 @@ namespace Dapper.Accelr8.Domain
 
     public interface IEntity
     {
+        object GenericId { get; }
         bool IsDirty { get; set; }
         int GetTypeHashCode();
         bool IsNew();

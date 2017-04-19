@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PersonPasswordColumnNames
+	public enum PersonPasswordFieldNames
 	{	
-		BusinessEntityID, 	
+		Id, 	
 		PasswordHash, 	
 		PasswordSalt, 	
 		rowguid, 	
@@ -33,15 +33,33 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		personperson_p, 	}
 
 	public class PersonPasswordTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PersonPasswordColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPasswordFieldNames.Id, "BusinessEntityID" }, 
+						{ (int)PersonPasswordFieldNames.PasswordHash, "PasswordHash" }, 
+						{ (int)PersonPasswordFieldNames.PasswordSalt, "PasswordSalt" }, 
+						{ (int)PersonPasswordFieldNames.rowguid, "rowguid" }, 
+						{ (int)PersonPasswordFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PersonPasswordIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PersonPasswordFieldNames.Id, "BusinessEntityID" }, 
+				};
+
 		public PersonPasswordTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PersonPasswordColumnNames.BusinessEntityID.ToString();
-			//Schema = "Person.Password";
+			Schema = "Person";
 			TableName = "Person.Password";
 			TableAlias = "personpassword";
-			ColumnNames = typeof(PersonPasswordColumnNames).ToDataList<Type, int>();
+			Columns = PersonPasswordColumnNames;
+			IdColumns = PersonPasswordIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_Password_Person_BusinessEntityID

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Dapper.Accelr8.Repo;
-using Dapper.Accelr8.Repo.Contracts.Readers;
-using Dapper.Accelr8.Repo.Contracts.Writers;
 using Dapper.Accelr8.Repo.Parameters;
 using Dapper.Accelr8.Repo.Extensions;
 using Dapper.Accelr8.Domain;
-
+using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.Repo
 {
@@ -111,9 +109,15 @@ namespace Dapper.Accelr8.Repo
         {
             using (var reader = GetReader())
             {
-                reader.WithAllChildrenForId(id);
+                reader.WhereId(id);
 
-                return reader.QueryResult().FirstOrDefault();
+                reader.WithAllJoins();
+
+                var res = reader.QueryResult().FirstOrDefault();
+
+                reader.SetAllChildrenForExisting(res);
+
+                return res;
             }
         }
 

@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, HumanResourcesEmployee> GetHumanResourcesEmployeeWriter()
-		{ return _locator.Resolve<IEntityWriter<int, HumanResourcesEmployee>>(); }
+		{ return s_loc8r.GetWriter<int, HumanResourcesEmployee>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,46 +49,46 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionDocumentColumnNames)f.Key)
+                switch ((ProductionDocumentFieldNames)f.Key)
                 {
                     
-					case ProductionDocumentColumnNames.DocumentLevel:
+					case ProductionDocumentFieldNames.DocumentLevel:
 						parms.Add(GetParamName("DocumentLevel", actionType, taskIndex, ref count), entity.DocumentLevel);
 						break;
-					case ProductionDocumentColumnNames.Title:
+					case ProductionDocumentFieldNames.Title:
 						parms.Add(GetParamName("Title", actionType, taskIndex, ref count), entity.Title);
 						break;
-					case ProductionDocumentColumnNames.Owner:
+					case ProductionDocumentFieldNames.Owner:
 						parms.Add(GetParamName("Owner", actionType, taskIndex, ref count), entity.Owner);
 						break;
-					case ProductionDocumentColumnNames.FolderFlag:
+					case ProductionDocumentFieldNames.FolderFlag:
 						parms.Add(GetParamName("FolderFlag", actionType, taskIndex, ref count), entity.FolderFlag);
 						break;
-					case ProductionDocumentColumnNames.FileName:
+					case ProductionDocumentFieldNames.FileName:
 						parms.Add(GetParamName("FileName", actionType, taskIndex, ref count), entity.FileName);
 						break;
-					case ProductionDocumentColumnNames.FileExtension:
+					case ProductionDocumentFieldNames.FileExtension:
 						parms.Add(GetParamName("FileExtension", actionType, taskIndex, ref count), entity.FileExtension);
 						break;
-					case ProductionDocumentColumnNames.Revision:
+					case ProductionDocumentFieldNames.Revision:
 						parms.Add(GetParamName("Revision", actionType, taskIndex, ref count), entity.Revision);
 						break;
-					case ProductionDocumentColumnNames.ChangeNumber:
+					case ProductionDocumentFieldNames.ChangeNumber:
 						parms.Add(GetParamName("ChangeNumber", actionType, taskIndex, ref count), entity.ChangeNumber);
 						break;
-					case ProductionDocumentColumnNames.Status:
+					case ProductionDocumentFieldNames.Status:
 						parms.Add(GetParamName("Status", actionType, taskIndex, ref count), entity.Status);
 						break;
-					case ProductionDocumentColumnNames.DocumentSummary:
+					case ProductionDocumentFieldNames.DocumentSummary:
 						parms.Add(GetParamName("DocumentSummary", actionType, taskIndex, ref count), entity.DocumentSummary);
 						break;
-					case ProductionDocumentColumnNames.Document:
+					case ProductionDocumentFieldNames.Document:
 						parms.Add(GetParamName("Document", actionType, taskIndex, ref count), entity.Document);
 						break;
-					case ProductionDocumentColumnNames.rowguid:
+					case ProductionDocumentFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case ProductionDocumentColumnNames.ModifiedDate:
+					case ProductionDocumentFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -104,7 +107,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_Document_Employee_Owner
 			var humanResourcesEmployee101 = GetHumanResourcesEmployeeWriter();
-		if ((_cascades.Contains(ProductionDocumentCascadeNames.humanresourcesemployee.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
+		if ((_cascades.Contains(ProductionDocumentCascadeNames.humanresourcesemployee_p.ToString()) || _cascades.Contains("all")) && entity.HumanResourcesEmployee != null)
 			if (Cascade(humanResourcesEmployee101, entity.HumanResourcesEmployee, context))
 				WithParent(humanResourcesEmployee101, entity);
 
@@ -118,7 +121,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_Document_Employee_Owner
 			if (entity.HumanResourcesEmployee != null)
-				entity.ProductionDocument = entity.HumanResourcesEmployee.Id;
+				entity.Owner = entity.HumanResourcesEmployee.Id;
 
 		}
 

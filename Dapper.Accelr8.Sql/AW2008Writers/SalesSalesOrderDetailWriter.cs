@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class SalesSalesOrderDetailWriter : EntityWriter<int, SalesSalesOrderDetail>
+    public class SalesSalesOrderDetailWriter : EntityWriter<CompoundKey, SalesSalesOrderDetail>
     {
         public SalesSalesOrderDetailWriter
 			(SalesSalesOrderDetailTableInfo tableInfo
@@ -28,14 +28,17 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, SalesSpecialOfferProduct> GetSalesSpecialOfferProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSpecialOfferProduct>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSpecialOfferProduct>(); }
 		static IEntityWriter<int, SalesSalesOrderHeader> GetSalesSalesOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderHeader>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -48,34 +51,34 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesSalesOrderDetailColumnNames)f.Key)
+                switch ((SalesSalesOrderDetailFieldNames)f.Key)
                 {
                     
-					case SalesSalesOrderDetailColumnNames.CarrierTrackingNumber:
+					case SalesSalesOrderDetailFieldNames.CarrierTrackingNumber:
 						parms.Add(GetParamName("CarrierTrackingNumber", actionType, taskIndex, ref count), entity.CarrierTrackingNumber);
 						break;
-					case SalesSalesOrderDetailColumnNames.OrderQty:
+					case SalesSalesOrderDetailFieldNames.OrderQty:
 						parms.Add(GetParamName("OrderQty", actionType, taskIndex, ref count), entity.OrderQty);
 						break;
-					case SalesSalesOrderDetailColumnNames.ProductID:
+					case SalesSalesOrderDetailFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case SalesSalesOrderDetailColumnNames.SpecialOfferID:
+					case SalesSalesOrderDetailFieldNames.SpecialOfferID:
 						parms.Add(GetParamName("SpecialOfferID", actionType, taskIndex, ref count), entity.SpecialOfferID);
 						break;
-					case SalesSalesOrderDetailColumnNames.UnitPrice:
+					case SalesSalesOrderDetailFieldNames.UnitPrice:
 						parms.Add(GetParamName("UnitPrice", actionType, taskIndex, ref count), entity.UnitPrice);
 						break;
-					case SalesSalesOrderDetailColumnNames.UnitPriceDiscount:
+					case SalesSalesOrderDetailFieldNames.UnitPriceDiscount:
 						parms.Add(GetParamName("UnitPriceDiscount", actionType, taskIndex, ref count), entity.UnitPriceDiscount);
 						break;
-					case SalesSalesOrderDetailColumnNames.LineTotal:
+					case SalesSalesOrderDetailFieldNames.LineTotal:
 						parms.Add(GetParamName("LineTotal", actionType, taskIndex, ref count), entity.LineTotal);
 						break;
-					case SalesSalesOrderDetailColumnNames.rowguid:
+					case SalesSalesOrderDetailFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case SalesSalesOrderDetailColumnNames.ModifiedDate:
+					case SalesSalesOrderDetailFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -94,19 +97,19 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID
 			var salesSpecialOfferProduct292 = GetSalesSpecialOfferProductWriter();
-		if ((_cascades.Contains(SalesSalesOrderDetailCascadeNames.salesspecialofferproduct.ToString()) || _cascades.Contains("all")) && entity.SalesSpecialOfferProduct != null)
-			if (Cascade(salesSpecialOfferProduct292, entity.SalesSpecialOfferProduct, context))
+		if ((_cascades.Contains(SalesSalesOrderDetailCascadeNames.salesspecialofferproduct1_p.ToString()) || _cascades.Contains("all")) && entity.SalesSpecialOfferProduct1 != null)
+			if (Cascade(salesSpecialOfferProduct292, entity.SalesSpecialOfferProduct1, context))
 				WithParent(salesSpecialOfferProduct292, entity);
 
 			//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID
 			var salesSpecialOfferProduct293 = GetSalesSpecialOfferProductWriter();
-		if ((_cascades.Contains(SalesSalesOrderDetailCascadeNames.salesspecialofferproduct.ToString()) || _cascades.Contains("all")) && entity.SalesSpecialOfferProduct != null)
-			if (Cascade(salesSpecialOfferProduct293, entity.SalesSpecialOfferProduct, context))
+		if ((_cascades.Contains(SalesSalesOrderDetailCascadeNames.salesspecialofferproduct2_p.ToString()) || _cascades.Contains("all")) && entity.SalesSpecialOfferProduct2 != null)
+			if (Cascade(salesSpecialOfferProduct293, entity.SalesSpecialOfferProduct2, context))
 				WithParent(salesSpecialOfferProduct293, entity);
 
 			//From Foreign Key FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID
 			var salesSalesOrderHeader294 = GetSalesSalesOrderHeaderWriter();
-		if ((_cascades.Contains(SalesSalesOrderDetailCascadeNames.salessalesorderheader.ToString()) || _cascades.Contains("all")) && entity.SalesSalesOrderHeader != null)
+		if ((_cascades.Contains(SalesSalesOrderDetailCascadeNames.salessalesorderheader_p.ToString()) || _cascades.Contains("all")) && entity.SalesSalesOrderHeader != null)
 			if (Cascade(salesSalesOrderHeader294, entity.SalesSalesOrderHeader, context))
 				WithParent(salesSalesOrderHeader294, entity);
 
@@ -119,16 +122,16 @@ namespace Dapper.Accelr8.AW2008Writers
 
 				
 			//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID
-			if (entity.SalesSpecialOfferProduct != null)
-				entity.SalesSalesOrderDetail = entity.SalesSpecialOfferProduct.SpecialOfferID;
+			if (entity.SalesSpecialOfferProduct1 != null)
+				entity.SpecialOfferID = entity.SalesSpecialOfferProduct1.SpecialOfferID;
 
 			//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID
-			if (entity.SalesSpecialOfferProduct != null)
-				entity.SalesSalesOrderDetail = entity.SalesSpecialOfferProduct.ProductID;
+			if (entity.SalesSpecialOfferProduct2 != null)
+				entity.ProductID = entity.SalesSpecialOfferProduct2.ProductID;
 
 			//From Foreign Key FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID
 			if (entity.SalesSalesOrderHeader != null)
-				entity.SalesSalesOrderDetail = entity.SalesSalesOrderHeader.Id;
+				entity.SalesOrderID = entity.SalesSalesOrderHeader.Id;
 
 		}
 

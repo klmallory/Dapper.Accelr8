@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 2
-		static IEntityReader<int , SalesCustomer> _salesCustomerReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , SalesCustomer> GetSalesCustomerReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesCustomer>>();
+			return s_loc8r.GetReader<int , SalesCustomer>();
 		}
 
 		
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesCustomers = typedChildren.Where(b => b.SalesCustomer == r.Id).ToList();
+				
+
+				r.SalesCustomers = typedChildren.Where(b =>  b.StoreID == r.Id ).ToList();
 				r.SalesCustomers.ToList().ForEach(b => { b.Loaded = false; b.SalesStore = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesStore();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.SalesPersonID = GetRowData<int?>(dataRow, "SalesPersonID"); 
       		domain.Demographics = GetRowData<string>(dataRow, "Demographics"); 
       		domain.rowguid = GetRowData<Guid>(dataRow, "rowguid"); 
@@ -93,15 +101,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesStore></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesStore> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesStore> WithAllChildrenForExisting(SalesStore existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesCustomerReader(), id, IdColumn, SetChildrenSalesCustomers);
+						WithChildForParentValues(GetSalesCustomerReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "StoreID",  }
+				, SetChildrenSalesCustomers);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesStore entity)
         {
@@ -110,11 +119,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesCustomerReader(), entity.Id
-				, SalesCustomerColumnNames.StoreID.ToString()
+						WithChildForParentValues(GetSalesCustomerReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "StoreID",  }
 				, SetChildrenSalesCustomers);
 
-			QueryResultForChildrenOnly(new List<SalesStore>() { entity });
+			
+QueryResultForChildrenOnly(new List<SalesStore>() { entity });
 			entity.Loaded = false;
 			GetSalesCustomerReader().SetAllChildrenForExisting(entity.SalesCustomers);
 				
@@ -125,15 +136,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesCustomerReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesCustomerColumnNames.StoreID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesCustomerReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "StoreID",  }
 				, SetChildrenSalesCustomers);
 
 					

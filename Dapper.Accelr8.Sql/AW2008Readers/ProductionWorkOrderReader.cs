@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 2
-		static IEntityReader<int , ProductionWorkOrderRouting> _productionWorkOrderRoutingReader;
-		protected static IEntityReader<int , ProductionWorkOrderRouting> GetProductionWorkOrderRoutingReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionWorkOrderRouting> GetProductionWorkOrderRoutingReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionWorkOrderRouting>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionWorkOrderRouting>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionWorkOrderRoutings(IList<ProductionWorkOrder> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionWorkOrderRouting
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionWorkOrderRoutings = typedChildren.Where(b => b.ProductionWorkOrderRouting == r.Id).ToList();
+				
+
+				r.ProductionWorkOrderRoutings = typedChildren.Where(b =>  b.WorkOrderID == r.Id ).ToList();
 				r.ProductionWorkOrderRoutings.ToList().ForEach(b => { b.Loaded = false; b.ProductionWorkOrder = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionWorkOrder();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
+			domain.Id = GetRowData<int>(dataRow, "WorkOrderID"); 
+      		domain.ProductID = GetRowData<int>(dataRow, "ProductID"); 
       		domain.OrderQty = GetRowData<int>(dataRow, "OrderQty"); 
       		domain.StockedQty = GetRowData<int>(dataRow, "StockedQty"); 
       		domain.ScrappedQty = GetRowData<short>(dataRow, "ScrappedQty"); 
@@ -97,15 +105,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionWorkOrder></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionWorkOrder> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionWorkOrder> WithAllChildrenForExisting(ProductionWorkOrder existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionWorkOrderRoutingReader(), id, IdColumn, SetChildrenProductionWorkOrderRoutings);
+						WithChildForParentValues(GetProductionWorkOrderRoutingReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "WorkOrderID",  }
+				, SetChildrenProductionWorkOrderRoutings);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionWorkOrder entity)
         {
@@ -114,11 +123,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionWorkOrderRoutingReader(), entity.Id
-				, ProductionWorkOrderRoutingColumnNames.WorkOrderID.ToString()
+						WithChildForParentValues(GetProductionWorkOrderRoutingReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "WorkOrderID",  }
 				, SetChildrenProductionWorkOrderRoutings);
 
-			QueryResultForChildrenOnly(new List<ProductionWorkOrder>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionWorkOrder>() { entity });
 			entity.Loaded = false;
 			GetProductionWorkOrderRoutingReader().SetAllChildrenForExisting(entity.ProductionWorkOrderRoutings);
 				
@@ -129,15 +140,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionWorkOrderRoutingReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionWorkOrderRoutingColumnNames.WorkOrderID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionWorkOrderRoutingReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "WorkOrderID",  }
 				, SetChildrenProductionWorkOrderRoutings);
 
 					

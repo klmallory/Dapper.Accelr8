@@ -18,7 +18,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum PurchasingProductVendorColumnNames
+	public enum PurchasingProductVendorFieldNames
 	{	
 		ProductID, 	
 		BusinessEntityID, 	
@@ -41,15 +41,40 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		productionproduct_p, 	}
 
 	public class PurchasingProductVendorTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> PurchasingProductVendorColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingProductVendorFieldNames.ProductID, "ProductID" }, 
+						{ (int)PurchasingProductVendorFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+						{ (int)PurchasingProductVendorFieldNames.AverageLeadTime, "AverageLeadTime" }, 
+						{ (int)PurchasingProductVendorFieldNames.StandardPrice, "StandardPrice" }, 
+						{ (int)PurchasingProductVendorFieldNames.LastReceiptCost, "LastReceiptCost" }, 
+						{ (int)PurchasingProductVendorFieldNames.LastReceiptDate, "LastReceiptDate" }, 
+						{ (int)PurchasingProductVendorFieldNames.MinOrderQty, "MinOrderQty" }, 
+						{ (int)PurchasingProductVendorFieldNames.MaxOrderQty, "MaxOrderQty" }, 
+						{ (int)PurchasingProductVendorFieldNames.OnOrderQty, "OnOrderQty" }, 
+						{ (int)PurchasingProductVendorFieldNames.UnitMeasureCode, "UnitMeasureCode" }, 
+						{ (int)PurchasingProductVendorFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> PurchasingProductVendorIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)PurchasingProductVendorFieldNames.ProductID, "ProductID" }, 
+						{ (int)PurchasingProductVendorFieldNames.BusinessEntityID, "BusinessEntityID" }, 
+				};
+
 		public PurchasingProductVendorTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = PurchasingProductVendorColumnNames.ProductID.ToString();
-			//Schema = "Purchasing.ProductVendor";
+			Schema = "Purchasing";
 			TableName = "Purchasing.ProductVendor";
 			TableAlias = "purchasingproductvendor";
-			ColumnNames = typeof(PurchasingProductVendorColumnNames).ToDataList<Type, int>();
+			Columns = PurchasingProductVendorColumnNames;
+			IdColumns = PurchasingProductVendorIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_ProductVendor_UnitMeasure_UnitMeasureCode

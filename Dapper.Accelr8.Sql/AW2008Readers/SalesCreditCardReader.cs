@@ -27,23 +27,58 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 2
 		//Parent Count 0
-		static IEntityReader<int , SalesSalesOrderHeader> _salesSalesOrderHeaderReader;
-		protected static IEntityReader<int , SalesSalesOrderHeader> GetSalesSalesOrderHeaderReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , SalesPersonCreditCard> GetSalesPersonCreditCardReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesSalesOrderHeader>>();
+			return s_loc8r.GetReader<CompoundKey , SalesPersonCreditCard>();
 		}
 
-		static IEntityReader<int , SalesPersonCreditCard> _salesPersonCreditCardReader;
-		protected static IEntityReader<int , SalesPersonCreditCard> GetSalesPersonCreditCardReader()
+				//Is CompoundKey False
+		protected static IEntityReader<int , SalesSalesOrderHeader> GetSalesSalesOrderHeaderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , SalesPersonCreditCard>>();
+			return s_loc8r.GetReader<int , SalesSalesOrderHeader>();
 		}
 
 		
+		/// <summary>
+		/// Sets the children of type SalesPersonCreditCard on the parent on SalesPersonCreditCards.
+		/// From foriegn key FK_PersonCreditCard_CreditCard_CreditCardID
+		/// </summary>
+		/// <param name="results"></param>
+		/// <param name="children"></param>
+		public void SetChildrenSalesPersonCreditCards(IList<SalesCreditCard> results, IList<object> children)
+		{
+			//Child Id Type: CompoundKey
+			//Child Type: SalesPersonCreditCard
+
+			if (results == null || results.Count < 1 || children == null || children.Count < 1)
+				return;
+
+			var typedChildren = children.OfType<SalesPersonCreditCard>();
+
+			foreach (var r in results)
+			{
+				if (r == null)
+					continue;
+				r.Loaded = false;
+				
+
+				r.SalesPersonCreditCards = typedChildren.Where(b =>  b.CreditCardID == r.Id ).ToList();
+				r.SalesPersonCreditCards.ToList().ForEach(b => { b.Loaded = false; b.SalesCreditCard = r; b.Loaded = true; });
+				
+				r.Loaded = true;
+			}
+		}
+
 		/// <summary>
 		/// Sets the children of type SalesSalesOrderHeader on the parent on SalesSalesOrderHeaders.
 		/// From foriegn key FK_SalesOrderHeader_CreditCard_CreditCardID
@@ -65,35 +100,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.SalesSalesOrderHeaders = typedChildren.Where(b => b.SalesSalesOrderHeader == r.Id).ToList();
+				
+
+				r.SalesSalesOrderHeaders = typedChildren.Where(b =>  b.CreditCardID == r.Id ).ToList();
 				r.SalesSalesOrderHeaders.ToList().ForEach(b => { b.Loaded = false; b.SalesCreditCard = r; b.Loaded = true; });
-				r.Loaded = true;
-			}
-		}
-
-		/// <summary>
-		/// Sets the children of type SalesPersonCreditCard on the parent on SalesPersonCreditCards.
-		/// From foriegn key FK_PersonCreditCard_CreditCard_CreditCardID
-		/// </summary>
-		/// <param name="results"></param>
-		/// <param name="children"></param>
-		public void SetChildrenSalesPersonCreditCards(IList<SalesCreditCard> results, IList<object> children)
-		{
-			//Child Id Type: int
-			//Child Type: SalesPersonCreditCard
-
-			if (results == null || results.Count < 1 || children == null || children.Count < 1)
-				return;
-
-			var typedChildren = children.OfType<SalesPersonCreditCard>();
-
-			foreach (var r in results)
-			{
-				if (r == null)
-					continue;
-				r.Loaded = false;
-				r.SalesPersonCreditCards = typedChildren.Where(b => b.SalesPersonCreditCard == r.Id).ToList();
-				r.SalesPersonCreditCards.ToList().ForEach(b => { b.Loaded = false; b.SalesCreditCard = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -109,8 +120,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesCreditCard();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.CardType = GetRowData<string>(dataRow, "CardType"); 
+			domain.Id = GetRowData<int>(dataRow, "CreditCardID"); 
+      		domain.CardType = GetRowData<string>(dataRow, "CardType"); 
       		domain.CardNumber = GetRowData<string>(dataRow, "CardNumber"); 
       		domain.ExpMonth = GetRowData<byte>(dataRow, "ExpMonth"); 
       		domain.ExpYear = GetRowData<short>(dataRow, "ExpYear"); 
@@ -126,17 +137,20 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, SalesCreditCard></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesCreditCard> WithAllChildrenForId(int id)
+        public override IEntityReader<int, SalesCreditCard> WithAllChildrenForExisting(SalesCreditCard existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), id, IdColumn, SetChildrenSalesSalesOrderHeaders);
-			
-			WithChildForParentId(GetSalesPersonCreditCardReader(), id, IdColumn, SetChildrenSalesPersonCreditCards);
+						WithChildForParentValues(GetSalesPersonCreditCardReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CreditCardID",  }
+				, SetChildrenSalesPersonCreditCards);
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "CreditCardID",  }
+				, SetChildrenSalesSalesOrderHeaders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesCreditCard entity)
         {
@@ -145,18 +159,21 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetSalesSalesOrderHeaderReader(), entity.Id
-				, SalesSalesOrderHeaderColumnNames.CreditCardID.ToString()
-				, SetChildrenSalesSalesOrderHeaders);
-
-			WithChildForParentId(GetSalesPersonCreditCardReader(), entity.Id
-				, SalesPersonCreditCardColumnNames.CreditCardID.ToString()
+						WithChildForParentValues(GetSalesPersonCreditCardReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CreditCardID",  }
 				, SetChildrenSalesPersonCreditCards);
 
-			QueryResultForChildrenOnly(new List<SalesCreditCard>() { entity });
+						WithChildForParentValues(GetSalesSalesOrderHeaderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "CreditCardID",  }
+				, SetChildrenSalesSalesOrderHeaders);
+
+			
+QueryResultForChildrenOnly(new List<SalesCreditCard>() { entity });
 			entity.Loaded = false;
-			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaders);
 			GetSalesPersonCreditCardReader().SetAllChildrenForExisting(entity.SalesPersonCreditCards);
+			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entity.SalesSalesOrderHeaders);
 				
 			entity.Loaded = true;
 		}
@@ -165,28 +182,29 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetSalesSalesOrderHeaderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesSalesOrderHeaderColumnNames.CreditCardID.ToString()
-				, SetChildrenSalesSalesOrderHeaders);
+			entities = entities.Where(e => e != null).ToList();
 
-			WithChildForParentIds(GetSalesPersonCreditCardReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), SalesPersonCreditCardColumnNames.CreditCardID.ToString()
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetSalesPersonCreditCardReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CreditCardID",  }
 				, SetChildrenSalesPersonCreditCards);
+
+			WithChildForParentsValues(GetSalesSalesOrderHeaderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "CreditCardID",  }
+				, SetChildrenSalesSalesOrderHeaders);
 
 					
 			QueryResultForChildrenOnly(entities);
 
-			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesOrderHeaders).ToList());
 			GetSalesPersonCreditCardReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesPersonCreditCards).ToList());
+			GetSalesSalesOrderHeaderReader().SetAllChildrenForExisting(entities.SelectMany(e => e.SalesSalesOrderHeaders).ToList());
 					
 		}
     }

@@ -18,29 +18,45 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesCurrencyColumnNames
+	public enum SalesCurrencyFieldNames
 	{	
-		CurrencyCode, 	
+		Id, 	
 		Name, 	
 		ModifiedDate, 	
 	}
 
 	public enum SalesCurrencyCascadeNames
 	{	
-		salescountryregioncurrency, 	
-		salescurrencyrate, 	
+		salescountryregioncurrencies, 	
+		salescurrencyrates1, 	
 		}
 
 	public class SalesCurrencyTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesCurrencyColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCurrencyFieldNames.Id, "CurrencyCode" }, 
+						{ (int)SalesCurrencyFieldNames.Name, "Name" }, 
+						{ (int)SalesCurrencyFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesCurrencyIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesCurrencyFieldNames.Id, "CurrencyCode" }, 
+				};
+
 		public SalesCurrencyTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesCurrencyColumnNames.CurrencyCode.ToString();
-			//Schema = "Sales.Currency";
+			Schema = "Sales";
 			TableName = "Sales.Currency";
 			TableAlias = "salescurrency";
-			ColumnNames = typeof(SalesCurrencyColumnNames).ToDataList<Type, int>();
+			Columns = SalesCurrencyColumnNames;
+			IdColumns = SalesCurrencyIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						};

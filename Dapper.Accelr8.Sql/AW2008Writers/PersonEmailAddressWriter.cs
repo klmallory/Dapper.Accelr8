@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Writers
 {
-    public class PersonEmailAddressWriter : EntityWriter<int, PersonEmailAddress>
+    public class PersonEmailAddressWriter : EntityWriter<CompoundKey, PersonEmailAddress>
     {
         public PersonEmailAddressWriter
 			(PersonEmailAddressTableInfo tableInfo
@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, PersonPerson> GetPersonPersonWriter()
-		{ return _locator.Resolve<IEntityWriter<int, PersonPerson>>(); }
+		{ return s_loc8r.GetWriter<int, PersonPerson>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,16 +49,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((PersonEmailAddressColumnNames)f.Key)
+                switch ((PersonEmailAddressFieldNames)f.Key)
                 {
                     
-					case PersonEmailAddressColumnNames.EmailAddress:
+					case PersonEmailAddressFieldNames.EmailAddress:
 						parms.Add(GetParamName("EmailAddress", actionType, taskIndex, ref count), entity.EmailAddress);
 						break;
-					case PersonEmailAddressColumnNames.rowguid:
+					case PersonEmailAddressFieldNames.rowguid:
 						parms.Add(GetParamName("rowguid", actionType, taskIndex, ref count), entity.rowguid);
 						break;
-					case PersonEmailAddressColumnNames.ModifiedDate:
+					case PersonEmailAddressFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -74,7 +77,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_EmailAddress_Person_BusinessEntityID
 			var personPerson103 = GetPersonPersonWriter();
-		if ((_cascades.Contains(PersonEmailAddressCascadeNames.personperson.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
+		if ((_cascades.Contains(PersonEmailAddressCascadeNames.personperson_p.ToString()) || _cascades.Contains("all")) && entity.PersonPerson != null)
 			if (Cascade(personPerson103, entity.PersonPerson, context))
 				WithParent(personPerson103, entity);
 
@@ -88,7 +91,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_EmailAddress_Person_BusinessEntityID
 			if (entity.PersonPerson != null)
-				entity.PersonEmailAddress = entity.PersonPerson.Id;
+				entity.BusinessEntityID = entity.PersonPerson.Id;
 
 		}
 

@@ -8,24 +8,27 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesPerson : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesPerson : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
 	{
 			public SalesSalesPerson()
-		{			
+		{
+							
 			IsDirty = false; 
-			_salesStores = new List<SalesStore>();
-		_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
+			_salesSalesOrderHeaders = new List<SalesSalesOrderHeader>();
 		_salesSalesPersonQuotaHistories = new List<SalesSalesPersonQuotaHistory>();
 		_salesSalesTerritoryHistories = new List<SalesSalesTerritoryHistory>();
+		_salesStores = new List<SalesStore>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected int? _territoryID;
 		public int? TerritoryID 
@@ -139,18 +142,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			}
 		} 
 		 
-	//From Foreign Key FK_Store_SalesPerson_SalesPersonID	
-		protected IList<SalesStore> _salesStores;
-		public virtual IList<SalesStore> SalesStores 
-		{ 
-			get { return _salesStores; }
-			set 
-			{ 
-				_salesStores = value;  
-				IsDirty = true;
-			}
-		} 
-			 
 	//From Foreign Key FK_SalesOrderHeader_SalesPerson_SalesPersonID	
 		protected IList<SalesSalesOrderHeader> _salesSalesOrderHeaders;
 		public virtual IList<SalesSalesOrderHeader> SalesSalesOrderHeaders 
@@ -183,6 +174,18 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_salesSalesTerritoryHistories = value;  
+				IsDirty = true;
+			}
+		} 
+			 
+	//From Foreign Key FK_Store_SalesPerson_SalesPersonID	
+		protected IList<SalesStore> _salesStores;
+		public virtual IList<SalesStore> SalesStores 
+		{ 
+			get { return _salesStores; }
+			set 
+			{ 
+				_salesStores = value;  
 				IsDirty = true;
 			}
 		} 

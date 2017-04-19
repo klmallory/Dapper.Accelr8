@@ -8,23 +8,26 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesCurrency : Dapper.Accelr8.Repo.Domain.BaseEntity<string>
+	public class SalesCurrency : Dapper.Accelr8.Repo.Domain.BaseEntity<string>
 	{
 			public SalesCurrency()
-		{			
+		{
+							
 			IsDirty = false; 
 			_salesCountryRegionCurrencies = new List<SalesCountryRegionCurrency>();
-		_salesCurrencyRates = new List<SalesCurrencyRate>();
-		_salesCurrencyRates = new List<SalesCurrencyRate>();
+		_salesCurrencyRates1 = new List<SalesCurrencyRate>();
+		_salesCurrencyRates2 = new List<SalesCurrencyRate>();
 		_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	
 		
 		protected object _name;
 		public object Name 
@@ -61,25 +64,25 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 		} 
 			 
 	//From Foreign Key FK_CurrencyRate_Currency_FromCurrencyCode	
-		protected IList<SalesCurrencyRate> _salesCurrencyRates;
-		public virtual IList<SalesCurrencyRate> SalesCurrencyRates 
+		protected IList<SalesCurrencyRate> _salesCurrencyRates1;
+		public virtual IList<SalesCurrencyRate> SalesCurrencyRates1 
 		{ 
-			get { return _salesCurrencyRates; }
+			get { return _salesCurrencyRates1; }
 			set 
 			{ 
-				_salesCurrencyRates = value;  
+				_salesCurrencyRates1 = value;  
 				IsDirty = true;
 			}
 		} 
 			 
 	//From Foreign Key FK_CurrencyRate_Currency_ToCurrencyCode	
-		protected IList<SalesCurrencyRate> _salesCurrencyRates;
-		public virtual IList<SalesCurrencyRate> SalesCurrencyRates 
+		protected IList<SalesCurrencyRate> _salesCurrencyRates2;
+		public virtual IList<SalesCurrencyRate> SalesCurrencyRates2 
 		{ 
-			get { return _salesCurrencyRates; }
+			get { return _salesCurrencyRates2; }
 			set 
 			{ 
-				_salesCurrencyRates = value;  
+				_salesCurrencyRates2 = value;  
 				IsDirty = true;
 			}
 		} 

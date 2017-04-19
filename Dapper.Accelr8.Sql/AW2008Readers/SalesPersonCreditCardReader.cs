@@ -17,7 +17,7 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008Readers
 {
-    public class SalesPersonCreditCardReader : EntityReader<int, SalesPersonCreditCard>
+    public class SalesPersonCreditCardReader : EntityReader<CompoundKey, SalesPersonCreditCard>
     {
         public SalesPersonCreditCardReader(
             SalesPersonCreditCardTableInfo tableInfo
@@ -27,7 +27,12 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 0
 		//Parent Count 2
@@ -43,26 +48,26 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new SalesPersonCreditCard();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
-      			
+			domain.BusinessEntityID = GetRowData<int>(dataRow, "BusinessEntityID"); 
+      		domain.CreditCardID = GetRowData<int>(dataRow, "CreditCardID"); 
+      		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
+      				domain.Id = SalesPersonCreditCard.GetCompoundKeyFor(domain); 
 			domain.IsDirty = false;
 			domain.Loaded = true;
 			return domain;
 		}
 
 		/// <summary>
-		/// Add All the children to the query for the specified int Id.
+		/// Add All the children to the query for the specified CompoundKey Id.
 		/// </summary>
-		/// <param name="results">IEntityReader<int, SalesPersonCreditCard></param>
-		/// <param name="id">int</param>
-        public override IEntityReader<int, SalesPersonCreditCard> WithAllChildrenForId(int id)
+		/// <param name="results">IEntityReader<CompoundKey, SalesPersonCreditCard></param>
+		/// <param name="id">CompoundKey</param>
+        public override IEntityReader<CompoundKey, SalesPersonCreditCard> WithAllChildrenForExisting(SalesPersonCreditCard existing)
         {
-			base.WithAllChildrenForId(id);
-
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(SalesPersonCreditCard entity)
         {

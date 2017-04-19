@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesTaxRateColumnNames
+	public enum SalesSalesTaxRateFieldNames
 	{	
-		SalesTaxRateID, 	
+		Id, 	
 		StateProvinceID, 	
 		TaxType, 	
 		TaxRate, 	
@@ -35,15 +35,35 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		personstateprovince_p, 	}
 
 	public class SalesSalesTaxRateTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesTaxRateColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesTaxRateFieldNames.Id, "SalesTaxRateID" }, 
+						{ (int)SalesSalesTaxRateFieldNames.StateProvinceID, "StateProvinceID" }, 
+						{ (int)SalesSalesTaxRateFieldNames.TaxType, "TaxType" }, 
+						{ (int)SalesSalesTaxRateFieldNames.TaxRate, "TaxRate" }, 
+						{ (int)SalesSalesTaxRateFieldNames.Name, "Name" }, 
+						{ (int)SalesSalesTaxRateFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesTaxRateFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesTaxRateIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesTaxRateFieldNames.Id, "SalesTaxRateID" }, 
+				};
+
 		public SalesSalesTaxRateTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesTaxRateColumnNames.SalesTaxRateID.ToString();
-			//Schema = "Sales.SalesTaxRate";
+			Schema = "Sales";
 			TableName = "Sales.SalesTaxRate";
 			TableAlias = "salessalestaxrate";
-			ColumnNames = typeof(SalesSalesTaxRateColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesTaxRateColumnNames;
+			IdColumns = SalesSalesTaxRateIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesTaxRate_StateProvince_StateProvinceID

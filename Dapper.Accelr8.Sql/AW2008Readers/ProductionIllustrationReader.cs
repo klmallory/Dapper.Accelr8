@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , ProductionProductModelIllustration> _productionProductModelIllustrationReader;
-		protected static IEntityReader<int , ProductionProductModelIllustration> GetProductionProductModelIllustrationReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , ProductionProductModelIllustration> GetProductionProductModelIllustrationReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionProductModelIllustration>>();
+			return s_loc8r.GetReader<CompoundKey , ProductionProductModelIllustration>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionProductModelIllustrations(IList<ProductionIllustration> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: ProductionProductModelIllustration
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionProductModelIllustrations = typedChildren.Where(b => b.ProductionProductModelIllustration == r.Id).ToList();
+				
+
+				r.ProductionProductModelIllustrations = typedChildren.Where(b =>  b.IllustrationID == r.Id ).ToList();
 				r.ProductionProductModelIllustrations.ToList().ForEach(b => { b.Loaded = false; b.ProductionIllustration = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionIllustration();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.Diagram = GetRowData<string>(dataRow, "Diagram"); 
+			domain.Id = GetRowData<int>(dataRow, "IllustrationID"); 
+      		domain.Diagram = GetRowData<string>(dataRow, "Diagram"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -90,15 +98,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, ProductionIllustration></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, ProductionIllustration> WithAllChildrenForId(int id)
+        public override IEntityReader<int, ProductionIllustration> WithAllChildrenForExisting(ProductionIllustration existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionProductModelIllustrationReader(), id, IdColumn, SetChildrenProductionProductModelIllustrations);
+						WithChildForParentValues(GetProductionProductModelIllustrationReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "IllustrationID",  }
+				, SetChildrenProductionProductModelIllustrations);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionIllustration entity)
         {
@@ -107,11 +116,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionProductModelIllustrationReader(), entity.Id
-				, ProductionProductModelIllustrationColumnNames.IllustrationID.ToString()
+						WithChildForParentValues(GetProductionProductModelIllustrationReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "IllustrationID",  }
 				, SetChildrenProductionProductModelIllustrations);
 
-			QueryResultForChildrenOnly(new List<ProductionIllustration>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionIllustration>() { entity });
 			entity.Loaded = false;
 			GetProductionProductModelIllustrationReader().SetAllChildrenForExisting(entity.ProductionProductModelIllustrations);
 				
@@ -122,15 +133,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionProductModelIllustrationReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionProductModelIllustrationColumnNames.IllustrationID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionProductModelIllustrationReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "IllustrationID",  }
 				, SetChildrenProductionProductModelIllustrations);
 
 					

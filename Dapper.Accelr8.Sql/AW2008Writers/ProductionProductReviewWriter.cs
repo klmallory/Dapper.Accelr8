@@ -28,12 +28,15 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
+
+		static ILoc8 s_loc8r = null;
 
 		
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -46,28 +49,28 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionProductReviewColumnNames)f.Key)
+                switch ((ProductionProductReviewFieldNames)f.Key)
                 {
                     
-					case ProductionProductReviewColumnNames.ProductID:
+					case ProductionProductReviewFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case ProductionProductReviewColumnNames.ReviewerName:
+					case ProductionProductReviewFieldNames.ReviewerName:
 						parms.Add(GetParamName("ReviewerName", actionType, taskIndex, ref count), entity.ReviewerName);
 						break;
-					case ProductionProductReviewColumnNames.ReviewDate:
+					case ProductionProductReviewFieldNames.ReviewDate:
 						parms.Add(GetParamName("ReviewDate", actionType, taskIndex, ref count), entity.ReviewDate);
 						break;
-					case ProductionProductReviewColumnNames.EmailAddress:
+					case ProductionProductReviewFieldNames.EmailAddress:
 						parms.Add(GetParamName("EmailAddress", actionType, taskIndex, ref count), entity.EmailAddress);
 						break;
-					case ProductionProductReviewColumnNames.Rating:
+					case ProductionProductReviewFieldNames.Rating:
 						parms.Add(GetParamName("Rating", actionType, taskIndex, ref count), entity.Rating);
 						break;
-					case ProductionProductReviewColumnNames.Comments:
+					case ProductionProductReviewFieldNames.Comments:
 						parms.Add(GetParamName("Comments", actionType, taskIndex, ref count), entity.Comments);
 						break;
-					case ProductionProductReviewColumnNames.ModifiedDate:
+					case ProductionProductReviewFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -86,7 +89,7 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_ProductReview_Product_ProductID
 			var productionProduct266 = GetProductionProductWriter();
-		if ((_cascades.Contains(ProductionProductReviewCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(ProductionProductReviewCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct266, entity.ProductionProduct, context))
 				WithParent(productionProduct266, entity);
 
@@ -100,7 +103,7 @@ namespace Dapper.Accelr8.AW2008Writers
 				
 			//From Foreign Key FK_ProductReview_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.ProductionProductReview = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 		}
 

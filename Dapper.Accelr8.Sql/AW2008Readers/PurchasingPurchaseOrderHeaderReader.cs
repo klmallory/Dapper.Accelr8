@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 3
-		static IEntityReader<int , PurchasingPurchaseOrderDetail> _purchasingPurchaseOrderDetailReader;
-		protected static IEntityReader<int , PurchasingPurchaseOrderDetail> GetPurchasingPurchaseOrderDetailReader()
+				//Is CompoundKey True
+		protected static IEntityReader<CompoundKey , PurchasingPurchaseOrderDetail> GetPurchasingPurchaseOrderDetailReader()
 		{
-			return _locator.Resolve<IEntityReader<int , PurchasingPurchaseOrderDetail>>();
+			return s_loc8r.GetReader<CompoundKey , PurchasingPurchaseOrderDetail>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenPurchasingPurchaseOrderDetails(IList<PurchasingPurchaseOrderHeader> results, IList<object> children)
 		{
-			//Child Id Type: int
+			//Child Id Type: CompoundKey
 			//Child Type: PurchasingPurchaseOrderDetail
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.PurchasingPurchaseOrderDetails = typedChildren.Where(b => b.PurchasingPurchaseOrderDetail == r.Id).ToList();
+				
+
+				r.PurchasingPurchaseOrderDetails = typedChildren.Where(b =>  b.PurchaseOrderID == r.Id ).ToList();
 				r.PurchasingPurchaseOrderDetails.ToList().ForEach(b => { b.Loaded = false; b.PurchasingPurchaseOrderHeader = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new PurchasingPurchaseOrderHeader();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<int>(dataRow, IdColumn);
-				domain.RevisionNumber = GetRowData<byte>(dataRow, "RevisionNumber"); 
+			domain.Id = GetRowData<int>(dataRow, "PurchaseOrderID"); 
+      		domain.RevisionNumber = GetRowData<byte>(dataRow, "RevisionNumber"); 
       		domain.Status = GetRowData<byte>(dataRow, "Status"); 
       		domain.EmployeeID = GetRowData<int>(dataRow, "EmployeeID"); 
       		domain.VendorID = GetRowData<int>(dataRow, "VendorID"); 
@@ -100,15 +108,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<int, PurchasingPurchaseOrderHeader></param>
 		/// <param name="id">int</param>
-        public override IEntityReader<int, PurchasingPurchaseOrderHeader> WithAllChildrenForId(int id)
+        public override IEntityReader<int, PurchasingPurchaseOrderHeader> WithAllChildrenForExisting(PurchasingPurchaseOrderHeader existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetPurchasingPurchaseOrderDetailReader(), id, IdColumn, SetChildrenPurchasingPurchaseOrderDetails);
+						WithChildForParentValues(GetPurchasingPurchaseOrderDetailReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "PurchaseOrderID",  }
+				, SetChildrenPurchasingPurchaseOrderDetails);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(PurchasingPurchaseOrderHeader entity)
         {
@@ -117,11 +126,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetPurchasingPurchaseOrderDetailReader(), entity.Id
-				, PurchasingPurchaseOrderDetailColumnNames.PurchaseOrderID.ToString()
+						WithChildForParentValues(GetPurchasingPurchaseOrderDetailReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "PurchaseOrderID",  }
 				, SetChildrenPurchasingPurchaseOrderDetails);
 
-			QueryResultForChildrenOnly(new List<PurchasingPurchaseOrderHeader>() { entity });
+			
+QueryResultForChildrenOnly(new List<PurchasingPurchaseOrderHeader>() { entity });
 			entity.Loaded = false;
 			GetPurchasingPurchaseOrderDetailReader().SetAllChildrenForExisting(entity.PurchasingPurchaseOrderDetails);
 				
@@ -132,15 +143,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetPurchasingPurchaseOrderDetailReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), PurchasingPurchaseOrderDetailColumnNames.PurchaseOrderID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetPurchasingPurchaseOrderDetailReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "PurchaseOrderID",  }
 				, SetChildrenPurchasingPurchaseOrderDetails);
 
 					

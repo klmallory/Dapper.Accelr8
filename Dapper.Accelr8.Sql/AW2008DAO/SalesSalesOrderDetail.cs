@@ -8,20 +8,63 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class SalesSalesOrderDetail : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class SalesSalesOrderDetail : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public SalesSalesOrderDetail()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(SalesSalesOrderDetail dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.SalesOrderID,
+							dao.SalesOrderDetailID,
+						
+				}
+			};
+		}
+
+			
+			protected int _salesOrderID;
+		public int SalesOrderID 
+		{ 
+			get { return _salesOrderID; }
+			set 
+			{ 
+				_salesOrderID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected int _salesOrderDetailID;
+		public int SalesOrderDetailID 
+		{ 
+			get { return _salesOrderDetailID; }
+			set 
+			{ 
+				_salesOrderDetailID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected string _carrierTrackingNumber;
 		public string CarrierTrackingNumber 
@@ -118,18 +161,6 @@ namespace Dapper.Accelr8.Sql.AW2008DAO
 			set 
 			{ 
 				_modifiedDate = value;  
-				IsDirty = true;
-			}
-		} 
-		 
-	//From Foreign Key FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID	
-		protected SalesSpecialOfferProduct _salesSpecialOfferProduct;
-		public virtual SalesSpecialOfferProduct SalesSpecialOfferProduct 
-		{ 
-			get { return _salesSpecialOfferProduct; }
-			set 
-			{ 
-				_salesSpecialOfferProduct = value;  
 				IsDirty = true;
 			}
 		} 

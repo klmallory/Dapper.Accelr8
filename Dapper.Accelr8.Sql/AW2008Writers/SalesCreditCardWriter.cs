@@ -28,13 +28,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, SalesSalesOrderHeader> GetSalesSalesOrderHeaderWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesSalesOrderHeader>>(); }
+		{ return s_loc8r.GetWriter<int, SalesSalesOrderHeader>(); }
 		static IEntityWriter<int, SalesPersonCreditCard> GetSalesPersonCreditCardWriter()
-		{ return _locator.Resolve<IEntityWriter<int, SalesPersonCreditCard>>(); }
+		{ return s_loc8r.GetWriter<int, SalesPersonCreditCard>(); }
 		
 		
 		/// <summary>
@@ -48,22 +51,22 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((SalesCreditCardColumnNames)f.Key)
+                switch ((SalesCreditCardFieldNames)f.Key)
                 {
                     
-					case SalesCreditCardColumnNames.CardType:
+					case SalesCreditCardFieldNames.CardType:
 						parms.Add(GetParamName("CardType", actionType, taskIndex, ref count), entity.CardType);
 						break;
-					case SalesCreditCardColumnNames.CardNumber:
+					case SalesCreditCardFieldNames.CardNumber:
 						parms.Add(GetParamName("CardNumber", actionType, taskIndex, ref count), entity.CardNumber);
 						break;
-					case SalesCreditCardColumnNames.ExpMonth:
+					case SalesCreditCardFieldNames.ExpMonth:
 						parms.Add(GetParamName("ExpMonth", actionType, taskIndex, ref count), entity.ExpMonth);
 						break;
-					case SalesCreditCardColumnNames.ExpYear:
+					case SalesCreditCardFieldNames.ExpYear:
 						parms.Add(GetParamName("ExpYear", actionType, taskIndex, ref count), entity.ExpYear);
 						break;
-					case SalesCreditCardColumnNames.ModifiedDate:
+					case SalesCreditCardFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -80,7 +83,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID
 			var salesSalesOrderHeader64 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(SalesCreditCardCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCreditCardCascadeNames.salessalesorderheaders.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					Cascade(salesSalesOrderHeader64, item, context);
 
@@ -89,7 +92,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_PersonCreditCard_CreditCard_CreditCardID
 			var salesPersonCreditCard65 = GetSalesPersonCreditCardWriter();
-			if (_cascades.Contains(SalesCreditCardCascadeNames.sales.personcreditcard.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCreditCardCascadeNames.salespersoncreditcards.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesPersonCreditCards)
 					Cascade(salesPersonCreditCard65, item, context);
 
@@ -108,12 +111,12 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID
 			if (entity.SalesSalesOrderHeaders != null && entity.SalesSalesOrderHeaders.Count > 0)
 				foreach (var rel in entity.SalesSalesOrderHeaders)
-					rel.SalesSalesOrderHeader = entity.Id;
+					rel.CreditCardID = entity.Id;
 
 			//From Foreign Key FK_PersonCreditCard_CreditCard_CreditCardID
 			if (entity.SalesPersonCreditCards != null && entity.SalesPersonCreditCards.Count > 0)
 				foreach (var rel in entity.SalesPersonCreditCards)
-					rel.SalesPersonCreditCard = entity.Id;
+					rel.CreditCardID = entity.Id;
 
 				
 		}
@@ -122,7 +125,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_SalesOrderHeader_CreditCard_CreditCardID
 			var salesSalesOrderHeader68 = GetSalesSalesOrderHeaderWriter();
-			if (_cascades.Contains(SalesCreditCardCascadeNames.sales.salesorderheader.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCreditCardCascadeNames.salessalesorderheader.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesSalesOrderHeaders)
 					CascadeDelete(salesSalesOrderHeader68, item, context);
 
@@ -131,7 +134,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 					//From Foreign Key FK_PersonCreditCard_CreditCard_CreditCardID
 			var salesPersonCreditCard69 = GetSalesPersonCreditCardWriter();
-			if (_cascades.Contains(SalesCreditCardCascadeNames.sales.personcreditcard.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(SalesCreditCardCascadeNames.salespersoncreditcard.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.SalesPersonCreditCards)
 					CascadeDelete(salesPersonCreditCard69, item, context);
 

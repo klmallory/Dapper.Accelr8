@@ -28,16 +28,19 @@ namespace Dapper.Accelr8.AW2008Writers
 			, ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
 		{
-
+			if (s_loc8r == null)
+				s_loc8r = loc8r;
 		}
 
+		static ILoc8 s_loc8r = null;
+
 		static IEntityWriter<int, ProductionWorkOrderRouting> GetProductionWorkOrderRoutingWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionWorkOrderRouting>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionWorkOrderRouting>(); }
 		
 		static IEntityWriter<int, ProductionProduct> GetProductionProductWriter()
-		{ return _locator.Resolve<IEntityWriter<int, ProductionProduct>>(); }
+		{ return s_loc8r.GetWriter<int, ProductionProduct>(); }
 		static IEntityWriter<short, ProductionScrapReason> GetProductionScrapReasonWriter()
-		{ return _locator.Resolve<IEntityWriter<short, ProductionScrapReason>>(); }
+		{ return s_loc8r.GetWriter<short, ProductionScrapReason>(); }
 		
 		/// <summary>
 		/// Gets the Sql Parameters from the Entity and names them according to column, action, and batch task, and array count.
@@ -50,34 +53,34 @@ namespace Dapper.Accelr8.AW2008Writers
 			
 			foreach (var f in ColumnNames)
             {
-                switch ((ProductionWorkOrderColumnNames)f.Key)
+                switch ((ProductionWorkOrderFieldNames)f.Key)
                 {
                     
-					case ProductionWorkOrderColumnNames.ProductID:
+					case ProductionWorkOrderFieldNames.ProductID:
 						parms.Add(GetParamName("ProductID", actionType, taskIndex, ref count), entity.ProductID);
 						break;
-					case ProductionWorkOrderColumnNames.OrderQty:
+					case ProductionWorkOrderFieldNames.OrderQty:
 						parms.Add(GetParamName("OrderQty", actionType, taskIndex, ref count), entity.OrderQty);
 						break;
-					case ProductionWorkOrderColumnNames.StockedQty:
+					case ProductionWorkOrderFieldNames.StockedQty:
 						parms.Add(GetParamName("StockedQty", actionType, taskIndex, ref count), entity.StockedQty);
 						break;
-					case ProductionWorkOrderColumnNames.ScrappedQty:
+					case ProductionWorkOrderFieldNames.ScrappedQty:
 						parms.Add(GetParamName("ScrappedQty", actionType, taskIndex, ref count), entity.ScrappedQty);
 						break;
-					case ProductionWorkOrderColumnNames.StartDate:
+					case ProductionWorkOrderFieldNames.StartDate:
 						parms.Add(GetParamName("StartDate", actionType, taskIndex, ref count), entity.StartDate);
 						break;
-					case ProductionWorkOrderColumnNames.EndDate:
+					case ProductionWorkOrderFieldNames.EndDate:
 						parms.Add(GetParamName("EndDate", actionType, taskIndex, ref count), entity.EndDate);
 						break;
-					case ProductionWorkOrderColumnNames.DueDate:
+					case ProductionWorkOrderFieldNames.DueDate:
 						parms.Add(GetParamName("DueDate", actionType, taskIndex, ref count), entity.DueDate);
 						break;
-					case ProductionWorkOrderColumnNames.ScrapReasonID:
+					case ProductionWorkOrderFieldNames.ScrapReasonID:
 						parms.Add(GetParamName("ScrapReasonID", actionType, taskIndex, ref count), entity.ScrapReasonID);
 						break;
-					case ProductionWorkOrderColumnNames.ModifiedDate:
+					case ProductionWorkOrderFieldNames.ModifiedDate:
 						parms.Add(GetParamName("ModifiedDate", actionType, taskIndex, ref count), entity.ModifiedDate);
 						break;
 				}
@@ -94,7 +97,7 @@ namespace Dapper.Accelr8.AW2008Writers
 
 			//From Foreign Key FK_WorkOrderRouting_WorkOrder_WorkOrderID
 			var productionWorkOrderRouting431 = GetProductionWorkOrderRoutingWriter();
-			if (_cascades.Contains(ProductionWorkOrderCascadeNames.production.workorderrouting.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionWorkOrderCascadeNames.productionworkorderroutings.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionWorkOrderRoutings)
 					Cascade(productionWorkOrderRouting431, item, context);
 
@@ -105,13 +108,13 @@ namespace Dapper.Accelr8.AW2008Writers
 		
 			//From Foreign Key FK_WorkOrder_Product_ProductID
 			var productionProduct432 = GetProductionProductWriter();
-		if ((_cascades.Contains(ProductionWorkOrderCascadeNames.productionproduct.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
+		if ((_cascades.Contains(ProductionWorkOrderCascadeNames.productionproduct_p.ToString()) || _cascades.Contains("all")) && entity.ProductionProduct != null)
 			if (Cascade(productionProduct432, entity.ProductionProduct, context))
 				WithParent(productionProduct432, entity);
 
 			//From Foreign Key FK_WorkOrder_ScrapReason_ScrapReasonID
 			var productionScrapReason433 = GetProductionScrapReasonWriter();
-		if ((_cascades.Contains(ProductionWorkOrderCascadeNames.productionscrapreason.ToString()) || _cascades.Contains("all")) && entity.ProductionScrapReason != null)
+		if ((_cascades.Contains(ProductionWorkOrderCascadeNames.productionscrapreason_p.ToString()) || _cascades.Contains("all")) && entity.ProductionScrapReason != null)
 			if (Cascade(productionScrapReason433, entity.ProductionScrapReason, context))
 				WithParent(productionScrapReason433, entity);
 
@@ -125,16 +128,16 @@ namespace Dapper.Accelr8.AW2008Writers
 			//From Foreign Key FK_WorkOrderRouting_WorkOrder_WorkOrderID
 			if (entity.ProductionWorkOrderRoutings != null && entity.ProductionWorkOrderRoutings.Count > 0)
 				foreach (var rel in entity.ProductionWorkOrderRoutings)
-					rel.ProductionWorkOrderRouting = entity.Id;
+					rel.WorkOrderID = entity.Id;
 
 				
 			//From Foreign Key FK_WorkOrder_Product_ProductID
 			if (entity.ProductionProduct != null)
-				entity.ProductionWorkOrder = entity.ProductionProduct.Id;
+				entity.ProductID = entity.ProductionProduct.Id;
 
 			//From Foreign Key FK_WorkOrder_ScrapReason_ScrapReasonID
 			if (entity.ProductionScrapReason != null)
-				entity.ProductionWorkOrder = entity.ProductionScrapReason.Id;
+				entity.ScrapReasonID = entity.ProductionScrapReason.Id;
 
 		}
 
@@ -142,7 +145,7 @@ namespace Dapper.Accelr8.AW2008Writers
         {
 					//From Foreign Key FK_WorkOrderRouting_WorkOrder_WorkOrderID
 			var productionWorkOrderRouting437 = GetProductionWorkOrderRoutingWriter();
-			if (_cascades.Contains(ProductionWorkOrderCascadeNames.production.workorderrouting.ToString()) || _cascades.Contains("all"))
+			if (_cascades.Contains(ProductionWorkOrderCascadeNames.productionworkorderrouting.ToString()) || _cascades.Contains("all"))
 				foreach (var item in entity.ProductionWorkOrderRoutings)
 					CascadeDelete(productionWorkOrderRouting437, item, context);
 

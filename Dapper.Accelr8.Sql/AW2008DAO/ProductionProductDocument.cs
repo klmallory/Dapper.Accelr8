@@ -8,20 +8,63 @@ using System.Text;
 
 using Dapper.Accelr8.Sql.AW2008DAO;
 using Dapper;
+using Dapper.Accelr8.Repo;
 using Dapper.Accelr8.Domain;
 using System.Data.SqlTypes;
 
 namespace Dapper.Accelr8.Sql.AW2008DAO
 {
-	public partial class ProductionProductDocument : Dapper.Accelr8.Repo.Domain.BaseEntity<int>
+	public class ProductionProductDocument : Dapper.Accelr8.Repo.Domain.BaseEntity<CompoundKey>
 	{
 			public ProductionProductDocument()
-		{			
+		{
+					Id = new CompoundKey();
+							
 			IsDirty = false; 
 			_modifiedDate = (DateTime)SqlDateTime.MinValue;
 		}
 
 
+	 
+		public static CompoundKey GetCompoundKeyFor(ProductionProductDocument dao)
+		{
+			return new CompoundKey()
+			{
+				Keys = new IComparable[]
+				{ 		dao.ProductID,
+							dao.DocumentNode,
+						
+				}
+			};
+		}
+
+			
+			protected int _productID;
+		public int ProductID 
+		{ 
+			get { return _productID; }
+			set 
+			{ 
+				_productID = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+			
+			protected Microsoft.SqlServer.Types.SqlHierarchyId _documentNode;
+		public Microsoft.SqlServer.Types.SqlHierarchyId DocumentNode 
+		{ 
+			get { return _documentNode; }
+			set 
+			{ 
+				_documentNode = value;
+				this.Id = GetCompoundKeyFor(this);
+
+								IsDirty = true;
+							}
+		}
+		
 		
 		protected DateTime _modifiedDate;
 		public DateTime ModifiedDate 

@@ -27,14 +27,19 @@ namespace Dapper.Accelr8.AW2008Readers
             , JoinBuilder joinBuilder
             , ILoc8 loc8r) 
             : base(tableInfo, connectionStringName, executer, queryBuilder, joinBuilder, loc8r)
-        { }
+        {
+			if (s_loc8r == null)
+				s_loc8r = loc8r;		 
+		}
+
+		static ILoc8 s_loc8r = null;
 
 		//Child Count 1
 		//Parent Count 0
-		static IEntityReader<int , ProductionWorkOrder> _productionWorkOrderReader;
+				//Is CompoundKey False
 		protected static IEntityReader<int , ProductionWorkOrder> GetProductionWorkOrderReader()
 		{
-			return _locator.Resolve<IEntityReader<int , ProductionWorkOrder>>();
+			return s_loc8r.GetReader<int , ProductionWorkOrder>();
 		}
 
 		
@@ -46,7 +51,7 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// <param name="children"></param>
 		public void SetChildrenProductionWorkOrders(IList<ProductionScrapReason> results, IList<object> children)
 		{
-			//Child Id Type: short
+			//Child Id Type: int
 			//Child Type: ProductionWorkOrder
 
 			if (results == null || results.Count < 1 || children == null || children.Count < 1)
@@ -59,8 +64,11 @@ namespace Dapper.Accelr8.AW2008Readers
 				if (r == null)
 					continue;
 				r.Loaded = false;
-				r.ProductionWorkOrders = typedChildren.Where(b => b.ProductionWorkOrder == r.Id).ToList();
+				
+
+				r.ProductionWorkOrders = typedChildren.Where(b =>  b.ScrapReasonID == r.Id ).ToList();
 				r.ProductionWorkOrders.ToList().ForEach(b => { b.Loaded = false; b.ProductionScrapReason = r; b.Loaded = true; });
+				
 				r.Loaded = true;
 			}
 		}
@@ -76,8 +84,8 @@ namespace Dapper.Accelr8.AW2008Readers
             var domain = new ProductionScrapReason();
 			domain.Loaded = false;
 
-			domain.Id = GetRowData<short>(dataRow, IdColumn);
-				domain.Name = GetRowData<object>(dataRow, "Name"); 
+			domain.Id = GetRowData<short>(dataRow, "ScrapReasonID"); 
+      		domain.Name = GetRowData<object>(dataRow, "Name"); 
       		domain.ModifiedDate = GetRowData<DateTime>(dataRow, "ModifiedDate"); 
       			
 			domain.IsDirty = false;
@@ -90,15 +98,16 @@ namespace Dapper.Accelr8.AW2008Readers
 		/// </summary>
 		/// <param name="results">IEntityReader<short, ProductionScrapReason></param>
 		/// <param name="id">short</param>
-        public override IEntityReader<short, ProductionScrapReason> WithAllChildrenForId(short id)
+        public override IEntityReader<short, ProductionScrapReason> WithAllChildrenForExisting(ProductionScrapReason existing)
         {
-			base.WithAllChildrenForId(id);
-
-			
-			WithChildForParentId(GetProductionWorkOrderReader(), id, IdColumn, SetChildrenProductionWorkOrders);
+						WithChildForParentValues(GetProductionWorkOrderReader()
+				, new object[] {  existing.Id,  } 
+				, new string[] {  "ScrapReasonID",  }
+				, SetChildrenProductionWorkOrders);
 			
             return this;
         }
+
 
         public override void SetAllChildrenForExisting(ProductionScrapReason entity)
         {
@@ -107,11 +116,13 @@ namespace Dapper.Accelr8.AW2008Readers
             if (entity == null)
                 return;
 
-			WithChildForParentId(GetProductionWorkOrderReader(), entity.Id
-				, ProductionWorkOrderColumnNames.ScrapReasonID.ToString()
+						WithChildForParentValues(GetProductionWorkOrderReader()
+				, new object[] {  entity.Id,  } 
+				, new string[] {  "ScrapReasonID",  }
 				, SetChildrenProductionWorkOrders);
 
-			QueryResultForChildrenOnly(new List<ProductionScrapReason>() { entity });
+			
+QueryResultForChildrenOnly(new List<ProductionScrapReason>() { entity });
 			entity.Loaded = false;
 			GetProductionWorkOrderReader().SetAllChildrenForExisting(entity.ProductionWorkOrders);
 				
@@ -122,15 +133,17 @@ namespace Dapper.Accelr8.AW2008Readers
         {
 			ClearAllQueries();
 
-			entities = entities.Where(e => e != null).ToList();
-
             if (entities == null || entities.Count < 1)
                 return;
 
-			WithChildForParentIds(GetProductionWorkOrderReader()
-				, entities
-				.Select(s => s.Id)
-				.ToArray(), ProductionWorkOrderColumnNames.ScrapReasonID.ToString()
+			entities = entities.Where(e => e != null).ToList();
+
+            if (entities.Count < 1)
+                return;
+
+			WithChildForParentsValues(GetProductionWorkOrderReader()
+				, entities.Select(s => new object[] {  s.Id,  }).ToList() 
+				, new string[] {  "ScrapReasonID",  }
 				, SetChildrenProductionWorkOrders);
 
 					

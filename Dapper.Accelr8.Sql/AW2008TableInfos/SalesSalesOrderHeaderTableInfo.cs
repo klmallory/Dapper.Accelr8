@@ -18,9 +18,9 @@ using Dapper.Accelr8.Repo.Contracts;
 
 namespace Dapper.Accelr8.AW2008TableInfos
 {
-	public enum SalesSalesOrderHeaderColumnNames
+	public enum SalesSalesOrderHeaderFieldNames
 	{	
-		SalesOrderID, 	
+		Id, 	
 		RevisionNumber, 	
 		OrderDate, 	
 		DueDate, 	
@@ -50,10 +50,11 @@ namespace Dapper.Accelr8.AW2008TableInfos
 
 	public enum SalesSalesOrderHeaderCascadeNames
 	{	
-		salessalesorderdetail, 	
-		salessalesorderheadersalesreason, 	
+		salessalesorderdetails, 	
+		salessalesorderheadersalesreasons, 	
 		
-		personaddress_p, 	
+		personaddress1_p, 	
+		personaddress2_p, 	
 		salescreditcard_p, 	
 		salescurrencyrate_p, 	
 		salescustomer_p, 	
@@ -62,22 +63,61 @@ namespace Dapper.Accelr8.AW2008TableInfos
 		purchasingshipmethod_p, 	}
 
 	public class SalesSalesOrderHeaderTableInfo : Dapper.Accelr8.Sql.TableInfo
-	{
+	{	
+	
+		public static readonly IDictionary<int, string> SalesSalesOrderHeaderColumnNames 
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesOrderHeaderFieldNames.Id, "SalesOrderID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.RevisionNumber, "RevisionNumber" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.OrderDate, "OrderDate" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.DueDate, "DueDate" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.ShipDate, "ShipDate" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.Status, "Status" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.OnlineOrderFlag, "OnlineOrderFlag" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.SalesOrderNumber, "SalesOrderNumber" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.PurchaseOrderNumber, "PurchaseOrderNumber" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.AccountNumber, "AccountNumber" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.CustomerID, "CustomerID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.SalesPersonID, "SalesPersonID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.TerritoryID, "TerritoryID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.BillToAddressID, "BillToAddressID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.ShipToAddressID, "ShipToAddressID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.ShipMethodID, "ShipMethodID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.CreditCardID, "CreditCardID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.CreditCardApprovalCode, "CreditCardApprovalCode" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.CurrencyRateID, "CurrencyRateID" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.SubTotal, "SubTotal" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.TaxAmt, "TaxAmt" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.Freight, "Freight" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.TotalDue, "TotalDue" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.Comment, "Comment" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.rowguid, "rowguid" }, 
+						{ (int)SalesSalesOrderHeaderFieldNames.ModifiedDate, "ModifiedDate" }, 
+				};	
+
+		public static readonly IDictionary<int, string> SalesSalesOrderHeaderIdColumnNames
+		= new Dictionary<int, string>()
+		{
+					{ (int)SalesSalesOrderHeaderFieldNames.Id, "SalesOrderID" }, 
+				};
+
 		public SalesSalesOrderHeaderTableInfo(ILoc8 loc8r) : base(loc8r)
 		{
+			int c = 0;
 			UniqueId = true;
-			IdColumn = SalesSalesOrderHeaderColumnNames.SalesOrderID.ToString();
-			//Schema = "Sales.SalesOrderHeader";
+			Schema = "Sales";
 			TableName = "Sales.SalesOrderHeader";
 			TableAlias = "salessalesorderheader";
-			ColumnNames = typeof(SalesSalesOrderHeaderColumnNames).ToDataList<Type, int>();
+			Columns = SalesSalesOrderHeaderColumnNames;
+			IdColumns = SalesSalesOrderHeaderIdColumnNames;
 
 			Joins = new JoinInfo[] {
 						//For Key FK_SalesOrderHeader_Address_BillToAddressID
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<int, PersonAddress>("PersonAddress")),
 			TableName = "Person.Address",
-			Alias = TableAlias + "_" + "PersonAddress",
+			Alias = TableAlias + "_" + "PersonAddress1",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -90,7 +130,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.AddressID == null || row.AddressID == default(int))
 						return st;
 
-					st.PersonAddress = reader.LoadEntityObject(row);
+					st.PersonAddress1 = reader.LoadEntityObject(row);
 
 					return st;
 				},
@@ -110,7 +150,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 			new JoinInfo() {
 			Reader = new Func<IEntityReader>(() => Loc8r.GetReader<int, PersonAddress>("PersonAddress")),
 			TableName = "Person.Address",
-			Alias = TableAlias + "_" + "PersonAddress",
+			Alias = TableAlias + "_" + "PersonAddress2",
 			Outer = false,
 			Load = (entity, row) =>
 				{ 
@@ -123,7 +163,7 @@ namespace Dapper.Accelr8.AW2008TableInfos
 					if (row.AddressID == null || row.AddressID == default(int))
 						return st;
 
-					st.PersonAddress = reader.LoadEntityObject(row);
+					st.PersonAddress2 = reader.LoadEntityObject(row);
 
 					return st;
 				},
