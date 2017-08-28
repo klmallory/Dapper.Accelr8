@@ -1,5 +1,5 @@
 # Dapper.Accelr8
-A Dapper Based Data Access Framework with Templating, I've included templates with some pieces from 
+A Dapper Based Data Access Framework with Templating, I've included templates with some pieces from
 SubSonic, and Peta Poco;
 Also https://www.nuget.org/packages/T4,
 And Damien G's output template https://damieng.com/blog/2009/11/06/multiple-outputs-from-t4-made-easy-revisited
@@ -11,22 +11,22 @@ Currently I only support SQL Server 2008, 2012 and above. Technically I can't se
 ## How to install
 
 For single project data access layer run this command using the nuget command line tool in your data access project:
-Install-Package Dapper.Accelr8.Sql 
+Install-Package Dapper.Accelr8.Sql
 
 It will automatically include these references:
   Dapper
-  Dapper.Accelr8.Repo 
+  Dapper.Accelr8.Repo
   Dapper.Accelr8.Domain
-  
+
 For distributed projects run these commands:
 Run Install-Package Dapper.Accelr8.Sql in your SQL layer.
 Remove the binary references to:
-Dapper.Accelr8.Repo 
+Dapper.Accelr8.Repo
 Dapper.Accelr8.Domain
 
 Run Install-Package Dapper.Accelr8.Repo.Src in your repo project.
 
-Remove binary references to 
+Remove binary references to
 Dapper.Accelr8.Domain
 
 Run Install-Package Dapper.Accelr8.Domain.Src in your domain project.
@@ -40,9 +40,9 @@ Open the schema.ttinclude
 Edit these variable to set the location of your output files for the templates.
 
 Keep CacheLocatorResults set to false.
-		
+
 UseDirtyProperties adds dirty property tracking to your domain templates.
-```	
+```
 UseDirtyProperties = true;
 ```
 
@@ -80,7 +80,7 @@ static string _database = @"AdventureWorks";
 These dictionaries hold name transformations..
 ```
 static Dictionary<string, string> tableNames = new Dictionary<string, string>()
-{ 
+{
 	{ "Order Details", "OrderDetails"}
 };
 ```
@@ -117,7 +117,7 @@ To Ignore Tables see this comment:
 ```
 
 And add C# code to ignore the tables you want.
-``` 
+```
 tables["Territories"].Ignore = true;
 ```
 
@@ -135,20 +135,20 @@ tables["Customers"].Columns["Fax"].Ignore = true;
 # Using Dependency Injection
 
  Dapper Accelr8 assumes, but does not require, that the user have some sort of IOC / DI already in place. Let's take a look at an example of how to wire up the three basic parts of the Dapper Accelr8or.
- 
+
  The Accelr8 interface "IAccelr8Locator" is a dependency for the classes that need to dynamically access the other parts of repository and sql builders. It's what allows a reader to get readers for child classes and parent classes.
- 
+
  This is the signature defined by the "IAccelr8Locator" interface.
- 
+
 ```
 object Resolve(Type type);
 object Resolve(Type type, string name);
 I Resolve<I>();
 I Resolve<I>(string name);
 ```
- 
+
  Here's an example of integrating it with Ninject (note that the _kernal variable represents an instance of the ninject Kernal class):
- 
+
 ```
 public virtual object Resolve(Type type)
 {
@@ -170,33 +170,33 @@ public virtual I Resolve<I>(string name)
     return _kernel.Get<I>(name);
 }
 ```
- 
+
  You will need to bind this interface before binding any of the other classes in the Dapper Accelr8or suite.
- 
+
  The DapperExecuter class will also need to be wired up, here is an example of doing so in ninject:
- 
+
  ```
  _kernel.Bind<DapperExecuter>().ToConstant<DapperExecuter>(new DapperExecuter
     (new Dictionary<string, string>(){ {"MyConnectionString", "Data Source=.\sqlexpress;Initial Catalog=NORTHWND;Integrated Security=SSPI;"));
  ```
- 
+
 ### Important
- 
+
  The "QueryBuilder" and "JoinBuilder" are self bindable and do not need explicit registrations in ninject. In other IOC / DI frameworks this may not be the case and they may need to be bound.
- 
+
 Even though this may seem like a complicated solution, remeber that IOC reduces complexity, and allows for better unit testing. For my own projects I have created a SQLLite version of the Dapper Executer, allowing for db independent unit testing off all my applications.
 
-### Registering the TableInfo Classes. 
- 
+### Registering the TableInfo Classes.
+
  This shows an example of registering a TableInfo class with ninject;
  the TableInfo class is designed to be registered staticly as to reduce processing time in creating and sorting the table data everytime a reader or writer is created.
- 
+
 ```
  _kernel.Bind<ProductTableInfo>().To<ProductTableInfo>(new ProductTableInfo(_kernel.Get<IAccelr8Locator>())).InSingletonScope();
 ```
- 
+
 ### Registering the Reader Classes.
-  
+
 ```
 _kernel.Bind<IEntityReader<int, Product>>().To<ProductReader>().WithConstructorArgument("connectionStringName", "MyConnectionString");
 ```
@@ -210,7 +210,7 @@ _kernel.Bind<IEntityWriter<int, Product>>().To<ProductWriter>().WithConstructorA
 # Using the Query Language
 
  Using the query language is simple, here is an example of pulling a user from a database / domain that has a user table. I'm using Ninject for my dependency injection so you can see how to retreive the repository.
- 
+
  ```
  var repo = _kernal.Get<IRepository<User>>();
  var user = repo.Select(new QueryElement()
@@ -220,7 +220,7 @@ _kernel.Bind<IEntityWriter<int, Product>>().To<ProductWriter>().WithConstructorA
  	Value = "User1"
  }).FirstOrDefault();
  ```
- 
+
 Here's an example of pulling the first 10 users with names that match search criteria:
 
 ```
@@ -231,8 +231,8 @@ Here's an example of pulling the first 10 users with names that match search cri
  	Value = "Billy"
  }, 0, 10);
  ```
- 
+
  the 0 indicates the amount of records to skip, and the 10 indicates the records to take. These parameters are executed in SQL.
- 
- 
- 
+
+
+ My Changes
